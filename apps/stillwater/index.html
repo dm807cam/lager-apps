@@ -486,7 +486,6 @@ async function initRemote(){
         else Object.keys(docs).forEach(id=>{if(!seen[id])dirty[id]=1});
         if(Object.keys(dirty).length){setSync("saving");flush()}else if(!partial)setSync("ok");
         if(changed){saveLocal();refresh()}
-        
       }else if(changed){saveLocal();refresh()}
     },()=>{clearTimeout(t);setSync("error")});
   }catch(e){setSync("local")}
@@ -960,4 +959,3 @@ loadLocal();render();restoreRun();initRemote();
 </script>
 </body>
 </html>
-
