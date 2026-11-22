@@ -3,7 +3,7 @@
   "slug": "byline",
   "title": "Byline",
   "description": "Cookie-free blog analytics: readers, read time, read-through, sources, trending posts and the best time to publish.",
-  "version": 1,
+  "version": 2,
   "status": "beta",
   "language": "en",
   "category": "analytics",

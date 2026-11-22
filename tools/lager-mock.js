@@ -8,6 +8,7 @@
  * Tests read and drive it through window.__lager:
  *   __lager.store       path -> data
  *   __lager.writes      every write [{op, path, data}]
+ *   __lager.reads       every query read with get() [{path, ids}]
  *   __lager.downloads   files offered through downloads.save
  *   __lager.ingest(collection, body)  add a document as if it arrived at an ingest endpoint
  *   __lager.flush()     resolves once pending snapshot listeners have run
@@ -20,7 +21,7 @@
   const cfg = window.__LAGER_CONFIG__ || {};
   const declared = cfg.capabilities || null;            // null: everything available
   const store = new Map();
-  const writes = [], downloads = [], assets = new Map();
+  const writes = [], reads = [], downloads = [], assets = new Map();
   (cfg.seed || []).forEach(d => store.set(d.path, clone(d.data)));
   const subs = new Set();
   let pending = null;
@@ -92,7 +93,7 @@
       where(f, op, v) { if (!OPS[op]) throw new TypeError("Unknown operator " + op); return query(path, wh.concat([[f, op, v]]), ob, lim); },
       orderBy(f, dir) { return query(path, wh, ob.concat([[f, dir || "asc"]]), lim); },
       limit(n) { return query(path, wh, ob, n); },
-      async get() { if (failing("get", path)) throw err("unavailable", "Network error (test)"); return run(); },
+      async get() { if (failing("get", path)) throw err("unavailable", "Network error (test)"); const r = run(); reads.push({ path, ids: r.docs.map(d => d.id) }); return r; },
       onSnapshot(next, error) {
         let last = null;
         const f = () => { if (failing("snapshot", path)) return; const s = run(); const sig = JSON.stringify(s.docs.map(d => [d.id, d.data()])); if (sig === last) return; last = sig; next(s); };
@@ -149,7 +150,7 @@
     }
   };
   window.__lager = {
-    store, writes, downloads, fail: cfg.fail || [],
+    store, writes, reads, downloads, fail: cfg.fail || [],
     ingest(collection, body) { const id = Math.random().toString(36).slice(2, 14); store.set(collection + "/" + id, Object.assign(clone(body), { _receivedAt: new Date().toISOString() })); return notify(); },
     set(path, data) { store.set(path, clone(data)); return notify(); },
     flush: () => notify(),

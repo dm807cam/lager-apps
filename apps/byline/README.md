@@ -2,7 +2,7 @@
 
 Cookie-free blog analytics: readers, read time, read-through, sources, trending posts and the best time to publish.
 
-**Language:** English · **Category:** analytics · **Status:** beta · **Deployed version:** 1
+**Language:** English · **Category:** analytics · **Status:** beta · **Deployed version:** 2
 
 ## Notes
 

@@ -494,6 +494,30 @@ function flush(){if(!col)return;Object.keys(dirty).forEach(id=>{
   col.doc(id).set(clone(docs[id])).then(()=>{delete inflight[id];if(dirty[id])flush();else if(!Object.keys(inflight).length&&!Object.keys(dirty).length)setSync("ok")},
     e=>{delete inflight[id];dirty[id]=1;setSync("error");if(!e||e.code==="unavailable"){clearTimeout(flushTimer);flushTimer=setTimeout(flush,8000)}});
 })}
+/* Everything past the first 1000 documents: paged by each time field, plus the fixed ids, then each copy on this device
+   that is still not found is looked up on its own. Afterwards the newest changes are followed live. */
+const REST_FIELDS=["updatedAt","createdAt","startedAt"],REST_IDS=()=>["settings","coach"].concat(Object.values(docs).filter(d=>d&&d.kind==="plan").map(d=>"coach_"+d.id));
+const takeRemote=(id,data)=>{if(!data || id==="coachlog")return false;const mine=docs[id];if(!mine||ts(data)>ts(mine)){docs[id]=Object.assign(clone(data),id==="coach"||/^coach_/.test(id)?{id}:{});return true}if(ts(mine)>ts(data))dirty[id]=1;return false};
+async function pageBy(f){const out=new Map();let last=null;
+  for(let n=0;n<500;n++){const q=last==null?col.orderBy(f):col.where(f,">=",last).orderBy(f);const s=await q.limit(1000).get();let fresh=0;
+    s.docs.forEach(d=>{if(!out.has(d.id)){out.set(d.id,d.data());fresh++}});
+    if(s.size<1000||!fresh)break;const nl=s.docs[s.docs.length-1].data()[f];if(nl==null||nl===last)break;last=nl}
+  return out}
+async function loadRest(seen,tries=0){
+  try{
+    const all=new Map();
+    for(const f of REST_FIELDS)(await pageBy(f)).forEach((v,k)=>all.set(k,v));
+    let changed=false;
+    all.forEach((data,id)=>{seen[id]=1;if(takeRemote(id,data))changed=true});
+    for(const id of REST_IDS())if(!seen[id]){const s=await col.doc(id).get();seen[id]=1;if(s.exists&&takeRemote(id,s.data()))changed=true}
+    for(const id of Object.keys(docs))if(!seen[id]){const s=await col.doc(id).get();seen[id]=1;
+      if(!s.exists)dirty[id]=1;else if(takeRemote(id,s.data()))changed=true}
+    partial=false;
+    col.orderBy("updatedAt","desc").limit(200).onSnapshot(s=>{let c=false;s.docs.forEach(d=>{const data=d.data(),mine=docs[d.id];if(data&&(!mine||ts(data)>ts(mine))&&takeRemote(d.id,data))c=true});if(c){saveLocal();if(!curS())pickCur();refresh()}},()=>{});
+    saveLocal();if(!curS())pickCur();refresh();maybeAuto();
+    if(Object.keys(dirty).length){setSync("saving");flush()}else if(!Object.keys(inflight).length)setSync("ok");
+  }catch(e){setTimeout(()=>loadRest(seen,tries+1),Math.min(60000,5000*(tries+1)))}
+}
 async function initRemote(){
   if(!R||!R.use){setSync("local");maybeAuto();return}
   try{
@@ -505,19 +529,18 @@ async function initRemote(){
     const t=setTimeout(()=>{if(sync==="loading")setSync("slow")},10000);
     col.limit(1000).onSnapshot(snap=>{
       clearTimeout(t);let changed=false;const seen={};
-      snap.docs.forEach(d=>{const data=d.data();if(!data||d.id==="coachlog")return;seen[d.id]=1;
-        const mine=docs[d.id];
-        if(!mine||ts(data)>ts(mine)){docs[d.id]=Object.assign(clone(data),d.id==="coach"||/^coach_/.test(d.id)?{id:d.id}:{});changed=true}
-        else if(firstSnap&&ts(mine)>ts(data))dirty[d.id]=1});
-      /* A query returns at most 1000 documents. Below that, a document missing from the snapshot is not stored yet;
-         at the cap it may be stored and newer than this copy, so it is looked up before this copy is sent. */
-      partial=snap.size>=1000;
-      if(firstSnap){Object.keys(docs).forEach(id=>{if(seen[id])return;if(!partial){dirty[id]=1;return}
-          col.doc(id).get().then(s=>{const data=s.exists?s.data():null;
-            if(!data||ts(docs[id])>ts(data)){dirty[id]=1;flush()}else if(ts(data)>ts(docs[id])){docs[id]=Object.assign(clone(data),id==="coach"||/^coach_/.test(id)?{id}:{});saveLocal();refresh()}},()=>{})});firstSnap=false;
-        if(Object.keys(dirty).length){setSync("saving");flush()}else setSync("ok");
+      snap.docs.forEach(d=>{const id=d.id,data=d.data();if(!data||id==="coachlog")return;seen[id]=1;
+        const mine=docs[id];
+        if(!mine||ts(data)>ts(mine)){docs[id]=Object.assign(clone(data),id==="coach"||/^coach_/.test(id)?{id}:{});changed=true}
+        else if(firstSnap&&ts(mine)>ts(data))dirty[id]=1});
+      if(firstSnap){firstSnap=false;
+        /* A query returns at most 1000 documents. Below that this is everything, and a copy missing here is new.
+           At the cap the rest is read page by page first; until then nothing missing is sent or treated as deleted. */
+        if(snap.size>=1000){partial=true;loadRest(seen)}
+        else Object.keys(docs).forEach(id=>{if(!seen[id])dirty[id]=1});
+        if(Object.keys(dirty).length){setSync("saving");flush()}else if(!partial)setSync("ok");
         if(changed){saveLocal();if(!curS())pickCur();refresh()}
-        maybeAuto();
+        if(!partial)maybeAuto();
       }else if(changed){saveLocal();if(!curS())pickCur();refresh()}
     },()=>{clearTimeout(t);setSync("error");maybeAuto()});
   }catch(e){setSync("local");maybeAuto()}

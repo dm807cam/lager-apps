@@ -47,12 +47,24 @@ test.describe("Habit Tracker bridge", () => {
     expect(sent(ingested)[1].events).toEqual([{ op: "delete", id: victim.data.id }]);
   });
 
-  test("sends no deletes while the snapshot is capped at 1000 documents", async ({ openApp }) => {
+  test("sends no deletes while only the first 1000 documents could be read", async ({ openApp }) => {
     const seed = workouts(1005).concat([{ path: `data/users/${UID}/bridge/habit-tracker/state`, data: { sent: { s_gone: "x" }, full: Date.now(), at: Date.now() } }]);
-    const { ingested } = await openApp("workout-tracker", { seed, waitFor: 0 });
+    const { ingested } = await openApp("workout-tracker", { seed, waitFor: 0, fail: [{ op: "get", path: `^data/users/${UID}$` }] });
     await expect.poll(() => sent(ingested).length, { timeout: 15000 }).toBeGreaterThan(0);
     await new Promise(r => setTimeout(r, 1500));
     const events = sent(ingested).flatMap(b => b.events);
     expect(events.filter(e => e.op === "delete")).toEqual([]);
+  });
+
+  test("reads the whole history past 1000 documents on a new device", async ({ openApp }) => {
+    const seed = workouts(1205).concat([{ path: `data/users/${UID}/bridge/habit-tracker/state`, data: { sent: { s_gone: "x" }, full: Date.now(), at: Date.now() } }]);
+    const { ingested, page } = await openApp("workout-tracker", { seed, waitFor: 0 });
+    const ids = () => new Set(sent(ingested).flatMap(b => b.events).filter(e => e.op === "upsert").map(e => e.id));
+    await expect.poll(() => ids().size, { timeout: 30000 }).toBe(1205);
+    // Only now is the list complete, so the stale entry is removed.
+    await expect.poll(() => sent(ingested).flatMap(b => b.events).filter(e => e.op === "delete").map(e => e.id), { timeout: 15000 }).toEqual(["s_gone"]);
+    // Nothing the device did not change is written back.
+    const writes = await page.evaluate(() => window.__lager.writes.filter(x => x.op === "set" && /\/s_/.test(x.path)).length);
+    expect(writes).toBe(0);
   });
 });

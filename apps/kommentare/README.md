@@ -2,7 +2,7 @@
 
 Einbettbares Kommentarsystem mit verschachtelten Antworten, Daumen hoch/runter, Moderation und Site-Auswahl für mehrere Websites.
 
-**Language:** German · **Category:** publishing · **Status:** stable · **Deployed version:** 4
+**Language:** German · **Category:** publishing · **Status:** stable · **Deployed version:** 5
 
 ## Notes
 

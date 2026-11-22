@@ -3,7 +3,7 @@
   "slug": "kommentare",
   "title": "Kommentare",
   "description": "Einbettbares Kommentarsystem mit verschachtelten Antworten, Daumen hoch/runter, Moderation und Site-Auswahl für mehrere Websites.",
-  "version": 4,
+  "version": 5,
   "language": "de",
   "category": "publishing",
   "themeColor": "#2f5bea",

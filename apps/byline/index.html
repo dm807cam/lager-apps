@@ -600,7 +600,17 @@ const chunkCache = new Map(); // doc id -> {updatedAt, events}
 async function loadChunks(siteId, from, to) {
   const a = utcDay(from - 14 * 36e5), b = utcDay(to + 14 * 36e5);
   let docs;
-  try { docs = (await db.collection("chunks").where("site", "==", siteId).where("day", ">=", a).where("day", "<=", b).get()).docs; }
+  // A query returns at most 1000 day files, so a long range is read page by page.
+  try {
+    const seen = new Map(); let from = a;
+    for (let n = 0; n < 200; n++) {
+      const snap = await db.collection("chunks").where("site", "==", siteId).where("day", ">=", from).where("day", "<=", b).orderBy("day").limit(1000).get();
+      let fresh = 0; for (const d of snap.docs) if (!seen.has(d.id)) { seen.set(d.id, d); fresh++; }
+      if (snap.size < 1000 || !fresh) break;
+      const last = snap.docs[snap.docs.length - 1].data().day; if (!last || last === from) break; from = last;
+    }
+    docs = [...seen.values()];
+  }
   catch (e) { docs = (await db.collection("chunks").where("site", "==", siteId).get()).docs.filter((d) => { const x = d.data(); return x.day >= a && x.day <= b; }); }
   const out = [];
   // Stored documents come back frozen; analysis annotates events, so it works on copies.
@@ -1111,11 +1121,20 @@ function editSite(id) {
     try {
       await db.doc("sites/" + x.id).delete();
       if (!x.demo) await syncOrigins(S.sites.filter((o) => o.id !== x.id));
-      const snap = await db.collection("chunks").where("site", "==", x.id).get(); let bytes = 0;
-      for (const c of snap.docs) { bytes += c.data().bytes || 0; await db.doc("chunks/" + c.id).delete(); }
+      const { bytes } = await deleteChunks(db.collection("chunks").where("site", "==", x.id));
       await bumpBytes(-bytes); if (S.siteId === x.id) S.siteId = null; d.close();
     } catch (e) { toast(e.message || "Couldn’t delete"); }
   };
+}
+// Deletes every day file a query matches, in rounds, since one query returns at most 1000. Resolves {count, bytes}.
+async function deleteChunks(q) {
+  let count = 0, bytes = 0;
+  for (let n = 0; n < 1000; n++) {
+    const snap = await q.limit(500).get(); if (snap.empty) break;
+    for (const c of snap.docs) { bytes += c.data().bytes || 0; await db.doc("chunks/" + c.id).delete(); count++; }
+    if (snap.size < 500) break;
+  }
+  return { count, bytes };
 }
 async function bumpBytes(delta) { try { const cur = ((await db.doc("settings/main").get()).data() || {}).bytes || 0; await db.doc("settings/main").update({ bytes: Math.max(0, cur + delta) }); } catch (e) {} }
 
@@ -1138,9 +1157,8 @@ function exportPages() {
 async function prune() {
   const days = +$("#pruneSel").value; const s = site(); const cut = utcDay(Date.now() - days * DAY);
   if (!confirm(`Delete ${s.name}’s raw data from before ${cut}?`)) return;
-  const snap = await db.collection("chunks").where("site", "==", s.id).where("day", "<", cut).get(); let bytes = 0;
-  for (const c of snap.docs) { bytes += c.data().bytes || 0; await db.doc("chunks/" + c.id).delete(); }
-  await bumpBytes(-bytes); toast(`Deleted ${snap.size} day files`); $("#dlg").close();
+  const { count, bytes } = await deleteChunks(db.collection("chunks").where("site", "==", s.id).where("day", "<", cut));
+  await bumpBytes(-bytes); toast(`Deleted ${count} day files`); $("#dlg").close();
 }
 
 // ---------- receiving: turning hits into statistics ----------
