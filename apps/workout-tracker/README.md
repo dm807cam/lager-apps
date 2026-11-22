@@ -2,7 +2,7 @@
 
 Workout tracker: plans, custom exercises, workouts from a plan or on the go, records, charts, a yearly heatmap and an AI coach.
 
-**Language:** English · **Category:** health · **Status:** stable · **Deployed version:** 3
+**Language:** English · **Category:** health · **Status:** stable · **Deployed version:** 4
 
 ## Notes
 
