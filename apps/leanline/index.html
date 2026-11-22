@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leanline</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f2f1ee;
+    --surface: #ffffff;
+    --surface-2: #f3f2ef;
+    --surface-3: #e9e8e4;
+    --border: rgba(0,0,0,.06);
+    --text: #0b0b0b;
+    --text-2: #52514e;
+    --text-3: #8a8984;
+    --grid: #eeede9;
+    --w: #2a78d6;            /* weight series */
+    --f: #eb6834;            /* body fat series */
+    --good: #0b7a3e;
+    --good-bg: rgba(11,122,62,.09);
+    --bad: #c23a39;
+    --ideal-band: rgba(27,175,122,.13);
+    --ideal-band-2: rgba(27,175,122,.06);
+    --band-1: rgba(0,0,0,.018);
+    --band-2: rgba(0,0,0,.04);
+    --band-3: rgba(0,0,0,.065);
+    --seg-ideal: #1baf7a;
+    --seg-near: #9bd9bf;
+    --seg-1: #dedcd6;
+    --seg-2: #cac8c1;
+    --seg-3: #b3b1aa;
+    --btn: #0b4a3e;
+    --btn-ink: #ffffff;
+    --shadow: 0 1px 1px rgba(0,0,0,.03), 0 6px 20px rgba(20,20,10,.06);
+    --radius: 22px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0c0c0b;
+      --surface: #171716;
+      --surface-2: #212120;
+      --surface-3: #2a2a28;
+      --border: rgba(255,255,255,.06);
+      --text: #f3f2ef;
+      --text-2: #c3c2b7;
+      --text-3: #8f8e86;
+      --grid: #232321;
+      --w: #3987e5;
+      --f: #e5703e;
+      --good: #4cc27e;
+      --good-bg: rgba(76,194,126,.12);
+      --bad: #e66767;
+      --ideal-band: rgba(27,175,122,.16);
+      --ideal-band-2: rgba(27,175,122,.07);
+      --band-1: rgba(255,255,255,.015);
+      --band-2: rgba(255,255,255,.035);
+      --band-3: rgba(255,255,255,.06);
+      --seg-ideal: #199e70;
+      --seg-near: #1d5c46;
+      --seg-1: #393936;
+      --seg-2: #4a4a46;
+      --seg-3: #5c5c57;
+      --btn: #199e70;
+      --btn-ink: #ffffff;
+      --shadow: 0 1px 1px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  button, input, select { font: inherit; color: inherit; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .num { font-variant-numeric: tabular-nums; }
+  .stack { display: grid; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 4px 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 20px; }
+  .brand svg { width: 32px; height: 32px; border-radius: 9px; box-shadow: 0 2px 8px rgba(11,74,62,.35); }
+  .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); display: grid; place-items: center; cursor: pointer; color: var(--text-2); }
+  .icon-btn svg { width: 19px; height: 19px; }
+
+  /* hero */
+  .hero {
+    position: relative; overflow: hidden; color: #fff; border: 0; padding: 22px 20px 18px; display: grid; gap: 18px;
+    background:
+      radial-gradient(110% 90% at 100% 0%, rgba(80,220,170,.38) 0%, rgba(80,220,170,0) 60%),
+      radial-gradient(80% 80% at 0% 100%, rgba(57,135,229,.25) 0%, rgba(57,135,229,0) 60%),
+      linear-gradient(160deg, #0f6b58 0%, #0b4a3e 55%, #08332b 100%);
+    box-shadow: 0 14px 34px rgba(8,51,43,.28);
+  }
+  .hero-rings { position: absolute; right: -50px; top: -60px; width: 230px; height: 230px; opacity: .16; pointer-events: none; }
+  .hero > *:not(.hero-rings) { position: relative; }
+  .hero-label { color: rgba(255,255,255,.7); font-size: 13px; font-weight: 500; }
+  .hero-value { font-size: clamp(44px, 13vw, 60px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; margin-top: 4px; display: flex; align-items: baseline; gap: 8px; }
+  .hero-value .u { font-size: .38em; font-weight: 600; color: rgba(255,255,255,.65); letter-spacing: 0; }
+  .hero-sub { color: rgba(255,255,255,.8); font-size: 14px; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 650; background: rgba(255,255,255,.14); }
+  .chip.ideal { background: rgba(132,232,174,.22); color: #b4f3cd; }
+  .chip .d { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+  .stat .k { color: rgba(255,255,255,.6); font-size: 11.5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+  .stat .v { font-weight: 650; font-size: 18px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat .v small { font-weight: 500; font-size: 12px; color: rgba(255,255,255,.62); }
+  .stat .z { font-size: 12px; color: rgba(255,255,255,.62); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat .z.ideal { color: #9ff0c2; }
+  .hero-cta { justify-self: start; background: #fff; color: #0b4a3e; border: 0; border-radius: 999px; padding: 12px 20px; font-weight: 700; cursor: pointer; }
+
+  /* segmented control */
+  .seg { display: flex; gap: 2px; background: var(--surface-2); padding: 3px; border-radius: 12px; }
+  .seg button { flex: 1; border: 0; background: transparent; color: var(--text-2); font-size: 13px; font-weight: 550; padding: 7px 11px; border-radius: 9px; cursor: pointer; min-height: 34px; white-space: nowrap; transition: background .15s, color .15s; }
+  .seg button[aria-pressed=true] { background: var(--surface); color: var(--text); font-weight: 650; box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 0 0 .5px rgba(0,0,0,.04); }
+  @media (prefers-color-scheme: dark) { .seg button[aria-pressed=true] { background: var(--surface-3); } }
+
+  /* zones card */
+  .zones { padding: 18px 18px 16px; display: grid; gap: 18px; }
+  .card-title { font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
+  .card-sub { color: var(--text-3); font-size: 12.5px; margin-top: 1px; }
+  .gauge-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .gauge-name { font-weight: 650; font-size: 14px; }
+  .gauge-val { font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .gauge-val b { color: var(--text); font-size: 15px; }
+  .gauge { position: relative; padding-top: 26px; }
+  .bar { display: flex; gap: 2px; height: 12px; }
+  .bar span { height: 100%; }
+  .bar span:first-child { border-radius: 6px 0 0 6px; } .bar span:last-child { border-radius: 0 6px 6px 0; }
+  .pin { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; transition: left .4s cubic-bezier(.2,.9,.25,1); }
+  .pin .b { background: var(--text); color: var(--bg); font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .pin .s { width: 3px; height: 20px; background: var(--text); border-radius: 2px; margin-top: 1px; box-shadow: 0 0 0 2px var(--surface); }
+  .labels { position: relative; height: 16px; margin-top: 7px; font-size: 11px; color: var(--text-3); }
+  .labels span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .labels span.ideal { color: var(--good); font-weight: 650; }
+  .gauge-note { font-size: 13px; color: var(--text-2); margin-top: 8px; line-height: 1.45; }
+  .gauge-note b { color: var(--text); font-weight: 650; }
+  .gauge-note .ok { color: var(--good); font-weight: 650; }
+  .setup-hint { background: var(--surface-2); border-radius: 14px; padding: 14px; font-size: 13.5px; color: var(--text-2); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .setup-hint button { border: 0; background: var(--btn); color: var(--btn-ink); border-radius: 999px; padding: 9px 14px; font-weight: 650; cursor: pointer; white-space: nowrap; }
+
+  /* chart */
+  .chart-card { padding: 16px 10px 10px; }
+  .chart-head { display: grid; gap: 10px; padding: 0 8px 4px; }
+  .chart-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .chart-row .seg { flex: none; }
+  #range { width: 100%; }
+  .legend { display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; padding: 8px 8px 4px; color: var(--text-2); font-size: 12px; }
+  .legend .item { display: flex; align-items: center; gap: 7px; }
+  .legend .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--series); opacity: .55; }
+  .legend .ln { width: 16px; height: 3px; border-radius: 2px; background: var(--series); }
+  .legend .bd { width: 14px; height: 10px; border-radius: 3px; background: var(--ideal-band); box-shadow: inset 0 0 0 1px rgba(27,175,122,.35); }
+  .legend .gl { width: 16px; height: 0; border-top: 2px dashed var(--text-3); }
+  .plot { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .plot svg { display: block; width: 100%; overflow: visible; }
+  .offchart { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 8px 4px; }
+  .offchart span { font-size: 11.5px; font-weight: 650; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--text-2); }
+  .offchart .ideal { background: var(--good-bg); color: var(--good); }
+  .offchart .soft { background: transparent; color: var(--text-3); font-weight: 500; padding-left: 2px; }
+  .tick { fill: var(--text-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .band-label { font-size: 10.5px; font-weight: 600; fill: var(--text-3); letter-spacing: .02em; }
+  .band-label.ideal { fill: var(--good); }
+  .tooltip { position: absolute; pointer-events: none; background: color-mix(in srgb, var(--surface) 90%, transparent); color: var(--text); border: 1px solid var(--border); border-radius: 14px; padding: 9px 11px; font-size: 12px; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,.18); min-width: 150px; opacity: 0; transition: opacity .12s; z-index: 2; }
+  .tooltip .t-date { color: var(--text-2); margin-bottom: 4px; font-weight: 650; }
+  .tooltip .row { display: flex; justify-content: space-between; gap: 14px; line-height: 1.65; }
+  .tooltip .row .l { color: var(--text-2); }
+  .tooltip .row .r { font-weight: 650; font-variant-numeric: tabular-nums; }
+  .tooltip .zone { margin-top: 3px; font-size: 11.5px; font-weight: 650; color: var(--text-3); }
+  .tooltip .zone.ideal { color: var(--good); }
+  .empty { padding: 44px 24px; text-align: center; color: var(--text-2); }
+  .empty b { color: var(--text); display: block; font-size: 16px; margin-bottom: 4px; }
+
+  /* history */
+  .history { padding: 6px 0 4px; overflow: hidden; }
+  .history h2 { font-size: 17px; margin: 12px 18px 2px; font-weight: 700; letter-spacing: -.01em; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .history h2 small { font-size: 12.5px; font-weight: 500; color: var(--text-3); letter-spacing: 0; }
+  .day { padding: 8px 6px 2px; }
+  .day-head { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 12px 4px; font-size: 12.5px; color: var(--text-3); font-weight: 600; }
+  .day-head .avg { font-weight: 500; font-variant-numeric: tabular-nums; }
+  .history ul { list-style: none; margin: 0; padding: 0; }
+  .history li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; cursor: pointer; transition: background .15s; }
+  .history li:hover, .history li.open { background: var(--surface-2); }
+  .time { min-width: 46px; white-space: nowrap; font-size: 13px; color: var(--text-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .vals { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: baseline; min-width: 0; }
+  .val { display: inline-flex; align-items: baseline; gap: 4px; font-weight: 650; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .val i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; align-self: center; }
+  .val small { font-size: 12px; font-weight: 500; color: var(--text-3); }
+  .zone-tag { font-size: 11.5px; font-weight: 650; color: var(--text-3); white-space: nowrap; }
+  .zone-tag.ideal { color: var(--good); }
+  .del { display: none; border: 0; background: var(--bad); color: #fff; cursor: pointer; font-size: 13px; font-weight: 650; padding: 8px 14px; border-radius: 999px; min-height: 34px; }
+  .history li.open .zone-tag { display: none; }
+  .history li.open .del { display: inline-block; }
+  .more { display: block; width: calc(100% - 24px); margin: 8px 12px 10px; border: 0; border-radius: 12px; background: var(--surface-2); color: var(--text); font-weight: 600; padding: 12px; cursor: pointer; }
+  .footnote { color: var(--text-3); font-size: 12px; text-align: center; padding: 6px 18px 0; line-height: 1.5; }
+  .status { text-align: center; color: var(--text-3); padding: 40px; }
+
+  /* fab + sheets */
+  .fab { white-space: nowrap; position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 20; display: flex; align-items: center; gap: 8px; border: 0; cursor: pointer; background: var(--btn); color: var(--btn-ink); font-weight: 700; font-size: 16px; padding: 15px 26px 15px 20px; border-radius: 999px; box-shadow: 0 10px 28px rgba(11,74,62,.4), 0 2px 6px rgba(0,0,0,.15); transition: transform .15s; }
+  .fab:active { transform: translateX(-50%) scale(.96); }
+  .fab svg { width: 20px; height: 20px; }
+  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.38); opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 30; }
+  .backdrop.open { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; margin: 0 auto; max-width: 560px; max-height: 92vh; overflow-y: auto; background: var(--surface); border-radius: 26px 26px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,.2); padding: 8px 18px calc(18px + env(safe-area-inset-bottom)); transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.9,.25,1); visibility: hidden; }
+  .sheet.open { transform: translateY(0); visibility: visible; }
+  @media (min-width: 640px) {
+    .sheet { bottom: 50%; border-radius: 26px; transform: translateY(calc(50% + 30px)) scale(.98); opacity: 0; transition: transform .25s, opacity .2s; }
+    .sheet.open { transform: translateY(50%); opacity: 1; }
+  }
+  .grab { width: 38px; height: 5px; border-radius: 3px; background: var(--surface-3); margin: 2px auto 10px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .sheet-head h3 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
+  .x { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--surface-2); color: var(--text-2); cursor: pointer; display: grid; place-items: center; }
+  form { display: grid; gap: 14px; }
+  .field { display: grid; gap: 6px; min-width: 0; }
+  .field label { font-size: 12.5px; color: var(--text-3); font-weight: 550; padding-left: 4px; }
+  .field input { width: 100%; background: var(--surface-2); color: var(--text); border: 1.5px solid transparent; border-radius: 14px; padding: 13px 14px; font-size: 17px; outline: none; min-height: 52px; font-variant-numeric: tabular-nums; -webkit-appearance: none; appearance: none; }
+  .field input:focus { border-color: var(--btn); background: var(--surface); }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  .big2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .big { position: relative; }
+  .big input { font-size: 30px; font-weight: 700; letter-spacing: -.02em; padding-right: 46px; min-height: 70px; }
+  .big .u { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 15px; font-weight: 650; pointer-events: none; }
+  .big .sw { position: absolute; left: 14px; top: 10px; width: 8px; height: 8px; border-radius: 50%; }
+  button.primary { background: var(--btn); color: var(--btn-ink); border: 0; border-radius: 16px; min-height: 54px; font-size: 17px; font-weight: 700; cursor: pointer; transition: transform .1s, opacity .15s; }
+  button.primary:active { transform: scale(.98); }
+  button.primary:disabled { opacity: .5; }
+  .form-hint { color: var(--text-3); font-size: 12.5px; padding: 0 4px; min-height: 18px; line-height: 1.45; }
+  .form-hint.err { color: var(--bad); }
+  .toast { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translate(-50%, -140%); z-index: 40; background: var(--text); color: var(--bg); padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.25); transition: transform .3s cubic-bezier(.2,.9,.25,1); max-width: calc(100% - 28px); text-align: center; visibility: hidden; }
+  .toast.show { transform: translate(-50%, 0); visibility: visible; }
+  @media (max-width: 520px) { .stats .stat { padding: 9px 10px; } .stat .v { font-size: 16px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#0b4a3e"/><rect x="96" y="112" width="320" height="300" rx="72" fill="#1baf7a"/><path d="M176 236 A80 80 0 0 1 336 236" fill="none" stroke="#e8fff4" stroke-width="26" stroke-linecap="round"/><path d="M256 236 L292 196" stroke="#0b4a3e" stroke-width="22" stroke-linecap="round"/><circle cx="256" cy="236" r="18" fill="#0b4a3e"/></svg>
+      Leanline
+    </div>
+    <button class="icon-btn" id="profile-btn" type="button" aria-label="Profile and settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+    </button>
+  </header>
+  <div id="app"><div class="status">Loading…</div></div>
+</div>
+
+<script>
+(async function () {
+  const $ = (s, el = document) => el.querySelector(s);
+  const app = $('#app');
+  const DAY = 86400000, WEEK = 7 * DAY;
+  const LB = 2.20462;
+
+  const db = window.lager && window.lager.use ? await window.lager.use('db') : null;
+  if (!db) { app.innerHTML = '<div class="card status">Storage isn\'t available. Open this page from your Lager app link while signed in.</div>'; return; }
+
+  // ---------- state ----------
+  let ms = [];                     // {id, t, w (kg|null), f (%|null)}
+  let profile = { sex: null, height: null, unit: 'kg', goal: null };
+  let range = '1m', metric = 'w';
+  let showDays = 7;
+
+  function normalize(res) {
+    const arr = Array.isArray(res) ? res : (res && (res.docs || res.documents)) || [];
+    return arr.map(d => Object.assign({ id: d.id }, (typeof d.data === 'function' ? d.data() : (d.data !== undefined ? d.data : d)) || {}));
+  }
+  const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
+
+  async function load() {
+    const [res, pres] = await Promise.all([db.collection('measurements').get(), db.doc('settings/profile').get().catch(() => null)]);
+    ms = normalize(res)
+      .map(d => ({ id: d.key || d.id, t: num(d.t), w: num(d.w), f: num(d.f) }))
+      .filter(d => d.t && (d.w !== null || d.f !== null))
+      .sort((a, b) => a.t - b.t);
+    const p = pres && (typeof pres.data === 'function' ? pres.data() : (pres.data !== undefined ? pres.data : null));
+    if (p && typeof p === 'object') {
+      profile = Object.assign(profile, {
+        sex: p.sex === 'm' || p.sex === 'f' ? p.sex : profile.sex,
+        height: num(p.height), unit: p.unit === 'lb' ? 'lb' : 'kg', goal: num(p.goal)
+      });
+      if (p.range) range = p.range;
+      if (p.metric) metric = p.metric;
+    }
+  }
+  const saveProfile = () => db.doc('settings/profile').set(Object.assign({}, profile, { range, metric })).catch(() => {});
+
+  // ---------- units & formatting ----------
+  const U = () => profile.unit;
+  const toDisp = kg => (U() === 'lb' ? kg * LB : kg);
+  const fromDisp = v => (U() === 'lb' ? v / LB : v);
+  const fw = (kg, d = 1) => toDisp(kg).toFixed(d);
+  const ff = (p, d = 1) => p.toFixed(d);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fmtTime = t => new Date(t).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const fmtDay = t => new Date(t).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  const dayStart = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  function relDay(t) {
+    const today = dayStart(Date.now()), d = dayStart(t);
+    if (d === today) return 'Today';
+    if (d === today - DAY || (today - d > 0 && today - d < 1.5 * DAY)) return 'Yesterday';
+    const opts = { weekday: 'long', day: 'numeric', month: 'short' };
+    if (new Date(t).getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+    return new Date(t).toLocaleDateString(undefined, opts);
+  }
+  function whenLabel(t) {
+    const r = relDay(t);
+    return (r === 'Today' || r === 'Yesterday' ? r : fmtDay(t)) + ', ' + fmtTime(t);
+  }
+  function localInputValue(t) {
+    const d = new Date(t), p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  // ---------- zones ----------
+  // BMI categories (WHO). Body fat categories (American Council on Exercise).
+  const BMI_ZONES = [
+    { from: 12, to: 18.5, label: 'Under', tone: 2 },
+    { from: 18.5, to: 25, label: 'Healthy', ideal: true },
+    { from: 25, to: 30, label: 'Over', tone: 2 },
+    { from: 30, to: 40, label: 'Obese', tone: 3 }
+  ];
+  const FAT_ZONES = {
+    m: [
+      { from: 2, to: 6, label: 'Essential', tone: 2 },
+      { from: 6, to: 14, label: 'Athletic', near: true },
+      { from: 14, to: 18, label: 'Fitness', ideal: true },
+      { from: 18, to: 25, label: 'Average', tone: 1 },
+      { from: 25, to: 40, label: 'High', tone: 3 }
+    ],
+    f: [
+      { from: 10, to: 14, label: 'Essential', tone: 2 },
+      { from: 14, to: 21, label: 'Athletic', near: true },
+      { from: 21, to: 25, label: 'Fitness', ideal: true },
+      { from: 25, to: 32, label: 'Average', tone: 1 },
+      { from: 32, to: 48, label: 'High', tone: 3 }
+    ]
+  };
+  const hM = () => profile.height / 100;
+  const hasHeight = () => profile.height && profile.height > 90 && profile.height < 250;
+  const bmiOf = kg => kg / (hM() * hM());
+  const weightZones = () => BMI_ZONES.map(z => Object.assign({}, z, { from: z.from * hM() * hM(), to: z.to * hM() * hM() }));
+  const fatZones = () => (profile.sex ? FAT_ZONES[profile.sex] : null);
+  function zoneOf(v, zones) {
+    if (!zones || v == null) return null;
+    for (const z of zones) if (v < z.to) return z;
+    return zones[zones.length - 1];
+  }
+  const idealOf = zones => zones.find(z => z.ideal);
+
+  // ---------- trend ----------
+  // Time-aware exponential smoothing (time constant ~7 days), like the Hacker's Diet trend.
+  function trendSeries(key) {
+    const pts = ms.filter(m => m[key] !== null);
+    const out = []; let tr = null, last = null;
+    for (const p of pts) {
+      if (tr === null) tr = p[key];
+      else { const a = 1 - Math.exp(-(p.t - last) / (5 * DAY)); tr += a * (p[key] - tr); }
+      last = p.t; out.push([p.t, tr]);
+    }
+    return out;
+  }
+  // Least-squares slope per week over the last 28 days.
+  function weeklyRate(key) {
+    const now = Date.now();
+    const pts = ms.filter(m => m[key] !== null && m.t > now - 28 * DAY);
+    if (pts.length < 3 || pts[pts.length - 1].t - pts[0].t < 4 * DAY) return null;
+    const n = pts.length, mx = pts.reduce((s, p) => s + p.t, 0) / n, my = pts.reduce((s, p) => s + p[key], 0) / n;
+    let sxy = 0, sxx = 0;
+    pts.forEach(p => { sxy += (p.t - mx) * (p[key] - my); sxx += (p.t - mx) ** 2; });
+    return sxx ? (sxy / sxx) * WEEK : null;
+  }
+  // A smoothed trend needs some data before it means anything.
+  function trendReady(key) {
+    const pts = ms.filter(m => m[key] !== null);
+    return pts.length >= 5 && pts[pts.length - 1].t - pts[0].t >= 5 * DAY;
+  }
+  const latest = key => { for (let i = ms.length - 1; i >= 0; i--) if (ms[i][key] !== null) return ms[i]; return null; };
+
+  // ---------- skeleton ----------
+  app.innerHTML = `
+    <div class="stack">
+      <section class="card hero" id="hero"></section>
+      <section class="card zones" id="zones"></section>
+      <section class="card chart-card">
+        <div class="chart-head">
+          <div class="chart-row">
+            <div><div class="card-title">Trends</div><div class="card-sub" id="chart-sub"></div></div>
+            <div class="seg" id="metric" role="group" aria-label="Metric">
+              <button data-m="w" type="button">Weight</button>
+              <button data-m="f" type="button">Body fat</button>
+            </div>
+          </div>
+          <div class="seg" id="range" role="group" aria-label="Time range">
+            <button data-r="1w" type="button">1W</button><button data-r="1m" type="button">1M</button>
+            <button data-r="3m" type="button">3M</button><button data-r="1y" type="button">1Y</button>
+            <button data-r="all" type="button">All</button>
+          </div>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="plot" id="plot"></div>
+      </section>
+      <section class="card history" id="history"></section>
+      <div class="footnote">Ideal weight uses the WHO healthy BMI range (18.5–24.9) for your height. Body-fat zones follow the American Council on Exercise categories. These are general guides, not medical advice.</div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <button class="fab" id="fab" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Log measurement
+    </button>
+    <div class="backdrop" id="backdrop"></div>
+
+    <div class="sheet" id="log-sheet" role="dialog" aria-modal="true" aria-labelledby="log-title">
+      <div class="grab"></div>
+      <div class="sheet-head"><h3 id="log-title">New measurement</h3>
+        <button class="x" data-close type="button" aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <form id="log-form" autocomplete="off">
+        <div class="big2">
+          <div class="field"><label for="in-w">Weight</label>
+            <div class="big"><span class="sw" style="background:var(--w)"></span><input id="in-w" type="number" inputmode="decimal" step="any" min="0" placeholder="0.0"><span class="u" id="in-w-u">kg</span></div></div>
+          <div class="field"><label for="in-f">Body fat</label>
+            <div class="big"><span class="sw" style="background:var(--f)"></span><input id="in-f" type="number" inputmode="decimal" step="any" min="0" placeholder="0.0"><span class="u">%</span></div></div>
+        </div>
+        <div class="field"><label for="in-t">When</label><input id="in-t" type="datetime-local"></div>
+        <div class="form-hint" id="log-hint">Log either value or both. Every measurement keeps its exact time, so log as often as you like.</div>
+        <button class="primary" id="log-save" type="submit">Save measurement</button>
+      </form>
+    </div>
+
+    <div class="sheet" id="prof-sheet" role="dialog" aria-modal="true" aria-labelledby="prof-title">
+      <div class="grab"></div>
+      <div class="sheet-head"><h3 id="prof-title">Your profile</h3>
+        <button class="x" data-close type="button" aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <form id="prof-form" autocomplete="off">
+        <div class="field"><label>Sex (sets your body-fat zones)</label>
+          <div class="seg" id="p-sex"><button type="button" data-v="f">Female</button><button type="button" data-v="m">Male</button></div></div>
+        <div class="big2">
+          <div class="field"><label for="p-h">Height</label><div class="big"><input id="p-h" type="number" inputmode="decimal" step="any" placeholder="175"><span class="u">cm</span></div></div>
+          <div class="field"><label for="p-g">Goal weight (optional)</label><div class="big"><input id="p-g" type="number" inputmode="decimal" step="any" placeholder="—"><span class="u" id="p-g-u">kg</span></div></div>
+        </div>
+        <div class="field"><label>Units</label>
+          <div class="seg" id="p-unit"><button type="button" data-v="kg">Kilograms</button><button type="button" data-v="lb">Pounds</button></div></div>
+        <div class="form-hint" id="prof-hint">Height sets your ideal weight range.</div>
+        <button class="primary" type="submit">Save profile</button>
+      </form>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>`);
+
+  // ---------- sheets ----------
+  const backdrop = $('#backdrop');
+  let openSheetEl = null;
+  function openSheet(el) {
+    closeSheet();
+    openSheetEl = el; backdrop.classList.add('open'); el.classList.add('open');
+  }
+  function closeSheet() {
+    if (openSheetEl) openSheetEl.classList.remove('open');
+    openSheetEl = null; backdrop.classList.remove('open');
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
+  backdrop.addEventListener('click', closeSheet);
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheet));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+  document.addEventListener('click', e => {
+    const o = e.target.closest('[data-open]'); if (!o) return;
+    o.dataset.open === 'profile' ? openProfile() : openLog();
+  });
+  let toastTimer;
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2800); }
+
+  // log sheet
+  const inW = $('#in-w'), inF = $('#in-f'), inT = $('#in-t'), logHint = $('#log-hint');
+  function openLog() {
+    const lw = latest('w'), lf = latest('f');
+    $('#in-w-u').textContent = U();
+    inW.value = ''; inF.value = '';
+    inW.placeholder = lw ? fw(lw.w) : '0.0';
+    inF.placeholder = lf ? ff(lf.f) : '0.0';
+    inT.value = localInputValue(Date.now());
+    inT.max = localInputValue(Date.now() + 60000);
+    logHint.className = 'form-hint';
+    logHint.textContent = 'Log either value or both. Every measurement keeps its exact time, so log as often as you like.';
+    openSheet($('#log-sheet'));
+    setTimeout(() => inW.focus({ preventScroll: true }), 280);
+  }
+  $('#fab').addEventListener('click', openLog);
+  $('#log-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const parse = s => { const v = parseFloat(String(s).replace(',', '.')); return isFinite(v) ? v : null; };
+    let w = parse(inW.value), f = parse(inF.value);
+    const err = m => { logHint.textContent = m; logHint.className = 'form-hint err'; };
+    if (w === null && f === null) return err('Enter a weight, a body-fat percentage, or both.');
+    if (w !== null) { w = fromDisp(w); if (w < 20 || w > 400) return err('That weight looks off. Check the number and units.'); }
+    if (f !== null && (f < 2 || f > 70)) return err('Body fat should be between 2% and 70%.');
+    const t = inT.value ? new Date(inT.value).getTime() : Date.now();
+    if (!isFinite(t)) return err('Pick a valid date and time.');
+    const key = t + '-' + Math.random().toString(36).slice(2, 7);
+    const btn = $('#log-save'); btn.disabled = true;
+    try {
+      await db.doc('measurements/' + key).set({ key, t, w: w === null ? null : Math.round(w * 100) / 100, f: f === null ? null : Math.round(f * 10) / 10, savedAt: Date.now() });
+      await refresh();
+      closeSheet();
+      toast('Saved ' + [w !== null ? `${fw(w)} ${U()}` : '', f !== null ? `${ff(f)}%` : ''].filter(Boolean).join(' · '));
+    } catch (ex) { err('Could not save: ' + (ex && ex.message || ex)); }
+    finally { btn.disabled = false; }
+  });
+
+  // profile sheet
+  let draftSex = null, draftUnit = 'kg';
+  function paintSeg(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
+  function openProfile() {
+    draftSex = profile.sex; draftUnit = profile.unit;
+    paintSeg('p-sex', draftSex); paintSeg('p-unit', draftUnit);
+    $('#p-h').value = profile.height || '';
+    $('#p-g').value = profile.goal ? fw(profile.goal) : '';
+    $('#p-g-u').textContent = draftUnit;
+    $('#prof-hint').className = 'form-hint';
+    $('#prof-hint').textContent = 'Height sets your ideal weight range. Sex sets your body-fat zones.';
+    openSheet($('#prof-sheet'));
+  }
+  $('#profile-btn').addEventListener('click', openProfile);
+  $('#p-sex').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { draftSex = b.dataset.v; paintSeg('p-sex', draftSex); } });
+  $('#p-unit').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.dataset.v === draftUnit) return;
+    const g = parseFloat($('#p-g').value);
+    if (isFinite(g)) $('#p-g').value = (b.dataset.v === 'lb' ? g * LB : g / LB).toFixed(1);
+    draftUnit = b.dataset.v; paintSeg('p-unit', draftUnit); $('#p-g-u').textContent = draftUnit;
+  });
+  $('#prof-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const h = parseFloat(String($('#p-h').value).replace(',', '.'));
+    const g = parseFloat(String($('#p-g').value).replace(',', '.'));
+    const hint = $('#prof-hint');
+    if ($('#p-h').value && !(h > 90 && h < 250)) { hint.textContent = 'Enter your height in centimetres, e.g. 175.'; hint.className = 'form-hint err'; return; }
+    profile.sex = draftSex; profile.unit = draftUnit;
+    profile.height = isFinite(h) ? Math.round(h * 10) / 10 : null;
+    profile.goal = isFinite(g) && g > 0 ? Math.round((draftUnit === 'lb' ? g / LB : g) * 100) / 100 : null;
+    await saveProfile();
+    closeSheet(); renderAll(); toast('Profile saved');
+  });
+
+  // chart controls
+  $('#metric').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { metric = b.dataset.m; saveProfile(); renderChart(); } });
+  $('#range').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { range = b.dataset.r; saveProfile(); renderChart(); } });
+
+  // ---------- hero ----------
+  const RINGS = `<svg class="hero-rings" viewBox="0 0 200 200" aria-hidden="true">${[90, 72, 54, 36].map(r => `<circle cx="100" cy="100" r="${r}" fill="none" stroke="#fff" stroke-width="1.5"/>`).join('')}</svg>`;
+  function renderHero() {
+    const hero = $('#hero');
+    const lw = latest('w'), lf = latest('f');
+    if (!lw && !lf) {
+      hero.innerHTML = `${RINGS}<div><div class="hero-label">Weight</div><div class="hero-value num" style="opacity:.5">—</div>
+        <div class="hero-sub">${profile.height ? 'Log your first measurement to see where you stand.' : 'Set up your profile, then log your first measurement.'}</div></div>
+        <button class="hero-cta" type="button" data-open="${profile.height && profile.sex ? 'log' : 'profile'}">${profile.height && profile.sex ? 'Log first measurement' : 'Set up profile'}</button>`;
+      return;
+    }
+    let sub = '';
+    if (lw) {
+      const tr = trendSeries('w'), rate = weeklyRate('w');
+      const z = hasHeight() ? zoneOf(bmiOf(lw.w), BMI_ZONES) : null;
+      sub += z ? `<span class="chip ${z.ideal ? 'ideal' : ''}"><span class="d"></span>${z.ideal ? 'Healthy weight' : z.label === 'Under' ? 'Underweight' : z.label === 'Over' ? 'Overweight' : 'Obese range'}</span>` : '';
+      if (trendReady('w')) sub += `<span>Trend ${fw(tr[tr.length - 1][1])} ${U()}</span>`;
+      if (rate !== null) sub += `<span>${rate > 0 ? '+' : rate < 0 ? '−' : '±'}${fw(Math.abs(rate), 2)} ${U()}/week</span>`;
+    }
+    const fz = lf ? zoneOf(lf.f, fatZones()) : null;
+    const bmi = lw && hasHeight() ? bmiOf(lw.w) : null;
+    const bz = bmi ? zoneOf(bmi, BMI_ZONES) : null;
+    const lean = lw && lf && Math.abs(lw.t - lf.t) < 2 * DAY ? lw.w * (1 - lf.f / 100) : null;
+    hero.innerHTML = `${RINGS}
+      <div>
+        <div class="hero-label">${lw ? 'Weight · ' + esc(whenLabel(lw.t)) : 'Weight'}</div>
+        <div class="hero-value num">${lw ? fw(lw.w) : '—'}<span class="u">${U()}</span></div>
+        <div class="hero-sub">${sub || '&nbsp;'}</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Body fat</div><div class="v num">${lf ? ff(lf.f) + '<small>%</small>' : '—'}</div>
+          <div class="z ${fz && fz.ideal ? 'ideal' : ''}">${fz ? fz.label : lf ? 'Set sex in profile' : 'Not logged yet'}</div></div>
+        <div class="stat"><div class="k">BMI</div><div class="v num">${bmi ? bmi.toFixed(1) : '—'}</div>
+          <div class="z ${bz && bz.ideal ? 'ideal' : ''}">${bz ? bz.label : 'Set height'}</div></div>
+        <div class="stat"><div class="k">Lean mass</div><div class="v num">${lean ? fw(lean) + `<small> ${U()}</small>` : '—'}</div>
+          <div class="z">${lean ? fw(lw.w - lean) + ' ' + U() + ' fat' : 'Needs both values'}</div></div>
+      </div>`;
+  }
+
+  // ---------- zone gauges ----------
+  const toneVar = z => z.ideal ? 'var(--seg-ideal)' : z.near ? 'var(--seg-near)' : `var(--seg-${z.tone || 1})`;
+  function gauge(name, zones, value, valueTxt, labelFmt) {
+    // Each zone gets an equal slice of the bar; the pin sits proportionally inside its zone.
+    const n = zones.length, seg = 100 / n;
+    const pos = v => {
+      if (v <= zones[0].from) return 1;
+      for (let i = 0; i < n; i++) { const z = zones[i]; if (v < z.to) return i * seg + (v - z.from) / (z.to - z.from) * seg; }
+      return 99;
+    };
+    const bar = zones.map(z => `<span style="flex:1;background:${toneVar(z)}"></span>`).join('');
+    const labels = zones.map((z, i) => `<span class="${z.ideal ? 'ideal' : ''}" style="left:${(i + .5) * seg}%">${z.label}</span>`).join('');
+    const pin = value != null ? `<div class="pin" style="left:${pos(value)}%"><span class="b">${valueTxt}</span><span class="s"></span></div>` : '';
+    return `<div><div class="gauge-head"><span class="gauge-name">${name}</span></div>
+      <div class="gauge">${pin}<div class="bar">${bar}</div></div><div class="labels">${labels}</div>${labelFmt || ''}</div>`;
+  }
+  function renderZones() {
+    const el = $('#zones');
+    const lw = latest('w'), lf = latest('f');
+    let html = `<div><div class="card-title">Ideal zones</div><div class="card-sub">Where your latest measurements sit</div></div>`;
+    if (!hasHeight() || !profile.sex) {
+      html += `<div class="setup-hint"><span>Add your ${!hasHeight() && !profile.sex ? 'height and sex' : !hasHeight() ? 'height' : 'sex'} to see your ideal zones.</span><button type="button" data-open="profile">Set up</button></div>`;
+    }
+    if (hasHeight()) {
+      const wz = weightZones(), ideal = idealOf(wz);
+      let note = `Ideal weight for ${profile.height} cm: <b>${fw(ideal.from)}–${fw(ideal.to)} ${U()}</b>`;
+      if (lw) {
+        if (lw.w < ideal.from) note += ideal.from - lw.w < 0.1 ? ` · right at the lower edge` : ` · <b>${fw(ideal.from - lw.w)} ${U()}</b> below`;
+        else if (lw.w >= ideal.to) note += lw.w - ideal.to < 0.1 ? ` · right at the upper edge` : ` · <b>${fw(lw.w - ideal.to)} ${U()}</b> above`;
+        else note += ` · <span class="ok">You're in it ✓</span>`;
+      }
+      const bmi = lw ? bmiOf(lw.w) : null;
+      html += gauge('BMI', BMI_ZONES, bmi, bmi ? bmi.toFixed(1) : '', `<div class="gauge-note">${note}</div>`);
+    }
+    if (profile.sex) {
+      const fz = fatZones(), ideal = idealOf(fz);
+      let note = `Ideal body fat: <b>${ideal.from}–${ideal.to}%</b> (Fitness range)`;
+      if (lf) {
+        if (lf.f < fz[1].from) note += ` · below the athletic range`;
+        else if (lf.f < ideal.from) note += ` · <span class="ok">Athletic ✓</span>`;
+        else if (lf.f >= ideal.to) note += ` · <b>${ff(lf.f - ideal.to)} pts</b> above`;
+        else note += ` · <span class="ok">You're in it ✓</span>`;
+      }
+      html += gauge('Body fat', fz, lf ? lf.f : null, lf ? ff(lf.f) + '%' : '', `<div class="gauge-note">${note}</div>`);
+    }
+    el.innerHTML = html;
+  }
+
+  // ---------- chart ----------
+  const plot = $('#plot');
+  let plotHide = () => {}, lastW = 0;
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('#plot')) plotHide(); });
+
+  function niceStep(r, target) { const raw = r / target, mag = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / mag; return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag; }
+  function timeTicks(t0, t1, maxTicks) {
+    const span = t1 - t0, ticks = [];
+    const daySteps = [1, 2, 7, 14];
+    for (const s of daySteps) {
+      if (span / (s * DAY) <= maxTicks) {
+        let d = new Date(dayStart(t0)); if (d.getTime() < t0) d.setDate(d.getDate() + 1);
+        if (s === 7 || s === 14) while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
+        for (; d.getTime() <= t1; d.setDate(d.getDate() + s)) ticks.push({ t: d.getTime(), label: s === 1 && span < 8 * DAY ? d.toLocaleDateString(undefined, { weekday: 'short' }) : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) });
+        return ticks;
+      }
+    }
+    for (const s of [1, 2, 3, 6, 12, 24]) {
+      if (span / (s * 30.44 * DAY) <= maxTicks) {
+        const d0 = new Date(t0); let d = new Date(d0.getFullYear(), d0.getMonth() + 1, 1);
+        while (d.getMonth() % s !== 0) d.setMonth(d.getMonth() + 1);
+        for (; d.getTime() <= t1; d.setMonth(d.getMonth() + s)) ticks.push({ t: d.getTime(), label: d.getMonth() === 0 ? String(d.getFullYear()) : d.toLocaleDateString(undefined, { month: 'short' }) });
+        return ticks;
+      }
+    }
+    return ticks;
+  }
+
+  function renderChart() {
+    document.querySelectorAll('#metric button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === metric)));
+    document.querySelectorAll('#range button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === range)));
+    const key = metric, color = key === 'w' ? 'var(--w)' : 'var(--f)';
+    const unitTxt = key === 'w' ? U() : '%';
+    const fmt = v => key === 'w' ? fw(v) : ff(v);
+    const zones = key === 'w' ? (hasHeight() ? weightZones() : null) : fatZones();
+    $('#chart-sub').textContent = key === 'w' ? `Weight in ${U()}${zones ? ' · healthy BMI zone shaded' : ''}` : `Body fat %${zones ? ' · ideal zone shaded' : ''}`;
+    plot.style.setProperty('--series', color);
+    $('#legend').style.setProperty('--series', color);
+    // Legend lists only what is actually drawn.
+    const setLegend = (trendOn, zoneOn, goalOn) => {
+      $('#legend').innerHTML = `<span class="item"><span class="dot"></span>Measurements</span>${trendOn ? '<span class="item"><span class="ln"></span>Trend</span>' : ''}${zoneOn ? '<span class="item"><span class="bd"></span>Ideal zone</span>' : ''}${goalOn ? '<span class="item"><span class="gl"></span>Goal</span>' : ''}`;
+    };
+    setLegend(false, false, false);
+
+    const all = ms.filter(m => m[key] !== null);
+    const W = plot.clientWidth || 600; lastW = W;
+    if (!all.length) {
+      plot.innerHTML = `<div class="empty"><b>No ${key === 'w' ? 'weight' : 'body-fat'} data yet</b>Tap <b style="display:inline">Log measurement</b> to add one.</div>`;
+      plotHide = () => {}; return;
+    }
+    const now = Date.now();
+    const spans = { '1w': 7, '1m': 30, '3m': 91, '1y': 365 };
+    let t1 = Math.max(now, all[all.length - 1].t);
+    const rangeStart = range === 'all' ? -Infinity : t1 - spans[range] * DAY;
+    const inRange = all.filter(m => m.t >= rangeStart);
+    // Start at the first entry in range (not at an empty range edge), and show at least 3 days.
+    let t0 = inRange.length ? Math.max(rangeStart, inRange[0].t - Math.max(12 * 3600e3, (t1 - inRange[0].t) * 0.06)) : rangeStart;
+    if (t1 - t0 < 3 * DAY) t0 = t1 - 3 * DAY;
+    const pad = (t1 - t0) * 0.02; t0 -= pad; const tEnd = t1 + pad;
+    const pts = all.filter(m => m.t >= t0 && m.t <= tEnd);
+    const showTrend = trendReady(key);
+    const trendAll = trendSeries(key);
+    // include one trend point before the window so the line enters from the left edge
+    const firstIn = trendAll.findIndex(p => p[0] >= t0);
+    const trend = firstIn > 0 ? trendAll.slice(firstIn - 1) : firstIn === 0 ? trendAll : [];
+
+    if (!pts.length) {
+      plot.innerHTML = `<div class="empty"><b>Nothing in this range</b>Your last ${key === 'w' ? 'weight' : 'body-fat'} entry was ${esc(relDay(all[all.length - 1].t).toLowerCase())}. Try a longer range.</div>`;
+      plotHide = () => {}; return;
+    }
+
+    // y-domain: data, trend, goal, and the nearest edge of the ideal zone (within reason)
+    const vals = pts.map(p => p[key]).concat(showTrend ? trend.filter(p => p[0] >= t0).map(p => p[1]) : []);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    const minSpan = key === 'w' ? (U() === 'lb' ? 4 / LB : 2) : 2;
+    if (hi - lo < minSpan) { const c = (hi + lo) / 2; lo = c - minSpan / 2; hi = c + minSpan / 2; }
+    const span0 = hi - lo;
+    if (zones) {
+      const iz = idealOf(zones);
+      if (iz.to < lo && lo - iz.to < span0 * 2) lo = iz.to - span0 * 0.15;
+      if (iz.from > hi && iz.from - hi < span0 * 2) hi = iz.from + span0 * 0.15;
+    }
+    if (key === 'w' && profile.goal && Math.abs(profile.goal - (lo + hi) / 2) < span0 * 2.5) { lo = Math.min(lo, profile.goal); hi = Math.max(hi, profile.goal); }
+    const p2 = (hi - lo) * 0.1; lo -= p2; hi += p2;
+    // nice ticks in display units
+    const dLo = key === 'w' ? toDisp(lo) : lo, dHi = key === 'w' ? toDisp(hi) : hi;
+    const step = niceStep(dHi - dLo, 4);
+    const yLoD = Math.floor(dLo / step) * step, yHiD = Math.ceil(dHi / step) * step;
+    const yLo = key === 'w' ? fromDisp(yLoD) : yLoD, yHi = key === 'w' ? fromDisp(yHiD) : yHiD;
+
+    const narrow = W < 480;
+    const H = Math.round(Math.max(narrow ? 300 : 280, Math.min(400, W * 0.55)));
+    const m = { l: 40, r: narrow ? 10 : 14, t: 10, b: 28 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const x = t => m.l + (t - t0) / (tEnd - t0) * iw;
+    const y = v => m.t + (1 - (v - yLo) / (yHi - yLo)) * ih;
+    const clampY = v => Math.max(m.t, Math.min(m.t + ih, y(v)));
+
+    let svg = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="${key === 'w' ? 'Weight' : 'Body fat'} over time with ideal zone">
+      <defs><clipPath id="clip"><rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}"/></clipPath></defs>`;
+    // zone bands
+    if (zones) {
+      zones.forEach(z => {
+        const top = clampY(z.to === zones[zones.length - 1].to ? 1e9 : z.to), bot = clampY(z.from === zones[0].from ? -1e9 : z.from);
+        if (bot - top < 1) return;
+        const fill = z.ideal ? 'var(--ideal-band)' : z.near ? 'var(--ideal-band-2)' : `var(--band-${z.tone || 1})`;
+        svg += `<rect x="${m.l}" y="${top.toFixed(1)}" width="${iw}" height="${(bot - top).toFixed(1)}" fill="${fill}"/>`;
+        if (z.ideal) {
+          [z.from, z.to].forEach(v => { const yy = y(v); if (yy > m.t && yy < m.t + ih) svg += `<line x1="${m.l}" x2="${m.l + iw}" y1="${yy.toFixed(1)}" y2="${yy.toFixed(1)}" stroke="var(--seg-ideal)" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>`; });
+        }
+        if (bot - top > 16) svg += `<text class="band-label ${z.ideal ? 'ideal' : ''}" x="${m.l + iw - 6}" y="${(top + 13).toFixed(1)}" text-anchor="end">${z.label.toUpperCase()}</text>`;
+      });
+    }
+    // grid
+    for (let v = yLoD; v <= yHiD + step / 2; v += step) {
+      const yy = y(key === 'w' ? fromDisp(v) : v).toFixed(1);
+      svg += `<line x1="${m.l}" x2="${m.l + iw}" y1="${yy}" y2="${yy}" stroke="var(--grid)" stroke-width="1" opacity="${zones ? .6 : 1}"/>`;
+      svg += `<text class="tick" x="${m.l - 7}" y="${yy}" text-anchor="end" dominant-baseline="middle">${+v.toFixed(step < 1 ? 1 : 0)}</text>`;
+    }
+    timeTicks(t0, tEnd, narrow ? 4 : 7).forEach(tk => { svg += `<text class="tick" x="${x(tk.t).toFixed(1)}" y="${H - 8}" text-anchor="middle">${esc(tk.label)}</text>`; });
+    // what is visible, and hints for what sits outside the visible range
+    const iz = zones ? idealOf(zones) : null;
+    const zoneOn = !!iz && iz.to > yLo && iz.from < yHi;
+    const goalOn = key === 'w' && !!profile.goal && profile.goal > yLo && profile.goal < yHi;
+    setLegend(showTrend, zoneOn, goalOn);
+    const hints = [];
+    if (iz && !zoneOn) hints.push(`<span class="ideal">${iz.to <= yLo ? '↓' : '↑'} ${key === 'w' ? 'Healthy zone' : 'Ideal zone'} ${iz.to <= yLo ? 'below ' + fmt(iz.to) : 'above ' + fmt(iz.from)} ${unitTxt}</span>`);
+    if (key === 'w' && profile.goal && !goalOn) hints.push(`<span>${profile.goal <= yLo ? '↓' : '↑'} Goal ${fw(profile.goal)} ${U()}</span>`);
+    if (!showTrend) hints.push(`<span class="soft">Trend line appears after 5 entries over 5+ days</span>`);
+    // goal
+    if (goalOn) {
+      const gy = y(profile.goal).toFixed(1);
+      svg += `<line x1="${m.l}" x2="${m.l + iw}" y1="${gy}" y2="${gy}" stroke="var(--text-3)" stroke-width="1.5" stroke-dasharray="6 5"/>`;
+      svg += `<text class="band-label" x="${m.l + 6}" y="${(+gy - 5).toFixed(1)}">GOAL ${fw(profile.goal)}</text>`;
+    }
+    // trend line + dots
+    svg += `<g clip-path="url(#clip)">`;
+    if (!showTrend && pts.length > 1) svg += `<path d="${pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p[key]).toFixed(1)}`).join('')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-opacity=".35" stroke-linejoin="round"/>`;
+    if (showTrend && trend.length > 1) svg += `<path d="${trend.map((p, i) => `${i ? 'L' : 'M'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join('')}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const r = pts.length > 150 ? 3 : 4.5;
+    pts.forEach(p => { svg += `<circle cx="${x(p.t).toFixed(1)}" cy="${y(p[key]).toFixed(1)}" r="${r}" fill="${color}" fill-opacity=".45" stroke="var(--surface)" stroke-width="1.5"/>`; });
+    const lastP = pts[pts.length - 1];
+    svg += `<circle cx="${x(lastP.t).toFixed(1)}" cy="${y(lastP[key]).toFixed(1)}" r="${r + 2}" fill="${color}" stroke="var(--surface)" stroke-width="2.5"/>`;
+    svg += `</g>`;
+    svg += `<g id="hover" style="display:none"><line id="hx" y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-3)" stroke-width="1"/><circle id="hdot" r="${r + 3}" fill="none" stroke="${color}" stroke-width="2"/></g>
+      <rect id="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+    plot.innerHTML = svg + (hints.length ? `<div class="offchart">${hints.join('')}</div>` : '') + `<div class="tooltip" id="tip"></div>`;
+
+    const svgEl = plot.querySelector('svg'), hover = svgEl.querySelector('#hover'), hx = svgEl.querySelector('#hx'), hdot = svgEl.querySelector('#hdot'), tip = plot.querySelector('#tip');
+    function trendAt(t) { let v = null; for (const p of trendAll) { if (p[0] <= t) v = p[1]; else break; } return v; }
+    function showAt(clientX) {
+      const rect = svgEl.getBoundingClientRect(), sc = rect.width / W;
+      const px = (clientX - rect.left) / sc;
+      let best = null, bd = Infinity;
+      pts.forEach(p => { const d = Math.abs(x(p.t) - px); if (d < bd) { bd = d; best = p; } });
+      if (!best) return;
+      const cx = x(best.t), cy = y(best[key]);
+      hover.style.display = ''; hx.setAttribute('x1', cx); hx.setAttribute('x2', cx); hdot.setAttribute('cx', cx); hdot.setAttribute('cy', cy);
+      const z = zones ? zoneOf(best[key], zones) : null, tv = trendAt(best.t);
+      const other = key === 'w' ? (best.f !== null ? `<div class="row"><span class="l">Body fat</span><span class="r">${ff(best.f)}%</span></div>` : '') : (best.w !== null ? `<div class="row"><span class="l">Weight</span><span class="r">${fw(best.w)} ${U()}</span></div>` : '');
+      tip.innerHTML = `<div class="t-date">${esc(fmtDay(best.t))} · ${esc(fmtTime(best.t))}</div>
+        <div class="row"><span class="l">${key === 'w' ? 'Weight' : 'Body fat'}</span><span class="r">${fmt(best[key])} ${unitTxt}</span></div>
+        ${tv !== null ? `<div class="row"><span class="l">Trend</span><span class="r">${fmt(tv)} ${unitTxt}</span></div>` : ''}${other}
+        ${z ? `<div class="zone ${z.ideal ? 'ideal' : ''}">${key === 'w' ? (z.ideal ? 'Healthy BMI zone' : z.label + ' BMI zone') : z.label + ' zone'}</div>` : ''}`;
+      tip.style.opacity = '1';
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      let left = cx * sc + 14; if (left + tw > rect.width) left = cx * sc - tw - 14;
+      let top = cy * sc - th - 12; if (top < 0) top = cy * sc + 14;
+      tip.style.left = Math.max(0, left) + 'px'; tip.style.top = Math.min(top, rect.height - th) + 'px';
+    }
+    const hide = () => { hover.style.display = 'none'; tip.style.opacity = '0'; };
+    const hit = svgEl.querySelector('#hit');
+    hit.addEventListener('pointermove', ev => showAt(ev.clientX));
+    hit.addEventListener('pointerdown', ev => showAt(ev.clientX));
+    hit.addEventListener('pointerleave', ev => { if (ev.pointerType !== 'touch') hide(); });
+    plotHide = hide;
+  }
+
+  // ---------- history ----------
+  function renderHistory() {
+    const el = $('#history');
+    if (!ms.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    el.style.display = '';
+    const days = new Map();
+    for (let i = ms.length - 1; i >= 0; i--) {
+      const k = dayStart(ms[i].t);
+      if (!days.has(k)) days.set(k, []);
+      days.get(k).push(ms[i]);
+    }
+    const keys = [...days.keys()];
+    const fz = fatZones(), wzOk = hasHeight();
+    const html = keys.slice(0, showDays).map(k => {
+      const list = days.get(k);
+      const ws = list.filter(m => m.w !== null);
+      const avg = ws.length > 1 ? `avg ${fw(ws.reduce((s, m) => s + m.w, 0) / ws.length)} ${U()}` : '';
+      return `<div class="day"><div class="day-head"><span>${esc(relDay(k))}</span><span class="avg">${avg}</span></div><ul>${list.map(mm => {
+        const z = mm.f !== null && fz ? zoneOf(mm.f, fz) : (mm.w !== null && wzOk ? zoneOf(bmiOf(mm.w), BMI_ZONES) : null);
+        const zl = z ? (mm.f !== null && fz ? z.label : (z.ideal ? 'Healthy BMI' : z.label + ' BMI')) : '';
+        return `<li tabindex="0">
+          <span class="time">${esc(fmtTime(mm.t))}</span>
+          <span class="vals">${mm.w !== null ? `<span class="val"><i style="background:var(--w)"></i>${fw(mm.w)}<small>${U()}</small></span>` : ''}${mm.f !== null ? `<span class="val"><i style="background:var(--f)"></i>${ff(mm.f)}<small>%</small></span>` : ''}</span>
+          <span><span class="zone-tag ${z && z.ideal ? 'ideal' : ''}">${esc(zl)}</span><button class="del" data-id="${esc(mm.id)}" type="button">Delete</button></span>
+        </li>`;
+      }).join('')}</ul></div>`;
+    }).join('');
+    el.innerHTML = `<h2>History <small>${ms.length} measurement${ms.length === 1 ? '' : 's'}</small></h2>${html}${keys.length > showDays ? `<button class="more" id="more" type="button">Show more days</button>` : ''}`;
+  }
+  $('#history').addEventListener('click', async ev => {
+    if (ev.target.closest('#more')) { showDays += 14; renderHistory(); return; }
+    const b = ev.target.closest('.del');
+    if (b) {
+      b.disabled = true; b.textContent = 'Deleting…';
+      try { await db.doc('measurements/' + b.dataset.id).delete(); await refresh(); toast('Deleted'); }
+      catch (_) { b.disabled = false; b.textContent = 'Delete'; toast('Could not delete'); }
+      return;
+    }
+    const li = ev.target.closest('li'); if (!li) return;
+    const was = li.classList.contains('open');
+    document.querySelectorAll('#history li.open').forEach(x => x.classList.remove('open'));
+    if (!was) li.classList.add('open');
+  });
+
+  // ---------- boot ----------
+  function renderAll() { renderHero(); renderZones(); renderChart(); renderHistory(); }
+  async function refresh() { await load(); renderAll(); }
+  new ResizeObserver(() => { if (Math.abs((plot.clientWidth || 0) - lastW) > 2) renderChart(); }).observe(plot);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', renderChart);
+
+  try { await load(); renderAll(); }
+  catch (err) { app.innerHTML = `<div class="card status">Could not load your data: ${esc(err && err.message || err)}</div>`; return; }
+  if (!profile.height && !profile.sex && !ms.length) setTimeout(openProfile, 400);
+
+  try { const col = db.collection('measurements'); if (typeof col.onSnapshot === 'function') col.onSnapshot(() => refresh().catch(() => {})); } catch (_) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "satz",
+  "title": "Satz",
+  "description": "Fokussiertes Schreiben für ganze Bücher – mit Kapiteln, Fokusmodus und einer sortierbaren Ablage für Gedankenfetzen.",
+  "version": 3,
+  "language": "de",
+  "category": "writing",
+  "themeColor": "#16181c",
+  "entry": "index.html",
+  "capabilities": {
+    "db": {},
+    "downloads": {},
+    "user": {}
+  },
+  "externalHosts": [
+    "cdn.jsdelivr.net"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "kommentare",
+  "title": "Kommentare",
+  "description": "Einbettbares Kommentarsystem mit verschachtelten Antworten, Daumen hoch/runter, Moderation und Site-Auswahl für mehrere Websites.",
+  "version": 4,
+  "language": "de",
+  "category": "publishing",
+  "themeColor": "#2f5bea",
+  "entry": "index.html",
+  "capabilities": {
+    "db": {
+      "rules": [
+        {
+          "path": "settings",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "approved",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "inbox",
+          "read": "admin",
+          "write": "anyone"
+        },
+        {
+          "path": "open",
+          "read": "view",
+          "write": "anyone"
+        },
+        {
+          "path": "votes",
+          "read": "view",
+          "write": "anyone"
+        }
+      ]
+    },
+    "downloads": {},
+    "embed": {},
+    "user": {}
+  }
+}

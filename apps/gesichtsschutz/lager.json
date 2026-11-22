@@ -1,0 +1,16 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "gesichtsschutz",
+  "title": "Gesichtsschutz",
+  "description": "Erkennt Gesichter in deinen Fotos und macht sie direkt im Browser unkenntlich – irreversibel und ohne Upload.",
+  "version": 3,
+  "language": "de",
+  "category": "privacy",
+  "themeColor": "#1b2a4d",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {},
+  "externalHosts": [
+    "cdn.jsdelivr.net"
+  ]
+}

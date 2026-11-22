@@ -1,0 +1,65 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "byline",
+  "title": "Byline",
+  "description": "Cookie-free blog analytics: readers, read time, read-through, sources, trending posts and the best time to publish.",
+  "version": 1,
+  "status": "beta",
+  "language": "en",
+  "category": "analytics",
+  "themeColor": "#16305c",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {
+    "complete": {},
+    "db": {
+      "rules": [
+        {
+          "path": "hits",
+          "read": "admin",
+          "write": "admin"
+        },
+        {
+          "path": "state",
+          "read": "admin",
+          "write": "admin"
+        },
+        {
+          "path": "locks",
+          "read": "admin",
+          "write": "admin"
+        },
+        {
+          "path": "sites",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "chunks",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "settings",
+          "read": "view",
+          "write": "admin"
+        }
+      ]
+    },
+    "downloads": {},
+    "ingest": {
+      "endpoints": [
+        {
+          "auth": "none",
+          "country": true,
+          "managedOrigins": true,
+          "maxBytes": 4096,
+          "maxPerDay": 100000,
+          "name": "hits",
+          "onFull": "rotate",
+          "visitor": "daily"
+        }
+      ]
+    }
+  }
+}

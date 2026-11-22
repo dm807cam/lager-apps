@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kommentare</title>
+<style>
+:root{--fg:#1f2430;--muted:#6b7280;--line:#e3e6ec;--card:#f6f7fa;--accent:#2f5bea;--up:#15803d;--down:#b91c1c;--page:#fff;color-scheme:light}
+html[data-theme=dark]{--fg:#e7e9ee;--muted:#9aa3b2;--line:#2c313b;--card:#1a1e26;--page:#12151b;color-scheme:dark}
+@media(prefers-color-scheme:dark){html[data-theme=auto]{--fg:#e7e9ee;--muted:#9aa3b2;--line:#2c313b;--card:#1a1e26;--page:#12151b;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;padding:4px;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--fg);background:transparent}
+body.admin{background:var(--page);min-height:100vh}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:46rem;margin:0 auto;padding:8px}
+.votes{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:18px;flex-wrap:wrap}
+.votes .q{flex:1;min-width:10rem;color:var(--muted)}
+.vbtn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600;transition:background .15s,border-color .15s}
+.vbtn .ic{display:inline-flex}
+.vbtn svg{width:20px;height:20px;fill:currentColor}
+.vbtn:hover{border-color:var(--accent)}
+.vbtn[aria-pressed=true].up{background:var(--up);border-color:var(--up);color:#fff}
+.vbtn[aria-pressed=true].down{background:var(--down);border-color:var(--down);color:#fff}
+h2{font-size:1.15rem;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+select{padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:transparent}
+h2 select{font-size:.85rem;padding:3px 6px}
+.form{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--card);margin:6px 0 18px}
+.form input[type=text],.form textarea,.card textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:transparent;margin-bottom:8px}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.count{margin-left:auto;font-size:.8rem;color:var(--muted)}
+.btn{padding:8px 16px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+.btn.sec{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn.danger{background:transparent;color:var(--down);border-color:var(--down)}
+.btn.small{padding:4px 10px;font-size:.88rem}
+.btn:disabled{opacity:.5;cursor:default}
+.link{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font-size:.9rem}
+.list>.c{border-top:1px solid var(--line);padding-top:12px}
+.c{display:grid;grid-template-columns:32px 1fr;gap:10px;padding:8px 0 4px}
+.cb{min-width:0}
+.av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.9rem;user-select:none}
+.c header{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.c time,.meta{color:var(--muted);font-size:.85rem}
+.badge{font-size:.7rem;background:var(--accent);color:#fff;border-radius:6px;padding:1px 6px}
+.sbadge{font-size:.72rem;border:1px solid var(--line);border-radius:6px;padding:0 6px;color:var(--muted)}
+.pendtag{font-size:.72rem;color:var(--muted);border:1px dashed var(--muted);border-radius:6px;padding:0 6px}
+.c.is-pending>.cb>.txt{opacity:.7}
+.txt{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.kids.flat{margin-left:-42px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;overflow:hidden}
+.note{padding:8px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line);margin:0 0 12px;font-size:.95rem}
+.muted{color:var(--muted)}
+.banner{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:.9rem;color:var(--muted)}
+/* admin */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.topbar h1{margin:0;font-size:1.4rem}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:12px 0 16px;flex-wrap:wrap}
+.tab{padding:8px 14px;border:0;background:none;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;color:var(--muted)}
+.tab[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--card)}
+.card .ctx{font-size:.85rem;color:var(--muted);margin-bottom:4px;border-left:3px solid var(--line);padding-left:8px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:.92rem;overflow-wrap:anywhere}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.toolbar input{padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:transparent}
+.snip{width:100%;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;min-height:280px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.has-badge .wrap{padding-bottom:52px}
+.okbadge{font-size:.72rem;border-radius:6px;padding:1px 6px;background:var(--up);color:#fff}
+.warnbadge{font-size:.72rem;border-radius:6px;padding:1px 6px;background:#b45309;color:#fff}
+.warn{padding:8px 12px;border-radius:10px;border:1px solid #b45309;background:rgba(180,83,9,.08);margin:8px 0;font-size:.92rem}
+a.btn{display:inline-block;text-decoration:none}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#111;color:#fff;padding:8px 14px;border-radius:10px;font-size:.9rem;z-index:9}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(async () => {
+const qs = new URLSearchParams(location.search);
+// Opened in Lager itself (top level, not framed by a blog, no page or site of a blog in the address): the management view.
+// The comment box is what a blog frames; ?site=…&page=… still shows it at top level, as a preview.
+const framed = (() => { try { return window.self !== window.top; } catch { return true; } })();
+const isAdmin = qs.has('admin') || (!framed && !qs.has('page') && !qs.has('site'));
+const LANG = qs.get('lang') === 'en' ? 'en' : 'de';
+const theme = ['light','dark','auto'].includes(qs.get('theme')) ? qs.get('theme') : (isAdmin ? 'auto' : 'light');
+document.documentElement.dataset.theme = theme;
+document.documentElement.lang = LANG;
+const ac = qs.get('accent');
+if (ac && /^#?[0-9a-f]{3,8}$/i.test(ac)) document.documentElement.style.setProperty('--accent', ac[0] === '#' ? ac : '#' + ac);
+if (isAdmin) document.body.classList.add('admin');
+const root = document.getElementById('app');
+
+const T = {
+  de: {enjoy:'Wie fandest du diesen Beitrag?', comments:'Kommentare', none:'Noch keine Kommentare. Schreib den ersten!', name:'Name (optional)', text:'Dein Kommentar …', send:'Absenden', reply:'Antworten', cancel:'Abbrechen', replyTo:'Antwort an', pending:'Danke! Dein Kommentar erscheint für alle, sobald er freigegeben wurde.', posted:'Danke für deinen Kommentar!', tooLong:'Der Kommentar ist zu lang.', wait:'Bitte warte kurz, bevor du erneut kommentierst.', newest:'Neueste zuerst', oldest:'Älteste zuerst', up:'Gefällt mir', down:'Gefällt mir nicht', error:'Das hat nicht geklappt. Bitte versuche es später erneut.', anon:'Anonym', author:'Autor', noDb:'Kommentare sind gerade nicht verfügbar.', pendTag:'wartet auf Freigabe', edited:'bearbeitet', justNow:'gerade eben', sort:'Sortierung'},
+  en: {enjoy:'How did you like this post?', comments:'Comments', none:'No comments yet. Be the first!', name:'Name (optional)', text:'Your comment …', send:'Post comment', reply:'Reply', cancel:'Cancel', replyTo:'Replying to', pending:'Thanks! Your comment will be visible to everyone once it has been approved.', posted:'Thanks for your comment!', tooLong:'Your comment is too long.', wait:'Please wait a moment before commenting again.', newest:'Newest first', oldest:'Oldest first', up:'Like', down:'Dislike', error:'That did not work. Please try again later.', anon:'Anonymous', author:'Author', noDb:'Comments are unavailable right now.', pendTag:'awaiting approval', edited:'edited', justNow:'just now', sort:'Sort order'}
+};
+const t = k => (T[LANG][k] ?? T.de[k]);
+
+function h(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) {
+    if (c == null || c === false) continue;
+    e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return e;
+}
+const fmt = ts => { try { return new Date(ts).toLocaleString(LANG === 'de' ? 'de-DE' : 'en-GB', {dateStyle:'medium', timeStyle:'short'}); } catch { return ''; } };
+const rtf = (() => { try { return new Intl.RelativeTimeFormat(LANG, {numeric: 'auto'}); } catch { return null; } })();
+function rel(ts) {
+  if (!Number.isFinite(ts)) return '';
+  const d = (ts - Date.now()) / 1000, a = Math.abs(d);
+  if (a < 45) return t('justNow');
+  if (!rtf || a > 30 * 86400) return fmt(ts);
+  let unit = 'minute', div = 60;
+  for (const [u, s] of [['hour', 3600], ['day', 86400], ['week', 604800]]) if (a >= s) { unit = u; div = s; }
+  return rtf.format(Math.round(d / div), unit);
+}
+const timeEl = ts => h('time', {datetime: Number.isFinite(ts) ? new Date(ts).toISOString() : null, title: fmt(ts)}, rel(ts));
+const rid = () => { const a = new Uint8Array(12); crypto.getRandomValues(a); return [...a].map(b => b.toString(16).padStart(2, '0')).join(''); };
+const errMsg = e => (e && e.message) || String(e);
+const safeUrl = u => (typeof u === 'string' && /^https?:\/\//i.test(u)) ? u : null;
+const normPage = p => String(p || '/').slice(0, 300).replace(/index\.html?$/i, '').replace(/(.)\/+$/, '$1') || '/';
+const normSite = s => String(s || '').trim().toLowerCase().replace(/^www\./, '').slice(0, 100);
+const siteName = s => s || '(ohne Site)';
+const byteLen = o => new TextEncoder().encode(JSON.stringify(o)).length;
+const validC = c => c && typeof c.name === 'string' && typeof c.text === 'string' && typeof c.page === 'string';
+const clean = c => {
+  const o = {site: normSite(c.site), page: String(c.page).slice(0, 300), url: String(c.url || '').slice(0, 300), parentId: c.parentId ? String(c.parentId) : null, name: String(c.name).slice(0, 60), text: String(c.text).slice(0, 1500), createdAt: Number(c.createdAt) || Date.now(), byAdmin: false};
+  if (Number.isFinite(c.editedAt)) o.editedAt = c.editedAt;
+  return o;
+};
+function richText(s) {
+  const frag = document.createDocumentFragment();
+  const re = /\bhttps?:\/\/[^\s<>"']+/gi;
+  let last = 0, m;
+  while ((m = re.exec(s))) {
+    const url = m[0].replace(/[),.;:!?]+$/, '');
+    frag.append(s.slice(last, m.index), h('a', {href: url, target: '_blank', rel: 'nofollow ugc noopener noreferrer'}, url));
+    last = m.index + url.length; re.lastIndex = last;
+  }
+  frag.append(s.slice(last));
+  return frag;
+}
+function avatar(name, isAuthor) {
+  let x = 0; for (const ch of String(name)) x = (x * 31 + ch.codePointAt(0)) >>> 0;
+  const initial = ([...String(name).trim()][0] || '?').toUpperCase();
+  return h('div', {class: 'av', 'aria-hidden': 'true', style: 'background:' + (isAuthor ? 'var(--accent)' : 'hsl(' + (x % 360) + ' 45% 46%)')}, initial);
+}
+function keepFocus(container, fn) {
+  const ae = document.activeElement;
+  const k = ae && container.contains(ae) && ae.dataset ? ae.dataset.k : null;
+  let s = null, e = null;
+  try { s = ae.selectionStart; e = ae.selectionEnd; } catch {}
+  fn();
+  if (!k) return;
+  const el = container.querySelector('[data-k="' + CSS.escape(k) + '"]');
+  if (el && el !== document.activeElement) {
+    el.focus({preventScroll: true});
+    try { if (s != null) el.setSelectionRange(s, e); } catch {}
+  }
+}
+const SVG_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>';
+const SVG_DOWN = SVG_UP.replace('<svg ', '<svg style="transform:rotate(180deg)" ');
+
+const db = await lager.use('db');
+const user = await lager.use('user');
+if (!db) { root.append(h('p', {class: 'note'}, t('noDb'))); return; }
+
+const visitor = (() => { try { let v = localStorage.getItem('lc_v'); if (!v) { v = rid(); localStorage.setItem('lc_v', v); } return v; } catch { return rid(); } })();
+
+function tallyOf(votes, page, site) {
+  const latest = new Map();
+  for (const v of votes) {
+    if (v.target !== 'page' || typeof v.visitor !== 'string' || typeof v.page !== 'string') continue;
+    if (page != null && v.page !== page) continue;
+    if (site != null && (v.site || '') !== site) continue;
+    const key = (v.site || '') + '|' + v.page + '|' + v.visitor;
+    const c = latest.get(key);
+    if (!c || (v.ts || 0) >= (c.ts || 0)) latest.set(key, v);
+  }
+  return latest;
+}
+
+/* ================= Widget ================= */
+function widgetApp() {
+  const SITE = normSite(qs.get('site'));
+  const PAGE = normPage(qs.get('page') || '/');
+  const URLP = (qs.get('u') || '').slice(0, 300);
+  const myKey = SITE + '|' + PAGE + '|' + visitor;
+  const st = {settings: null, approved: [], open: [], votes: [], replyTo: null, sort: 'new', voteBusy: false, lastPost: 0, mine: loadMine()};
+
+  function loadMine() {
+    try {
+      const a = JSON.parse(localStorage.getItem('lc_pending') || '[]');
+      const cut = Date.now() - 14 * 864e5;
+      return Array.isArray(a) ? a.filter(c => c && typeof c.id === 'string' && c.createdAt > cut && validC(c)) : [];
+    } catch { return []; }
+  }
+  function saveMine() { try { localStorage.setItem('lc_pending', JSON.stringify(st.mine.slice(-30))); } catch {} }
+
+  const report = () => { if (window.parent !== window) window.parent.postMessage({lagerCommentsHeight: Math.ceil(document.body.getBoundingClientRect().height + 8)}, '*'); };
+  new ResizeObserver(report).observe(document.body);
+
+  const voteBar = h('div', {class: 'votes'});
+  const noteEl = h('div', {'aria-live': 'polite'});
+  const topSlot = h('div');
+  const list = h('div', {class: 'list'});
+  const titleEl = h('span');
+  const sortSel = h('select', {'aria-label': t('sort'), onchange: e => { st.sort = e.target.value; renderList(); }},
+    h('option', {value: 'new'}, t('newest')), h('option', {value: 'old'}, t('oldest')));
+
+  const banner = h('div', {class: 'banner', hidden: true});
+  const nameIn = h('input', {type: 'text', maxlength: 60, placeholder: t('name'), 'aria-label': t('name'), autocomplete: 'nickname', 'data-k': 'name'});
+  try { nameIn.value = localStorage.getItem('lc_name') || ''; } catch {}
+  const ta = h('textarea', {maxlength: 1500, placeholder: t('text'), 'aria-label': t('text'), required: true, 'data-k': 'text'});
+  const counter = h('span', {class: 'count'}, '0/1500');
+  ta.addEventListener('input', () => { counter.textContent = ta.value.length + '/1500'; });
+  const hp = h('input', {type: 'text', name: 'website', tabindex: '-1', autocomplete: 'off'});
+  const sendBtn = h('button', {class: 'btn', type: 'submit', disabled: true}, t('send'));
+  const form = h('form', {class: 'form', novalidate: true, onsubmit: onSubmit}, banner, nameIn, ta, h('div', {class: 'hp', 'aria-hidden': 'true'}, hp), h('div', {class: 'row'}, sendBtn, counter));
+
+  root.append(h('div', {class: 'wrap'}, voteBar, noteEl, topSlot, h('h2', {}, titleEl, sortSel), list));
+
+  function note(msg) { noteEl.replaceChildren(msg ? h('div', {class: 'note', role: 'status'}, msg) : ''); report(); }
+
+  function visible() {
+    const m = new Map();
+    for (const c of st.approved) if (validC(c)) m.set(c.id, c);
+    if (st.settings && st.settings.moderation === false) {
+      const since = st.settings.instantSince || 0;
+      for (const c of st.open) if (!m.has(c.id) && validC(c) && (c.createdAt || 0) >= since) m.set(c.id, {...c, byAdmin: false});
+    }
+    for (const c of st.mine) if ((c.site || '') === SITE && c.page === PAGE && !m.has(c.id)) m.set(c.id, {...c, byAdmin: false, pending: true});
+    return m;
+  }
+
+  function renderList() { keepFocus(root, renderListInner); report(); }
+  function renderListInner() {
+    const m = visible();
+    const kids = new Map();
+    for (const c of m.values()) {
+      const p = c.parentId || null;
+      if (p && !m.has(p)) continue;
+      if (!kids.has(p)) kids.set(p, []);
+      kids.get(p).push(c);
+    }
+    if (st.replyTo && !m.has(st.replyTo.id)) st.replyTo = null;
+    let count = 0;
+    const build = (c, depth) => {
+      if (!c.pending) count++;
+      const slot = h('div');
+      if (st.replyTo && st.replyTo.id === c.id) slot.append(form);
+      const ch = (kids.get(c.id) || []).slice().sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      return h('article', {class: 'c' + (c.pending ? ' is-pending' : ''), id: 'c-' + c.id},
+        avatar(c.name, c.byAdmin),
+        h('div', {class: 'cb'},
+          h('header', {}, h('strong', {}, c.name), c.byAdmin && h('span', {class: 'badge'}, t('author')), c.pending && h('span', {class: 'pendtag'}, t('pendTag')), timeEl(c.createdAt), Number.isFinite(c.editedAt) && h('span', {class: 'meta'}, '· ' + t('edited'))),
+          h('p', {class: 'txt'}, richText(c.text)),
+          !c.pending && h('div', {}, h('button', {class: 'link', type: 'button', onclick: () => { st.replyTo = c; renderList(); ta.focus(); }}, t('reply'))),
+          slot,
+          ch.length && depth < 60 ? h('div', {class: 'kids' + (depth >= 3 ? ' flat' : '')}, ch.map(x => build(x, depth + 1))) : null));
+    };
+    const roots = (kids.get(null) || []).slice().sort((a, b) => st.sort === 'new' ? (b.createdAt || 0) - (a.createdAt || 0) : (a.createdAt || 0) - (b.createdAt || 0));
+    const nodes = roots.map(c => build(c, 0));
+    if (!st.replyTo) { if (form.parentNode !== topSlot) topSlot.replaceChildren(form); }
+    else topSlot.replaceChildren();
+    if (st.replyTo) {
+      banner.hidden = false;
+      banner.replaceChildren(h('span', {}, t('replyTo') + ' ' + st.replyTo.name), h('button', {class: 'link', type: 'button', onclick: () => { st.replyTo = null; renderList(); }}, t('cancel')));
+    } else { banner.hidden = true; banner.replaceChildren(); }
+    titleEl.textContent = t('comments') + (count ? ' (' + count + ')' : '');
+    list.replaceChildren(...(nodes.length ? nodes : [h('p', {class: 'muted'}, t('none'))]));
+    sendBtn.disabled = !st.settings;
+  }
+
+  function renderVotes() {
+    const latest = tallyOf(st.votes, PAGE, SITE);
+    let up = 0, down = 0;
+    for (const v of latest.values()) { if (v.value === 1) up++; else if (v.value === -1) down++; }
+    const mine = latest.get(myKey);
+    const mv = mine ? mine.value : 0;
+    const btn = (kind, n, pressed) => {
+      const ic = h('span', {class: 'ic'}); ic.innerHTML = kind === 'up' ? SVG_UP : SVG_DOWN;
+      return h('button', {class: 'vbtn ' + kind, type: 'button', 'aria-pressed': pressed ? 'true' : 'false', 'aria-label': t(kind) + ' (' + n + ')', title: t(kind), onclick: () => cast(kind === 'up' ? 1 : -1)}, ic, h('span', {}, String(n)));
+    };
+    voteBar.replaceChildren(h('span', {class: 'q'}, t('enjoy')), btn('up', up, mv === 1), btn('down', down, mv === -1));
+    report();
+  }
+
+  async function cast(v) {
+    if (st.voteBusy) return;
+    st.voteBusy = true;
+    const mine = tallyOf(st.votes, PAGE, SITE).get(myKey);
+    const value = (mine && mine.value === v) ? 0 : v;
+    const doc = {site: SITE, page: PAGE, target: 'page', visitor, value, ts: Date.now()};
+    const local = {...doc, id: 'local' + doc.ts};
+    st.votes = [...st.votes, local]; renderVotes();
+    try { await db.collection('votes').add(doc); }
+    catch (e) { st.votes = st.votes.filter(x => x !== local); renderVotes(); note(t('error')); }
+    finally { setTimeout(() => { st.voteBusy = false; }, 600); }
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    const text = ta.value.trim();
+    if (!text || !st.settings) return;
+    if (hp.value) { ta.value = ''; note(t('posted')); return; }
+    if (Date.now() - st.lastPost < 20000) { note(t('wait')); return; }
+    const name = nameIn.value.trim().slice(0, 60) || t('anon');
+    const doc = {site: SITE, page: PAGE, url: URLP, parentId: st.replyTo ? st.replyTo.id : null, name, text: text.slice(0, 1500), createdAt: Date.now()};
+    if (text.length > 1500 || byteLen(doc) > 3900) { note(t('tooLong')); return; }
+    const moderated = st.settings.moderation !== false;
+    sendBtn.disabled = true;
+    try {
+      const ref = await db.collection(moderated ? 'inbox' : 'open').add(doc);
+      st.lastPost = Date.now();
+      if (moderated && ref && ref.id) { st.mine.push({id: ref.id, ...doc}); saveMine(); }
+      try { localStorage.setItem('lc_name', nameIn.value.trim()); } catch {}
+      ta.value = ''; counter.textContent = '0/1500'; st.replyTo = null;
+      note(moderated ? t('pending') : t('posted'));
+      renderList();
+    } catch (err) { note(t('error')); }
+    finally { sendBtn.disabled = !st.settings; }
+  }
+
+  const defaults = {moderation: true, instantSince: 0};
+  db.doc('settings/main').onSnapshot(s => { st.settings = s.exists ? s.data() : defaults; renderList(); }, () => { st.settings = defaults; renderList(); });
+  db.collection('approved').where('site', '==', SITE).where('page', '==', PAGE).onSnapshot(s => {
+    st.approved = s.docs.map(d => ({id: d.id, ...d.data()}));
+    const ids = new Set(st.approved.map(c => c.id));
+    const n = st.mine.length; st.mine = st.mine.filter(c => !ids.has(c.id)); if (st.mine.length !== n) saveMine();
+    renderList();
+  }, () => {});
+  db.collection('open').where('site', '==', SITE).where('page', '==', PAGE).onSnapshot(s => { st.open = s.docs.map(d => ({id: d.id, ...d.data()})); renderList(); }, () => {});
+  db.collection('votes').where('site', '==', SITE).where('page', '==', PAGE).limit(1000).onSnapshot(s => { st.votes = s.docs.map(d => ({id: d.id, ...d.data()})); renderVotes(); }, () => {});
+  setInterval(renderList, 60000);
+  // Lager shows its small "Made with Lager" badge in the bottom right corner for visitors; keep room for it below the
+  // last comment, and give the room back when the visitor hides it.
+  const badgeRoom = () => { document.body.classList.toggle('has-badge', !!document.querySelector('lager-badge')); report(); };
+  new MutationObserver(badgeRoom).observe(document.body, {childList: true});
+  badgeRoom();
+  renderVotes(); renderList();
+}
+
+/* ================= Admin ================= */
+async function adminApp() {
+  const safe = async f => { try { return user ? await f() : false; } catch { return false; } };
+  const owner = await safe(() => user.isOwner());
+  const editor = owner || await safe(() => user.canEdit());
+  const wrap = h('div', {class: 'wrap'});
+  root.append(wrap);
+  document.title = 'Kommentare – Verwaltung';
+  if (!editor) {
+    // A public instance signs nobody in by itself: offer the sign-in address the server names for this instance.
+    let session = null;
+    try { session = await (await fetch('/__lager/session', {credentials: 'same-origin'})).json(); } catch {}
+    const signedIn = !!(session && session.viewer && session.viewer.id);
+    const login = session && typeof session.loginUrl === 'string' && /^(https?:\/\/|\/)/.test(session.loginUrl) ? session.loginUrl : null;
+    wrap.append(h('h1', {}, 'Kommentare – Verwaltung'),
+      signedIn
+        ? h('p', {class: 'note'}, 'Du bist angemeldet, verwaltest diese Instanz aber nicht. Bitte den Besitzer, dich als Manager hinzuzufügen.')
+        : h('div', {class: 'card'}, h('p', {}, 'Melde dich mit deinem Lager-Konto an, um Kommentare zu prüfen, zu beantworten und zu löschen.'),
+            login ? h('a', {class: 'btn', href: login}, 'Mit Lager anmelden') : h('p', {class: 'meta'}, 'Melde dich auf deinem Lager-Server an und öffne diese Adresse erneut.')));
+    return;
+  }
+  const dl = await lager.use('downloads');
+  const embed = await lager.use('embed');
+  const A = {inbox: [], approved: [], open: [], votes: [], settings: null, embed: null, embedError: null};
+  async function loadEmbed() {
+    if (!embed) return;
+    try { A.embed = await embed.get(); A.embedError = null; } catch (e) { A.embedError = errMsg(e); }
+    schedule();
+  }
+  const hostOf = o => { try { return normSite(new URL(o).hostname); } catch { return ''; } };
+  const embedSites = () => new Set(((A.embed && A.embed.active) || []).map(hostOf));
+  const siteEmbedded = s => !s || embedSites().has(s);
+  let tab = 'pending', filterPage = '', search = '', denied = false, timer = null;
+  let siteSel = qs.has('site') ? normSite(qs.get('site')) : null; // null = alle Sites
+  const drafts = {}; const openReply = new Set(); const editing = new Set();
+
+  const toast = msg => { const el = h('div', {class: 'toast', role: 'status'}, msg); document.body.append(el); setTimeout(() => el.remove(), 3000); };
+  const cbtn = (label, fn, cls = 'btn sec small') => {
+    let armed = false, tm; const b = h('button', {class: cls, type: 'button'}, label);
+    b.addEventListener('click', async () => {
+      if (!armed) { armed = true; b.textContent = 'Sicher?'; tm = setTimeout(() => { armed = false; b.textContent = label; }, 4000); return; }
+      clearTimeout(tm); b.disabled = true;
+      try { await fn(); } catch (e) { toast(errMsg(e)); b.disabled = false; }
+    });
+    return b;
+  };
+  const abtn = (label, fn, cls = 'btn small') => h('button', {class: cls, type: 'button', onclick: async ev => { const b = ev.currentTarget; b.disabled = true; try { await fn(); } catch (e) { toast(errMsg(e)); } b.disabled = false; }}, label);
+
+  const since = () => (A.settings && A.settings.instantSince) || 0;
+  const instant = () => !!(A.settings && A.settings.moderation === false);
+  const openVisible = c => instant() && validC(c) && (c.createdAt || 0) >= since();
+  const inSite = c => siteSel === null || (c.site || '') === siteSel;
+  function everything() {
+    const m = new Map();
+    for (const c of A.inbox) if (validC(c)) m.set(c.id, {...c, col: 'inbox'});
+    for (const c of A.open) if (validC(c)) m.set(c.id, {...c, col: 'open'});
+    for (const c of A.approved) if (validC(c)) m.set(c.id, {...c, col: 'approved'});
+    return m;
+  }
+  function allSites() {
+    const s = new Set();
+    for (const c of [...A.inbox, ...A.approved, ...A.open, ...A.votes]) if (c && typeof c.page === 'string') s.add(c.site || '');
+    for (const o of (A.embed && A.embed.origins) || []) { const host = hostOf(o); if (host) s.add(host); }
+    if (siteSel !== null) s.add(siteSel);
+    return [...s].sort();
+  }
+  function setSite(v) {
+    siteSel = v; filterPage = '';
+    const u = new URL(location.href);
+    // With a site in the address the page would open as the comment box; ?admin keeps it the management view on reload.
+    if (v === null) u.searchParams.delete('site'); else { u.searchParams.set('admin', ''); u.searchParams.set('site', v); }
+    history.replaceState(null, '', u);
+    draw();
+  }
+  const pageLabel = c => { const u = safeUrl(c.url); return u ? h('a', {href: u, target: '_blank', rel: 'noopener noreferrer'}, c.page) : h('span', {}, c.page); };
+
+  async function approve(c) { await db.doc('approved/' + c.id).set(clean(c)); await db.doc('inbox/' + c.id).delete(); }
+  async function removeComment(c) {
+    const all = [...everything().values()];
+    const del = new Map([[c.id, c.col]]);
+    let grew = true;
+    while (grew) { grew = false; for (const x of all) if (x.parentId && del.has(x.parentId) && !del.has(x.id)) { del.set(x.id, x.col); grew = true; } }
+    for (const [id, col] of del) await db.doc(col + '/' + id).delete();
+    toast(del.size > 1 ? del.size + ' Kommentare gelöscht' : 'Gelöscht');
+  }
+  async function adminReply(parent, text) {
+    const name = (await safe(() => user.name())) || 'Autor';
+    await db.collection('approved').add({site: normSite(parent.site), page: parent.page, url: parent.url || '', parentId: parent.id, name: String(name).slice(0, 60), text: text.slice(0, 1500), createdAt: Date.now(), byAdmin: true});
+  }
+  async function saveEdit(c, text) { await db.doc(c.col + '/' + c.id).update({text: text.slice(0, 1500), editedAt: Date.now()}); }
+  async function setModeration(v) {
+    try {
+      if (v && instant()) for (const c of A.open) if (openVisible(c)) await db.doc('approved/' + c.id).set(clean(c));
+      await db.doc('settings/main').set({moderation: v, instantSince: v ? since() : Date.now()});
+      if (v) for (const c of A.open) await db.doc('open/' + c.id).delete();
+      toast(v ? 'Moderation aktiviert' : 'Kommentare erscheinen jetzt sofort');
+    } catch (e) { toast(errMsg(e)); draw(); }
+  }
+
+  function commentCard(c, actions) {
+    const m = everything(); const p = c.parentId ? m.get(c.parentId) : null;
+    const id = c.id;
+    let extra = null;
+    if (editing.has(id)) {
+      const k = 'e' + id;
+      extra = h('div', {style: 'margin-top:8px'},
+        h('textarea', {'data-k': k, maxlength: 1500, oninput: e => { drafts[k] = e.target.value; }}, drafts[k] ?? c.text),
+        h('div', {class: 'row'}, abtn('Speichern', async () => { const tx = (drafts[k] ?? c.text).trim(); if (!tx) return; await saveEdit(c, tx); delete drafts[k]; editing.delete(id); toast('Gespeichert'); draw(); }),
+          h('button', {class: 'btn sec small', type: 'button', onclick: () => { editing.delete(id); delete drafts[k]; draw(); }}, 'Abbrechen')));
+    } else if (openReply.has(id)) {
+      const k = 'r' + id;
+      extra = h('div', {style: 'margin-top:8px'},
+        h('textarea', {'data-k': k, maxlength: 1500, placeholder: 'Antwort als Autor …', oninput: e => { drafts[k] = e.target.value; }}, drafts[k] || ''),
+        h('div', {class: 'row'}, abtn('Antwort senden', async () => { const tx = (drafts[k] || '').trim(); if (!tx) return; await adminReply(c, tx); delete drafts[k]; openReply.delete(id); toast('Antwort veröffentlicht'); draw(); }),
+          h('button', {class: 'btn sec small', type: 'button', onclick: () => { openReply.delete(id); draw(); }}, 'Abbrechen')));
+    }
+    return h('div', {class: 'card'},
+      p ? h('div', {class: 'ctx'}, 'Antwort auf ' + p.name + ': ' + p.text.slice(0, 90) + (p.text.length > 90 ? '…' : '')) : null,
+      h('div', {class: 'meta row', style: 'gap:6px'}, h('strong', {style: 'color:var(--fg)'}, c.name), c.byAdmin ? h('span', {class: 'badge'}, 'Autor') : null, '·', h('span', {title: fmt(c.createdAt)}, rel(c.createdAt)), Number.isFinite(c.editedAt) ? '· bearbeitet' : null, '·', siteSel === null ? h('span', {class: 'sbadge'}, siteName(c.site)) : null, pageLabel(c)),
+      h('p', {class: 'txt'}, richText(c.text)),
+      h('div', {class: 'row'}, actions), extra);
+  }
+  const editBtn = c => h('button', {class: 'btn sec small', type: 'button', onclick: () => { openReply.delete(c.id); editing.add(c.id); draw(); }}, 'Bearbeiten');
+
+  function pendingView() {
+    const items = A.inbox.filter(validC).filter(inSite).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    if (!items.length) return h('p', {class: 'muted'}, siteSel === null ? 'Keine Kommentare zur Prüfung.' : 'Keine Kommentare zur Prüfung auf ' + siteName(siteSel) + '.');
+    return h('div', {}, h('div', {class: 'toolbar'}, cbtn('Alle ' + items.length + ' freigeben', async () => { for (const c of items) await approve(c); toast('Alle freigegeben'); }, 'btn small')),
+      items.map(c => { const x = {...c, col: 'inbox'}; return commentCard(x, [abtn('Freigeben', () => approve(c)), editBtn(x), cbtn('Löschen', () => removeComment(x), 'btn danger small')]); }));
+  }
+
+  const csvCell = v => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+  function allView() {
+    const items = [...A.approved.filter(validC).map(c => ({...c, col: 'approved'})), ...A.open.filter(openVisible).map(c => ({...c, col: 'open', byAdmin: false}))].filter(inSite).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const pages = [...new Set(items.map(c => c.page))].sort();
+    if (filterPage && !pages.includes(filterPage)) filterPage = '';
+    const sel = h('select', {'data-k': 'fpage', 'aria-label': 'Seite', onchange: e => { filterPage = e.target.value; draw(); }}, h('option', {value: ''}, 'Alle Seiten'), pages.map(p => h('option', {value: p, selected: p === filterPage}, p)));
+    const q = h('input', {type: 'search', 'data-k': 'search', placeholder: 'Suchen …', value: search, oninput: e => { search = e.target.value; clearTimeout(q._t); q._t = setTimeout(draw, 250); }});
+    const shown = items.filter(c => (!filterPage || c.page === filterPage) && (!search || (c.text + ' ' + c.name).toLowerCase().includes(search.toLowerCase())));
+    const exp = dl ? abtn('CSV exportieren', async () => {
+      const rows = [['Site', 'Seite', 'URL', 'Name', 'Kommentar', 'Datum', 'Autor', 'Antwort auf'], ...shown.map(c => [c.site || '', c.page, c.url || '', c.name, c.text, new Date(c.createdAt).toISOString(), c.byAdmin ? 'ja' : '', c.parentId || ''])];
+      await dl.save({filename: 'kommentare' + (siteSel ? '-' + siteSel.replace(/[^a-z0-9.-]/g, '-') : '') + '.csv', data: '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n')});
+    }, 'btn sec small') : null;
+    return h('div', {}, h('div', {class: 'toolbar'}, sel, q, exp),
+      h('p', {class: 'meta'}, shown.length + ' Kommentar' + (shown.length === 1 ? '' : 'e') + (shown.length > 200 ? ' (die neuesten 200 werden angezeigt)' : '')),
+      shown.length ? shown.slice(0, 200).map(c => commentCard(c, [h('button', {class: 'btn sec small', type: 'button', onclick: () => { editing.delete(c.id); openReply.add(c.id); draw(); }}, 'Antworten'), editBtn(c), cbtn('Löschen', () => removeComment(c), 'btn danger small')])) : h('p', {class: 'muted'}, 'Keine Kommentare gefunden.'));
+  }
+
+  function pagesView() {
+    const pages = new Map();
+    const get = (site, p) => { const k = (site || '') + '\u0000' + p; if (!pages.has(k)) pages.set(k, {site: site || '', page: p, url: '', comments: 0, pending: 0, up: 0, down: 0, last: 0}); return pages.get(k); };
+    const touch = (s, c) => { s.url = s.url || c.url || ''; s.last = Math.max(s.last, c.createdAt || 0); };
+    for (const c of A.approved) if (validC(c) && inSite(c)) { const s = get(c.site, c.page); s.comments++; touch(s, c); }
+    for (const c of A.open) if (openVisible(c) && inSite(c)) { const s = get(c.site, c.page); s.comments++; touch(s, c); }
+    for (const c of A.inbox) if (validC(c) && inSite(c)) { const s = get(c.site, c.page); s.pending++; touch(s, c); }
+    for (const v of tallyOf(A.votes, null, siteSel).values()) { const s = get(v.site, v.page); if (v.value === 1) s.up++; else if (v.value === -1) s.down++; }
+    const rows = [...pages.values()].filter(r => r.comments + r.pending + r.up + r.down > 0).sort((a, b) => b.last - a.last || (b.comments + b.up + b.down) - (a.comments + a.up + a.down));
+    if (!rows.length) return h('p', {class: 'muted'}, 'Noch keine Aktivität.');
+    const showSite = siteSel === null;
+    const open = r => { if (showSite) { siteSel = r.site; const u = new URL(location.href); u.searchParams.set('admin', ''); u.searchParams.set('site', r.site); history.replaceState(null, '', u); } filterPage = r.page; tab = 'all'; draw(); };
+    return h('div', {}, h('table', {}, h('thead', {}, h('tr', {}, [showSite && 'Site', 'Seite', 'Kommentare', 'Offen', '👍', '👎', ''].filter(x => x !== false).map(x => h('th', {}, x)))),
+      h('tbody', {}, rows.map(r => h('tr', {}, showSite ? h('td', {}, siteName(r.site), A.embed && r.site && !siteEmbedded(r.site) ? [' ', h('span', {class: 'warnbadge', title: 'Nicht als Website freigegeben'}, '!')] : null) : null, h('td', {}, pageLabel(r)), h('td', {}, r.comments), h('td', {}, r.pending), h('td', {}, r.up), h('td', {}, r.down), h('td', {}, r.comments ? h('button', {class: 'link', type: 'button', onclick: () => open(r)}, 'Anzeigen') : ''))))),
+      A.votes.length >= 1000 ? h('p', {class: 'meta'}, 'Hinweis: Es werden maximal 1000 Abstimmungs-Ereignisse gelesen; bei sehr vielen Stimmen können Zahlen abweichen.') : null);
+  }
+
+  function snippet(preset) {
+    const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+    return [
+      '<div id="lager-comments"' + (preset ? ' data-site="' + preset.replace(/"/g, '') + '"' : '') + '></div>',
+      '<script>',
+      '(function(){',
+      '  var box=document.getElementById("lager-comments");',
+      '  var u=new URL("' + base + '");',
+      '  u.searchParams.set("site",box.getAttribute("data-site")||location.hostname);',
+      '  u.searchParams.set("page",box.getAttribute("data-page")||location.pathname);',
+      '  u.searchParams.set("u",location.href.split("#")[0]);',
+      '  ["theme","accent","lang"].forEach(function(k){var v=box.getAttribute("data-"+k);if(v)u.searchParams.set(k,v)});',
+      '  var f=document.createElement("iframe");',
+      '  f.src=u.href;f.title="Kommentare";f.loading="lazy";',
+      '  f.style.cssText="width:100%;border:0;height:360px;display:block";',
+      '  box.appendChild(f);',
+      '  window.addEventListener("message",function(e){',
+      '    if(e.source===f.contentWindow&&e.data&&e.data.lagerCommentsHeight)f.style.height=e.data.lagerCommentsHeight+"px";',
+      '  });',
+      '})();',
+      '<\/script>'
+    ].join('\n');
+  }
+
+  function embedCard() {
+    const title = h('strong', {}, 'Websites mit Kommentarfeld');
+    if (!embed) return h('div', {class: 'card'}, title, h('p', {class: 'meta'}, 'Dieser Lager-Server kann die App noch nicht auf anderen Websites zeigen. Aktualisiere Lager auf eine Version mit „embed“.'));
+    if (A.embedError) return h('div', {class: 'card'}, title, h('p', {class: 'meta'}, 'Die Liste konnte nicht geladen werden: ' + A.embedError), abtn('Erneut laden', loadEmbed, 'btn sec small'));
+    if (!A.embed) return h('div', {class: 'card'}, title, h('p', {class: 'meta'}, 'Wird geladen …'));
+    const active = new Set(A.embed.active);
+    const rows = A.embed.origins.map(o => h('tr', {},
+      h('td', {}, h('span', {style: 'font-family:ui-monospace,Menlo,Consolas,monospace'}, o)),
+      h('td', {}, active.has(o) ? h('span', {class: 'okbadge'}, 'aktiv') : h('span', {class: 'warnbadge'}, 'nicht wirksam')),
+      h('td', {style: 'text-align:right'}, cbtn('Entfernen', async () => { A.embed = await embed.setOrigins(A.embed.origins.filter(x => x !== o)); toast('Entfernt'); draw(); }, 'btn danger small'))));
+    return h('div', {class: 'card'}, title,
+      h('p', {class: 'meta'}, 'Nur auf diesen Websites lässt sich das Kommentarfeld einbetten. Neue Websites fügst du aus Sicherheitsgründen auf der Lager-Seite dieser Instanz hinzu; hier kannst du sie sehen und entfernen.'),
+      rows.length ? h('table', {}, h('tbody', {}, rows)) : h('p', {class: 'warn'}, 'Noch keine Website freigegeben – das Snippet zeigt auf deinem Blog erst etwas, wenn du die Adresse hinzugefügt hast.'),
+      h('div', {class: 'row', style: 'margin-top:10px'},
+        A.embed.manageUrl ? h('a', {class: 'btn small', href: A.embed.manageUrl, target: '_blank', rel: 'noopener'}, 'Website auf Lager hinzufügen ↗') : null,
+        abtn('Aktualisieren', loadEmbed, 'btn sec small')),
+      h('p', {class: 'meta'}, 'Trage jede Adresse so ein, wie sie im Browser steht, z. B. https://meinblog.de. Nutzt dein Blog auch www., brauchst du https://www.meinblog.de zusätzlich. Adressen unter der Domain dieses Lager-Servers lehnt Lager ab, weil Besucher dort angemeldet im Rahmen wären.'));
+  }
+
+  function settingsView() {
+    const cb = h('input', {type: 'checkbox', id: 'mod', onchange: e => setModeration(e.target.checked)});
+    cb.checked = !A.settings || A.settings.moderation !== false;
+    const stray = A.open.filter(c => !openVisible(c));
+    const snip = snippet(siteSel);
+    const ta = h('textarea', {class: 'snip', readonly: true, onfocus: e => e.target.select()}, snip);
+    return h('div', {},
+      h('div', {class: 'card'}, h('label', {class: 'row'}, cb, h('strong', {}, 'Kommentare vor der Veröffentlichung prüfen')),
+        h('p', {class: 'meta'}, 'Gilt für alle Sites. Aktiv: neue Kommentare landen unter „Prüfen“ und erscheinen erst nach deiner Freigabe. Aus: Kommentare erscheinen sofort (Löschen und Bearbeiten bleibt möglich).')),
+      embedCard(),
+      h('div', {class: 'card'}, h('strong', {}, 'Snippet' + (siteSel !== null ? ' für ' + siteName(siteSel) : '')),
+        siteSel && A.embed && !siteEmbedded(siteSel) ? h('p', {class: 'warn'}, siteName(siteSel) + ' ist noch nicht als Website freigegeben. Füge die Adresse oben über „Website auf Lager hinzufügen“ hinzu, sonst bleibt das Kommentarfeld dort leer.') : null,
+        h('p', {class: 'meta'}, 'Auf jeder Seite einfügen, wo Kommentare erscheinen sollen. Die Site ist standardmäßig der Hostname (ohne www.), die Seite der Pfad. Mit data-site="…" und data-page="…" am div legst du beides fest – praktisch für Apps, deren URLs sich ändern. Optional: data-theme="light|dark|auto", data-accent="#2f5bea", data-lang="de|en".'),
+        ta, h('div', {class: 'row', style: 'margin-top:8px'}, abtn('Snippet kopieren', async () => { try { await navigator.clipboard.writeText(snip); toast('Kopiert'); } catch { ta.focus(); toast('Bitte mit Strg/Cmd+C kopieren'); } }, 'btn small'))),
+      h('div', {class: 'card'}, h('strong', {}, 'Gut zu wissen'), h('p', {class: 'meta'}, 'Die Instanz muss „öffentlich“ sein, damit Besucher lesen und schreiben können. Im Kommentarfeld sind alle Besucher Gäste, auch du; antworten, freigeben und löschen kannst du hier. Freigegebene Websites erscheinen sofort in der Site-Auswahl oben. Unten rechts im Kommentarfeld zeigt Lager ein kleines „Made with Lager“-Abzeichen; es lässt sich auf der Lager-Seite der Instanz abschalten. Diese Verwaltung erreichst du direkt unter ' + location.origin + '/')),
+      stray.length ? h('div', {class: 'card'}, h('p', {class: 'meta'}, stray.length + ' nicht angezeigte Direkt-Einträge (z. B. aus der Zeit vor einer Umstellung oder Spam).'), cbtn('Aufräumen', async () => { for (const c of stray) await db.doc('open/' + c.id).delete(); toast('Aufgeräumt'); }, 'btn danger small')) : null);
+  }
+
+  function draw() { keepFocus(wrap, drawInner); }
+  function drawInner() {
+    if (denied) { wrap.replaceChildren(h('h1', {}, 'Kommentare – Verwaltung'), h('p', {class: 'note'}, 'Kein Zugriff auf die Moderationsdaten. Du brauchst Manager- oder Besitzerrechte auf dieser Instanz.')); return; }
+    const pendAll = A.inbox.filter(validC).length;
+    const pend = A.inbox.filter(validC).filter(inSite).length;
+    document.title = (pendAll ? '(' + pendAll + ') ' : '') + 'Kommentare – Verwaltung';
+    const sites = allSites();
+    const pendBySite = s => A.inbox.filter(c => validC(c) && (c.site || '') === s).length;
+    const siteSelect = h('select', {'data-k': 'site', 'aria-label': 'Site auswählen', onchange: e => setSite(e.target.value === '*' ? null : e.target.value)},
+      h('option', {value: '*', selected: siteSel === null}, 'Alle Sites' + (pendAll ? ' (' + pendAll + ' offen)' : '')),
+      sites.map(s => { const n = pendBySite(s); return h('option', {value: s, selected: siteSel === s}, siteName(s) + (n ? ' (' + n + ' offen)' : '')); }));
+    const tabs = [['pending', 'Prüfen' + (pend ? ' (' + pend + ')' : '')], ['all', 'Kommentare'], ['pages', 'Seiten'], ['settings', 'Einstellungen']];
+    const body = tab === 'pending' ? pendingView() : tab === 'all' ? allView() : tab === 'pages' ? pagesView() : settingsView();
+    wrap.replaceChildren(h('div', {class: 'topbar'}, h('h1', {}, 'Kommentare – Verwaltung'), h('label', {class: 'row meta'}, 'Site:', siteSelect)),
+      h('div', {class: 'tabs', role: 'tablist'}, tabs.map(([k, l]) => h('button', {class: 'tab', role: 'tab', 'aria-selected': tab === k ? 'true' : 'false', onclick: () => { tab = k; draw(); }}, l))), body);
+  }
+  const schedule = () => { clearTimeout(timer); timer = setTimeout(draw, 120); };
+
+  const sub = (col, key, limit) => { let q = db.collection(col); if (limit) q = q.limit(limit); return q.onSnapshot(s => { A[key] = s.docs.map(d => ({id: d.id, ...d.data()})); schedule(); }, () => { if (col === 'inbox') { denied = true; draw(); } }); };
+  db.doc('settings/main').onSnapshot(s => { A.settings = s.exists ? s.data() : null; schedule(); }, () => {});
+  sub('inbox', 'inbox', 1000); sub('approved', 'approved', 1000); sub('open', 'open', 1000); sub('votes', 'votes', 1000);
+  setInterval(() => { if (!document.querySelector('textarea:focus,input:focus,select:focus')) draw(); }, 60000);
+  // Websites are added on the Lager page in another tab: read the list again when the owner comes back.
+  window.addEventListener('focus', loadEmbed);
+  loadEmbed();
+  draw();
+}
+
+if (isAdmin) await adminApp(); else widgetApp();
+})();
+</script>
+</body>
+</html>

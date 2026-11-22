@@ -1,0 +1,929 @@
+[
+ {
+  "path": "facts/f001",
+  "data": {
+   "cat": "Weltall",
+   "n": 1,
+   "text": "Die Venus dreht sich so langsam, dass eine Umdrehung um ihre eigene Achse 243 Erdtage dauert – länger als ihr Jahr, also eine Runde um die Sonne, mit nur 225 Tagen. Außerdem dreht sie sich andersherum: Auf der Venus ginge die Sonne im Westen auf.",
+   "title": "Länger als ein Jahr"
+  }
+ },
+ {
+  "path": "facts/f002",
+  "data": {
+   "cat": "Biologie",
+   "n": 2,
+   "text": "Kraken haben drei Herzen: Zwei pumpen Blut durch die Kiemen, eins durch den restlichen Körper. Ihr Blut ist blau, weil der Sauerstoff an kupferhaltiges Hämocyanin gebunden ist statt an eisenhaltiges Hämoglobin.",
+   "title": "Drei Herzen, blaues Blut"
+  }
+ },
+ {
+  "path": "facts/f003",
+  "data": {
+   "cat": "Physik",
+   "n": 3,
+   "text": "Ein Blitzkanal erhitzt sich für Sekundenbruchteile auf rund 30.000 °C – etwa fünfmal heißer als die Oberfläche der Sonne. Die schlagartige Ausdehnung der Luft hören wir als Donner.",
+   "title": "Heißer als die Sonne"
+  }
+ },
+ {
+  "path": "facts/f004",
+  "data": {
+   "cat": "Mensch",
+   "n": 4,
+   "text": "Lange hieß es, in uns lebten zehnmal mehr Bakterien als Körperzellen. Neuere Schätzungen zeigen: Es sind ungefähr gleich viele – rund 38 Billionen Bakterien auf etwa 30 Billionen menschliche Zellen.",
+   "title": "Halb Mensch, halb Mikrobe"
+  }
+ },
+ {
+  "path": "facts/f005",
+  "data": {
+   "cat": "Erde",
+   "n": 5,
+   "text": "Vom Fuß bis zum Gipfel gemessen ist nicht der Mount Everest der höchste Berg, sondern der Mauna Kea auf Hawaii: rund 10.200 Meter. Nur liegt mehr als die Hälfte davon unter dem Meeresspiegel.",
+   "title": "Der wahre höchste Berg"
+  }
+ },
+ {
+  "path": "facts/f006",
+  "data": {
+   "cat": "Mathe",
+   "n": 6,
+   "text": "Schon bei 23 Personen in einem Raum ist die Wahrscheinlichkeit größer als 50 %, dass zwei am selben Tag Geburtstag haben. Bei 70 Personen sind es über 99,9 %.",
+   "title": "Das Geburtstagsparadox"
+  }
+ },
+ {
+  "path": "facts/f007",
+  "data": {
+   "cat": "Chemie",
+   "n": 7,
+   "text": "Gallium ist ein Metall, das schon bei 29,8 °C schmilzt. Legt man ein Stück auf die Handfläche, wird es nach kurzer Zeit flüssig und glänzt wie Quecksilber.",
+   "title": "Metall, das in der Hand schmilzt"
+  }
+ },
+ {
+  "path": "facts/f008",
+  "data": {
+   "cat": "Technik",
+   "n": 8,
+   "text": "1947 fanden Techniker im Harvard-Mark-II-Rechner eine Motte, die eine Störung verursachte. Sie klebten sie ins Logbuch – mit dem Vermerk, dies sei der erste echte Fall eines gefundenen „Bugs“.",
+   "title": "Der erste Bug war ein Insekt"
+  }
+ },
+ {
+  "path": "facts/f009",
+  "data": {
+   "cat": "Weltall",
+   "n": 9,
+   "text": "Neutronensterne sind so dicht, dass ein Teelöffel ihrer Materie auf der Erde rund eine Milliarde Tonnen wiegen würde. Mehr Masse als die Sonne steckt dort in einer Kugel von nur etwa 20 Kilometern Durchmesser.",
+   "title": "Ein Teelöffel Stern"
+  }
+ },
+ {
+  "path": "facts/f010",
+  "data": {
+   "cat": "Biologie",
+   "n": 10,
+   "text": "Botanisch gesehen sind Bananen, Kiwis und sogar Auberginen Beeren – Erdbeeren und Himbeeren dagegen nicht. Bei der Erdbeere sind die eigentlichen Früchte die kleinen gelben „Kerne“ auf der Außenseite.",
+   "title": "Bananen sind Beeren"
+  }
+ },
+ {
+  "path": "facts/f011",
+  "data": {
+   "cat": "Physik",
+   "n": 11,
+   "text": "Alte Kirchenfenster sind unten oft dicker – aber nicht, weil Glas über Jahrhunderte nach unten fließt. Das ist ein Mythos. Früher ließ sich Glas nicht gleichmäßig dick herstellen, und Glaser setzten die dickere Seite meist nach unten.",
+   "title": "Glas fließt nicht"
+  }
+ },
+ {
+  "path": "facts/f012",
+  "data": {
+   "cat": "Mensch",
+   "n": 12,
+   "text": "Dein Gehirn macht nur etwa 2 % deines Körpergewichts aus, verbraucht aber rund 20 % deiner Energie – auch dann, wenn du gerade gar nichts tust.",
+   "title": "Energiefresser Gehirn"
+  }
+ },
+ {
+  "path": "facts/f013",
+  "data": {
+   "cat": "Erde",
+   "n": 13,
+   "text": "Die größte Wüste der Welt ist nicht die Sahara, sondern die Antarktis. Eine Wüste wird über geringen Niederschlag definiert – und im Inneren der Antarktis fällt weniger als in vielen heißen Wüsten.",
+   "title": "Die größte Wüste ist kalt"
+  }
+ },
+ {
+  "path": "facts/f014",
+  "data": {
+   "cat": "Biologie",
+   "n": 14,
+   "text": "Haie gibt es seit über 400 Millionen Jahren. Damit sind sie älter als Bäume, die erst vor rund 385 Millionen Jahren auftauchten.",
+   "title": "Älter als Bäume"
+  }
+ },
+ {
+  "path": "facts/f015",
+  "data": {
+   "cat": "Weltall",
+   "n": 15,
+   "text": "Die Internationale Raumstation umrundet die Erde etwa alle 90 Minuten. Die Crew erlebt deshalb rund 16 Sonnenaufgänge und 16 Sonnenuntergänge pro Tag.",
+   "title": "16 Sonnenaufgänge am Tag"
+  }
+ },
+ {
+  "path": "facts/f016",
+  "data": {
+   "cat": "Mathe",
+   "n": 16,
+   "text": "Ein Kartenspiel mit 52 Karten lässt sich auf etwa 8 × 10⁶⁷ Arten ordnen. Mischst du gründlich, hältst du mit sehr hoher Wahrscheinlichkeit eine Reihenfolge in der Hand, die es in der Geschichte noch nie gegeben hat.",
+   "title": "Eine Reihenfolge, die es nie gab"
+  }
+ },
+ {
+  "path": "facts/f017",
+  "data": {
+   "cat": "Chemie",
+   "n": 17,
+   "text": "Diamant und Graphit – das Zeug in deinem Bleistift – bestehen beide aus reinem Kohlenstoff. Der Unterschied liegt nur in der Anordnung der Atome: im Diamanten als festes 3D-Gitter, im Graphit als gleitende Schichten.",
+   "title": "Zweimal reiner Kohlenstoff"
+  }
+ },
+ {
+  "path": "facts/f018",
+  "data": {
+   "cat": "Mensch",
+   "n": 18,
+   "text": "Jedes deiner Augen hat einen blinden Fleck – dort, wo der Sehnerv die Netzhaut verlässt und keine Sinneszellen sitzen. Du bemerkst ihn nicht, weil dein Gehirn die Lücke einfach mit passender Umgebung auffüllt.",
+   "title": "Der blinde Fleck"
+  }
+ },
+ {
+  "path": "facts/f019",
+  "data": {
+   "cat": "Erde",
+   "n": 19,
+   "text": "Jedes Jahr weht der Wind Millionen Tonnen Staub aus der Sahara über den Atlantik. Ein Teil landet im Amazonasgebiet und liefert dort Phosphor – einen Nährstoff, der dem ausgewaschenen Regenwaldboden fehlt.",
+   "title": "Wüstenstaub düngt den Regenwald"
+  }
+ },
+ {
+  "path": "facts/f020",
+  "data": {
+   "cat": "Technik",
+   "n": 20,
+   "text": "Der Bordcomputer der Apollo-Missionen hatte rund 4 Kilobyte Arbeitsspeicher. Ein heutiges Smartphone hat millionenfach mehr – und trotzdem brachte der Apollo-Computer Menschen sicher zum Mond.",
+   "title": "Mondlandung mit 4 Kilobyte"
+  }
+ },
+ {
+  "path": "facts/f021",
+  "data": {
+   "cat": "Biologie",
+   "n": 21,
+   "text": "Wombats sind die einzigen bekannten Tiere, die würfelförmigen Kot produzieren. Die Kanten entstehen im Darm durch unterschiedlich steife Abschnitte der Darmwand. Die Würfel nutzen sie, um ihr Revier zu markieren.",
+   "title": "Würfelkot"
+  }
+ },
+ {
+  "path": "facts/f022",
+  "data": {
+   "cat": "Physik",
+   "n": 22,
+   "text": "Schall breitet sich in Wasser rund viermal schneller aus als in Luft – etwa 1.500 statt 343 Meter pro Sekunde. Wale können sich deshalb über Hunderte Kilometer verständigen.",
+   "title": "Schnell unter Wasser"
+  }
+ },
+ {
+  "path": "facts/f023",
+  "data": {
+   "cat": "Weltall",
+   "n": 23,
+   "text": "Der Mond entfernt sich jedes Jahr um etwa 3,8 Zentimeter von der Erde – ungefähr so schnell, wie Fingernägel wachsen. Gemessen wird das mit Laserstrahlen, die an Spiegeln der Apollo-Missionen reflektiert werden.",
+   "title": "Der Mond haut ab"
+  }
+ },
+ {
+  "path": "facts/f024",
+  "data": {
+   "cat": "Mensch",
+   "n": 24,
+   "text": "Gänsehaut ist ein Überbleibsel unserer Vorfahren: Winzige Muskeln richten die Haare auf. Bei Tieren mit dichtem Fell plustert das auf – es wärmt und lässt sie größer wirken. Bei uns bleibt davon nur die Gänsehaut.",
+   "title": "Gänsehaut vom Fell"
+  }
+ },
+ {
+  "path": "facts/f025",
+  "data": {
+   "cat": "Erde",
+   "n": 25,
+   "text": "Auf der Erde wachsen rund drei Billionen Bäume. Die Milchstraße hat nach Schätzungen nur 100 bis 400 Milliarden Sterne – es gibt also mehr Bäume auf unserem Planeten als Sterne in unserer Galaxie.",
+   "title": "Mehr Bäume als Sterne"
+  }
+ },
+ {
+  "path": "facts/f026",
+  "data": {
+   "cat": "Chemie",
+   "n": 26,
+   "text": "Wasser dehnt sich beim Gefrieren um etwa 9 % aus – fast alle anderen Stoffe ziehen sich zusammen. Deshalb schwimmt Eis, Seen frieren von oben zu, und Fische können darunter überwintern.",
+   "title": "Warum Eis oben schwimmt"
+  }
+ },
+ {
+  "path": "facts/f027",
+  "data": {
+   "cat": "Mathe",
+   "n": 27,
+   "text": "0,999… mit unendlich vielen Neunen ist nicht „fast“ 1, sondern exakt 1. Ein einfacher Beweis: 1/3 = 0,333…, und dreimal 0,333… ergibt 0,999… – also 3/3 = 1.",
+   "title": "0,999… ist genau 1"
+  }
+ },
+ {
+  "path": "facts/f028",
+  "data": {
+   "cat": "Biologie",
+   "n": 28,
+   "text": "Katzen können Süßes nicht schmecken. Ihnen fehlt ein funktionierendes Gen für den Süß-Rezeptor. Als reine Fleischfresser haben sie ihn im Lauf der Evolution schlicht nicht gebraucht.",
+   "title": "Katzen schmecken nichts Süßes"
+  }
+ },
+ {
+  "path": "facts/f029",
+  "data": {
+   "cat": "Weltall",
+   "n": 29,
+   "text": "Der höchste bekannte Vulkan im Sonnensystem steht auf dem Mars: Olympus Mons ist rund 22 Kilometer hoch – etwa zweieinhalbmal so hoch wie der Mount Everest. Seine Grundfläche ist ungefähr so groß wie Polen.",
+   "title": "Der Riesenvulkan"
+  }
+ },
+ {
+  "path": "facts/f030",
+  "data": {
+   "cat": "Technik",
+   "n": 30,
+   "text": "GPS funktioniert nur dank Einstein: Die Uhren in den Satelliten gehen wegen der Relativitätstheorie pro Tag rund 38 Mikrosekunden schneller als auf der Erde. Ohne Korrektur läge dein Navi täglich um etwa 10 Kilometer daneben.",
+   "title": "Einstein im Navi"
+  }
+ },
+ {
+  "path": "facts/f031",
+  "data": {
+   "cat": "Physik",
+   "n": 31,
+   "text": "Wäre ein Atomkern so groß wie ein Stecknadelkopf, wäre das ganze Atom so groß wie ein Fußballstadion. Der Rest ist fast leerer Raum, in dem sich die Elektronen aufhalten.",
+   "title": "Atome sind fast leer"
+  }
+ },
+ {
+  "path": "facts/f032",
+  "data": {
+   "cat": "Mensch",
+   "n": 32,
+   "text": "Menschen leuchten tatsächlich – nur extrem schwach. Stoffwechselprozesse in der Haut erzeugen winzige Mengen Licht, etwa tausendmal schwächer, als unsere Augen wahrnehmen können. Japanische Forscher haben das 2009 mit hochempfindlichen Kameras festgehalten.",
+   "title": "Du leuchtest"
+  }
+ },
+ {
+  "path": "facts/f033",
+  "data": {
+   "cat": "Biologie",
+   "n": 33,
+   "text": "Die Qualle Turritopsis dohrnii kann sich bei Stress oder Verletzung in ein Jugendstadium zurückverwandeln und neu heranwachsen. Theoretisch kann sie diesen Kreislauf immer wieder durchlaufen.",
+   "title": "Die unsterbliche Qualle"
+  }
+ },
+ {
+  "path": "facts/f034",
+  "data": {
+   "cat": "Erde",
+   "n": 34,
+   "text": "Die Erde ist am Äquator etwas dicker als an den Polen. Deshalb ist der Gipfel des Chimborazo in Ecuador der Punkt der Erdoberfläche, der am weitesten vom Erdmittelpunkt entfernt ist – rund 2 Kilometer weiter als der Gipfel des Everest.",
+   "title": "Der Gipfel am nächsten zum All"
+  }
+ },
+ {
+  "path": "facts/f035",
+  "data": {
+   "cat": "Chemie",
+   "n": 35,
+   "text": "Helium wurde zuerst auf der Sonne entdeckt: 1868 sahen Astronomen eine unbekannte gelbe Linie im Sonnenlicht. Benannt nach dem griechischen Wort „helios“ für Sonne, wurde es erst 1895 auch auf der Erde gefunden.",
+   "title": "Entdeckt auf der Sonne"
+  }
+ },
+ {
+  "path": "facts/f036",
+  "data": {
+   "cat": "Weltall",
+   "n": 36,
+   "text": "Die Sonne macht rund 99,86 % der gesamten Masse unseres Sonnensystems aus. Alle Planeten, Monde, Asteroiden und Kometen zusammen sind nur ein winziger Rest.",
+   "title": "Die Sonne ist (fast) alles"
+  }
+ },
+ {
+  "path": "facts/f037",
+  "data": {
+   "cat": "Mathe",
+   "n": 37,
+   "text": "Ein Blatt Papier ist etwa 0,1 mm dick. Könnte man es 42-mal falten, wäre der Stapel rund 440.000 Kilometer hoch – weiter als bis zum Mond. In der Praxis schafft man allerdings kaum mehr als sieben oder acht Faltungen.",
+   "title": "Bis zum Mond gefaltet"
+  }
+ },
+ {
+  "path": "facts/f038",
+  "data": {
+   "cat": "Biologie",
+   "n": 38,
+   "text": "Delfine schlafen mit nur einer Gehirnhälfte. Die andere bleibt wach, damit sie weiter auftauchen, atmen und auf Gefahren achten können. Nach einiger Zeit wechseln die Hälften.",
+   "title": "Halbes Gehirn schläft"
+  }
+ },
+ {
+  "path": "facts/f039",
+  "data": {
+   "cat": "Mensch",
+   "n": 39,
+   "text": "Ein menschliches Herz schlägt im Lauf eines Lebens etwa 2,5 bis 3 Milliarden Mal – ohne Pause und ohne Wartung.",
+   "title": "Drei Milliarden Schläge"
+  }
+ },
+ {
+  "path": "facts/f040",
+  "data": {
+   "cat": "Physik",
+   "n": 40,
+   "text": "Am sogenannten Tripelpunkt – bei 0,01 °C und sehr niedrigem Druck – kann Wasser gleichzeitig kochen und gefrieren. Fest, flüssig und gasförmig existieren dort im Gleichgewicht.",
+   "title": "Kochen und Frieren zugleich"
+  }
+ },
+ {
+  "path": "facts/f041",
+  "data": {
+   "cat": "Erde",
+   "n": 41,
+   "text": "Etwa die Hälfte des Sauerstoffs auf der Erde stammt aus dem Meer. Erzeugt wird er von Phytoplankton – winzigen, im Wasser schwebenden Algen und Bakterien.",
+   "title": "Jeder zweite Atemzug kommt aus dem Meer"
+  }
+ },
+ {
+  "path": "facts/f042",
+  "data": {
+   "cat": "Technik",
+   "n": 42,
+   "text": "Die Kreiszahl π wurde schon auf über 100 Billionen Nachkommastellen berechnet. Die NASA nutzt für Berechnungen im Sonnensystem gerade einmal etwa 15 Stellen.",
+   "title": "π auf Billionen Stellen"
+  }
+ },
+ {
+  "path": "facts/f043",
+  "data": {
+   "cat": "Biologie",
+   "n": 43,
+   "text": "Krähen erkennen einzelne Menschen am Gesicht und merken sich jahrelang, wer sie schlecht behandelt hat. In Experimenten warnten sie sogar Artgenossen, die die Person selbst nie erlebt hatten.",
+   "title": "Krähen vergessen kein Gesicht"
+  }
+ },
+ {
+  "path": "facts/f044",
+  "data": {
+   "cat": "Weltall",
+   "n": 44,
+   "text": "Uranus liegt quasi auf der Seite: Seine Achse ist um rund 98 Grad geneigt. Deshalb herrscht an seinen Polen jeweils etwa 42 Jahre lang Tag – und danach 42 Jahre Nacht.",
+   "title": "Ein Planet in Seitenlage"
+  }
+ },
+ {
+  "path": "facts/f045",
+  "data": {
+   "cat": "Chemie",
+   "n": 45,
+   "text": "Luft fühlt sich nach nichts an, wiegt aber etwas: Ein Liter wiegt auf Meereshöhe etwa 1,2 Gramm. Die Luft in einem normalen Wohnzimmer bringt locker 50 bis 100 Kilogramm auf die Waage.",
+   "title": "Luft hat Gewicht"
+  }
+ },
+ {
+  "path": "facts/f046",
+  "data": {
+   "cat": "Mensch",
+   "n": 46,
+   "text": "Du verlierst jede Minute Zehntausende Hautzellen. Ein Teil des Hausstaubs in deiner Wohnung besteht aus abgestorbener Haut.",
+   "title": "Ständiger Hautwechsel"
+  }
+ },
+ {
+  "path": "facts/f047",
+  "data": {
+   "cat": "Erde",
+   "n": 47,
+   "text": "Das Magnetfeld der Erde polt sich immer wieder um – magnetischer Nord- und Südpol tauschen die Plätze. Das letzte Mal geschah das vor rund 780.000 Jahren.",
+   "title": "Wenn der Kompass nach Süden zeigt"
+  }
+ },
+ {
+  "path": "facts/f048",
+  "data": {
+   "cat": "Biologie",
+   "n": 48,
+   "text": "Pilze sind enger mit Tieren verwandt als mit Pflanzen. Wie wir können sie keine Photosynthese betreiben, und ihre Zellwände enthalten Chitin – denselben Stoff wie Insektenpanzer.",
+   "title": "Pilze sind fast Tiere"
+  }
+ },
+ {
+  "path": "facts/f049",
+  "data": {
+   "cat": "Mathe",
+   "n": 49,
+   "text": "Manche Zikaden in Nordamerika schlüpfen nur alle 13 oder 17 Jahre – beides Primzahlen. Eine Theorie: So fallen ihre Massenauftritte selten mit den Zyklen von Fressfeinden zusammen.",
+   "title": "Zikaden lieben Primzahlen"
+  }
+ },
+ {
+  "path": "facts/f050",
+  "data": {
+   "cat": "Physik",
+   "n": 50,
+   "text": "Im Vakuum des Weltalls können zwei blanke Metallteile, die sich berühren, einfach zusammenwachsen. Auf der Erde verhindert eine dünne Oxidschicht das – im All fehlt sie oft. Man nennt das Kaltverschweißen.",
+   "title": "Kaltverschweißen im All"
+  }
+ },
+ {
+  "path": "facts/f051",
+  "data": {
+   "cat": "Weltall",
+   "n": 51,
+   "text": "Das Sonnenlicht, das du gerade siehst, ist rund 8 Minuten und 20 Sekunden alt. So lange braucht es für die etwa 150 Millionen Kilometer zur Erde.",
+   "title": "Licht von gestern"
+  }
+ },
+ {
+  "path": "facts/f052",
+  "data": {
+   "cat": "Biologie",
+   "n": 52,
+   "text": "Flamingos sind nicht von Natur aus rosa – ihre Küken sind grau. Die Farbe stammt aus Carotinoiden in Algen und kleinen Krebsen, die sie fressen. Ohne diese Nahrung verblasst das Gefieder.",
+   "title": "Rosa durch Futter"
+  }
+ },
+ {
+  "path": "facts/f053",
+  "data": {
+   "cat": "Mensch",
+   "n": 53,
+   "text": "Die bekannte Zungenkarte mit eigenen Zonen für süß, sauer, salzig und bitter ist falsch. Sie beruht auf einer Fehldeutung einer Studie von 1901. Tatsächlich nehmen alle Bereiche der Zunge alle Geschmacksrichtungen wahr.",
+   "title": "Die Zungenkarte ist ein Mythos"
+  }
+ },
+ {
+  "path": "facts/f054",
+  "data": {
+   "cat": "Erde",
+   "n": 54,
+   "text": "Regentropfen haben nicht die bekannte Tränenform. Kleine sind fast kugelrund, größere werden durch den Luftwiderstand unten abgeflacht und sehen eher aus wie ein Burgerbrötchen.",
+   "title": "Burger statt Träne"
+  }
+ },
+ {
+  "path": "facts/f055",
+  "data": {
+   "cat": "Technik",
+   "n": 55,
+   "text": "Voyager 1, 1977 gestartet, ist das am weitesten entfernte von Menschen gebaute Objekt. Ein Funksignal braucht inzwischen fast einen ganzen Tag, um die Sonde zu erreichen – und noch einmal so lange für die Antwort.",
+   "title": "Funk mit einem Tag Verspätung"
+  }
+ },
+ {
+  "path": "facts/f056",
+  "data": {
+   "cat": "Biologie",
+   "n": 56,
+   "text": "Bärtierchen, kaum einen Millimeter groß, überstehen fast alles: Austrocknung, extreme Kälte und sogar das Vakuum des Weltalls. 2007 überlebten einige einen Flug ungeschützt außen an einem Satelliten.",
+   "title": "Bärtierchen im All"
+  }
+ },
+ {
+  "path": "facts/f057",
+  "data": {
+   "cat": "Physik",
+   "n": 57,
+   "text": "Nach Einsteins E = mc² stecken in einem einzigen Gramm Materie rund 90 Billionen Joule. Das sind etwa 25 Millionen Kilowattstunden – genug, um rund 7.000 Haushalte ein ganzes Jahr lang mit Strom zu versorgen.",
+   "title": "Ein Gramm voller Energie"
+  }
+ },
+ {
+  "path": "facts/f058",
+  "data": {
+   "cat": "Mensch",
+   "n": 58,
+   "text": "Placebos können sogar wirken, wenn Patienten wissen, dass sie ein Scheinmedikament bekommen. In Studien zum Reizdarmsyndrom ging es Teilnehmern mit solchen „offenen Placebos“ deutlich besser als ohne Behandlung.",
+   "title": "Placebo mit Ansage"
+  }
+ },
+ {
+  "path": "facts/f059",
+  "data": {
+   "cat": "Weltall",
+   "n": 59,
+   "text": "Tief im Inneren von Uranus und Neptun regnet es vermutlich Diamanten. Unter enormem Druck und Hitze zerfallen dort Kohlenwasserstoffe, und der Kohlenstoff verdichtet sich zu Diamanten, die nach innen sinken. Laborexperimente stützen diese Idee.",
+   "title": "Es regnet Diamanten"
+  }
+ },
+ {
+  "path": "facts/f060",
+  "data": {
+   "cat": "Biologie",
+   "n": 60,
+   "text": "Das vermutlich größte Lebewesen der Erde ist ein Pilz: Ein Hallimasch in Oregon (USA) erstreckt sich unterirdisch über fast 10 Quadratkilometer – und ist wohl mehrere tausend Jahre alt.",
+   "title": "Ein Pilz, so groß wie eine Stadt"
+  }
+ },
+ {
+  "path": "facts/f061",
+  "data": {
+   "cat": "Erde",
+   "n": 61,
+   "text": "Der innere Erdkern ist mit über 5.000 °C etwa so heiß wie die Oberfläche der Sonne. Trotzdem ist er fest – der gewaltige Druck verhindert, dass das Eisen schmilzt.",
+   "title": "Ein Kern so heiß wie die Sonne"
+  }
+ },
+ {
+  "path": "facts/f062",
+  "data": {
+   "cat": "Mathe",
+   "n": 62,
+   "text": "Es gibt verschiedene Größen von Unendlich. Georg Cantor bewies: Es gibt mehr reelle Zahlen als natürliche Zahlen – obwohl es von beiden unendlich viele gibt.",
+   "title": "Unendlich ist nicht gleich unendlich"
+  }
+ },
+ {
+  "path": "facts/f063",
+  "data": {
+   "cat": "Physik",
+   "n": 63,
+   "text": "Energie, die im Kern der Sonne entsteht, wird dort unzählige Male absorbiert und wieder ausgesandt. Bis sie die Oberfläche erreicht, vergehen Zehntausende bis Hunderttausende Jahre – danach braucht das Licht nur noch gut 8 Minuten bis zu uns.",
+   "title": "Gefangenes Licht"
+  }
+ },
+ {
+  "path": "facts/f064",
+  "data": {
+   "cat": "Biologie",
+   "n": 64,
+   "text": "Faultiere sind an Land langsam, aber gute Schwimmer. Sie können ihren Herzschlag verlangsamen und bis zu 40 Minuten lang die Luft anhalten.",
+   "title": "Das tauchende Faultier"
+  }
+ },
+ {
+  "path": "facts/f065",
+  "data": {
+   "cat": "Mensch",
+   "n": 65,
+   "text": "Rund 99 % deiner Körpermasse bestehen aus nur sechs Elementen: Sauerstoff, Kohlenstoff, Wasserstoff, Stickstoff, Calcium und Phosphor. Allein Sauerstoff macht etwa 65 % aus – vor allem im Wasser.",
+   "title": "Sechs Elemente"
+  }
+ },
+ {
+  "path": "facts/f066",
+  "data": {
+   "cat": "Weltall",
+   "n": 66,
+   "text": "Saturn hat eine geringere mittlere Dichte als Wasser. Gäbe es eine Badewanne, die groß genug ist, würde der Planet darin schwimmen.",
+   "title": "Ein Planet, der schwimmen würde"
+  }
+ },
+ {
+  "path": "facts/f067",
+  "data": {
+   "cat": "Chemie",
+   "n": 67,
+   "text": "Der typische Geruch nach Regen heißt Petrichor. Ein Bestandteil davon, Geosmin, wird von Bodenbakterien gebildet. Unsere Nase ist dafür extrem empfindlich und riecht es schon in winzigsten Konzentrationen.",
+   "title": "Der Duft von Regen"
+  }
+ },
+ {
+  "path": "facts/f068",
+  "data": {
+   "cat": "Biologie",
+   "n": 68,
+   "text": "Fangschreckenkrebse schlagen so schnell zu, dass das Wasser vor ihrer Keule kurz verdampft. Die entstehenden Bläschen fallen in sich zusammen und erzeugen einen zweiten Stoß – mit winzigem Lichtblitz und kurzzeitig Tausenden Grad.",
+   "title": "Der Superschlag"
+  }
+ },
+ {
+  "path": "facts/f069",
+  "data": {
+   "cat": "Erde",
+   "n": 69,
+   "text": "Die Erde dreht sich immer langsamer, vor allem wegen der Gezeitenreibung durch den Mond. Vor rund 1,4 Milliarden Jahren dauerte ein Tag nur etwa 19 Stunden.",
+   "title": "Die Tage werden länger"
+  }
+ },
+ {
+  "path": "facts/f070",
+  "data": {
+   "cat": "Mensch",
+   "n": 70,
+   "text": "Die schnellsten Nervensignale rasen mit über 100 Metern pro Sekunde durch deinen Körper – das sind mehr als 400 km/h.",
+   "title": "Nerven auf der Überholspur"
+  }
+ },
+ {
+  "path": "facts/f071",
+  "data": {
+   "cat": "Biologie",
+   "n": 71,
+   "text": "Rund zwei Drittel der Nervenzellen eines Kraken sitzen nicht im Gehirn, sondern in den Armen. Jeder Arm kann tasten, schmecken und einfache Bewegungen teilweise selbst steuern.",
+   "title": "Arme mit eigenem Kopf"
+  }
+ },
+ {
+  "path": "facts/f072",
+  "data": {
+   "cat": "Weltall",
+   "n": 72,
+   "text": "Im beobachtbaren Universum gibt es nach groben Schätzungen deutlich mehr Sterne als Sandkörner an allen Stränden der Erde zusammen – vermutlich um ein Vielfaches.",
+   "title": "Mehr Sterne als Sand"
+  }
+ },
+ {
+  "path": "facts/f073",
+  "data": {
+   "cat": "Physik",
+   "n": 73,
+   "text": "Heißes Wasser kann unter bestimmten Bedingungen schneller gefrieren als kaltes. Dieser Mpemba-Effekt ist seit Jahrzehnten bekannt – aber bis heute umstritten, wann und warum genau er auftritt.",
+   "title": "Das Mpemba-Rätsel"
+  }
+ },
+ {
+  "path": "facts/f074",
+  "data": {
+   "cat": "Mensch",
+   "n": 74,
+   "text": "Die Mitochondrien, die Kraftwerke deiner Zellen, haben ihr eigenes Erbgut. Es wird fast ausschließlich von der Mutter weitergegeben – deshalb lassen sich mütterliche Abstammungslinien über Zehntausende Jahre zurückverfolgen.",
+   "title": "Das Erbe der Mutter"
+  }
+ },
+ {
+  "path": "facts/f075",
+  "data": {
+   "cat": "Erde",
+   "n": 75,
+   "text": "Bis heute ist erst rund ein Viertel des Meeresbodens in hoher Auflösung kartiert. Von der Oberfläche des Mars gibt es dagegen nahezu vollständige detaillierte Karten.",
+   "title": "Der unbekannte Meeresboden"
+  }
+ },
+ {
+  "path": "facts/f076",
+  "data": {
+   "cat": "Biologie",
+   "n": 76,
+   "text": "Das Herz eines Blauwals wiegt etwa 180 Kilogramm. Es ist das größte bekannte Herz im Tierreich.",
+   "title": "Das größte Herz"
+  }
+ },
+ {
+  "path": "facts/f077",
+  "data": {
+   "cat": "Mathe",
+   "n": 77,
+   "text": "Für Topologen sind eine Kaffeetasse und ein Donut dasselbe: Beide haben genau ein Loch und lassen sich – aus Knete gedacht – ohne Reißen ineinander verformen.",
+   "title": "Tasse = Donut"
+  }
+ },
+ {
+  "path": "facts/f078",
+  "data": {
+   "cat": "Chemie",
+   "n": 78,
+   "text": "Honig verdirbt bei richtiger Lagerung praktisch nie. Er enthält kaum freies Wasser, ist leicht sauer und bildet geringe Mengen Wasserstoffperoxid – Bakterien und Schimmel haben kaum eine Chance.",
+   "title": "Honig hält (fast) ewig"
+  }
+ },
+ {
+  "path": "facts/f079",
+  "data": {
+   "cat": "Weltall",
+   "n": 79,
+   "text": "Merkur, der sonnennächste Planet, rast in nur 88 Erdtagen einmal um die Sonne. Ein Merkurjahr ist also kürzer als ein Quartal auf der Erde.",
+   "title": "Ein Jahr in 88 Tagen"
+  }
+ },
+ {
+  "path": "facts/f080",
+  "data": {
+   "cat": "Mensch",
+   "n": 80,
+   "text": "Rund 8 % deines Erbguts stammen von Viren, die vor Millionen Jahren unsere Vorfahren infiziert haben. Einige dieser Gene sind heute sogar lebenswichtig – etwa für die Bildung der Plazenta.",
+   "title": "Viren im Erbgut"
+  }
+ },
+ {
+  "path": "facts/f081",
+  "data": {
+   "cat": "Biologie",
+   "n": 81,
+   "text": "Das Herz mancher Kolibris schlägt im Flug über 1.000 Mal pro Minute. Nachts fallen sie in eine Starre, in der Herzschlag und Körpertemperatur stark absinken, um Energie zu sparen.",
+   "title": "Herzschlag im Turbo"
+  }
+ },
+ {
+  "path": "facts/f082",
+  "data": {
+   "cat": "Erde",
+   "n": 82,
+   "text": "Auf der Erde zucken pro Sekunde rund 40 bis 50 Blitze – das sind über drei Millionen am Tag.",
+   "title": "Dauergewitter"
+  }
+ },
+ {
+  "path": "facts/f083",
+  "data": {
+   "cat": "Physik",
+   "n": 83,
+   "text": "Kälter als −273,15 °C geht nicht. Am absoluten Nullpunkt hätten Teilchen die geringstmögliche Energie. Im Labor kommen Forscher bis auf Milliardstel Grad heran – erreichen lässt er sich aber nie.",
+   "title": "Absolut kalt"
+  }
+ },
+ {
+  "path": "facts/f084",
+  "data": {
+   "cat": "Biologie",
+   "n": 84,
+   "text": "Erdnüsse sind Hülsenfrüchte wie Erbsen und Bohnen. Sie reifen unter der Erde, nachdem sich die Stiele der verblühten Blüten in den Boden gebohrt haben.",
+   "title": "Erdnüsse sind keine Nüsse"
+  }
+ },
+ {
+  "path": "facts/f085",
+  "data": {
+   "cat": "Technik",
+   "n": 85,
+   "text": "Die erste Webcam der Welt zeigte eine Kaffeemaschine: Ab 1991 filmten Informatiker der Universität Cambridge ihren Kaffeetopf, damit niemand umsonst zur leeren Kanne lief. Ab 1993 war das Bild im Web zu sehen.",
+   "title": "Die erste Webcam"
+  }
+ },
+ {
+  "path": "facts/f086",
+  "data": {
+   "cat": "Weltall",
+   "n": 86,
+   "text": "Auf dem Mond gibt es weder Wind noch Wasser. Die Fußabdrücke der Apollo-Astronauten könnten daher Millionen Jahre erhalten bleiben – nur winzige Meteoriten tragen sie ganz langsam ab.",
+   "title": "Fußspuren für die Ewigkeit"
+  }
+ },
+ {
+  "path": "facts/f087",
+  "data": {
+   "cat": "Mensch",
+   "n": 87,
+   "text": "Die DNA einer einzigen Zelle wäre ausgerollt etwa 2 Meter lang. Legt man die DNA aller Zellen deines Körpers aneinander, reicht sie über hundertmal zur Sonne und zurück.",
+   "title": "DNA bis zur Sonne"
+  }
+ },
+ {
+  "path": "facts/f088",
+  "data": {
+   "cat": "Biologie",
+   "n": 88,
+   "text": "Forscher schätzen, dass auf der Erde rund 20 Billiarden Ameisen leben – etwa 2,5 Millionen pro Mensch.",
+   "title": "Ein Planet der Ameisen"
+  }
+ },
+ {
+  "path": "facts/f089",
+  "data": {
+   "cat": "Erde",
+   "n": 89,
+   "text": "Schneeflocken haben fast immer eine sechszählige Form. Das liegt daran, wie sich Wassermoleküle beim Gefrieren über Wasserstoffbrücken zu einem sechseckigen Gitter anordnen.",
+   "title": "Immer sechs Arme"
+  }
+ },
+ {
+  "path": "facts/f090",
+  "data": {
+   "cat": "Chemie",
+   "n": 90,
+   "text": "Rosten und Verbrennen sind chemisch eng verwandt: In beiden Fällen verbindet sich ein Stoff mit Sauerstoff und gibt Wärme ab. Beim Rosten passiert das nur so langsam, dass wir es nicht spüren – Einweg-Handwärmer nutzen genau diesen Effekt.",
+   "title": "Rost ist Feuer in Zeitlupe"
+  }
+ },
+ {
+  "path": "facts/f091",
+  "data": {
+   "cat": "Biologie",
+   "n": 91,
+   "text": "Europäische Aale wandern Tausende Kilometer bis in die Sargassosee im Atlantik, um sich dort fortzupflanzen. Obwohl Forscher seit über 100 Jahren suchen, hat noch nie jemand Aale in freier Wildbahn beim Laichen beobachtet.",
+   "title": "Das Aal-Rätsel"
+  }
+ },
+ {
+  "path": "facts/f092",
+  "data": {
+   "cat": "Weltall",
+   "n": 92,
+   "text": "Totale Sonnenfinsternisse gibt es, weil die Sonne etwa 400-mal größer ist als der Mond – aber auch etwa 400-mal weiter entfernt. Dadurch erscheinen beide am Himmel fast gleich groß.",
+   "title": "Ein kosmischer Zufall"
+  }
+ },
+ {
+  "path": "facts/f093",
+  "data": {
+   "cat": "Mathe",
+   "n": 93,
+   "text": "Viele Verschlüsselungen im Internet beruhen auf einer simplen Tatsache: Zwei riesige Primzahlen zu multiplizieren ist leicht – das Ergebnis wieder in seine Faktoren zu zerlegen, ist selbst für Supercomputer praktisch unmöglich.",
+   "title": "Sicherheit durch Primzahlen"
+  }
+ },
+ {
+  "path": "facts/f094",
+  "data": {
+   "cat": "Biologie",
+   "n": 94,
+   "text": "Unter ihrem Fell haben Eisbären schwarze Haut. Und ihre Haare sind gar nicht weiß, sondern durchsichtig und hohl – sie wirken nur weiß, weil sie das Licht streuen.",
+   "title": "Eisbären sind schwarz"
+  }
+ },
+ {
+  "path": "facts/f095",
+  "data": {
+   "cat": "Physik",
+   "n": 95,
+   "text": "Gold ist so dehnbar, dass sich aus einem einzigen Gramm ein Draht von rund zwei Kilometern Länge ziehen lässt. Zu Blattgold gehämmert wird es dünner als ein Tausendstel Millimeter.",
+   "title": "Gold ohne Ende"
+  }
+ },
+ {
+  "path": "facts/f096",
+  "data": {
+   "cat": "Erde",
+   "n": 96,
+   "text": "Ein Teil des Wassers auf der Erde ist vermutlich älter als die Sonne selbst. Studien zufolge stammt es aus der kalten Gas- und Staubwolke, aus der unser Sonnensystem entstand.",
+   "title": "Wasser, älter als die Sonne"
+  }
+ },
+ {
+  "path": "facts/f097",
+  "data": {
+   "cat": "Biologie",
+   "n": 97,
+   "text": "In Experimenten haben Honigbienen gelernt, dass „nichts“ weniger ist als „eins“. Damit begreifen sie ein Konzept der Null – eine Fähigkeit, die man lange nur großen Gehirnen zutraute.",
+   "title": "Bienen verstehen die Null"
+  }
+ },
+ {
+  "path": "facts/f098",
+  "data": {
+   "cat": "Mensch",
+   "n": 98,
+   "text": "Fast jede Zelle deines Körpers hat eine eigene innere Uhr. Licht am Morgen stellt über eine Hauptuhr im Gehirn alle diese Uhren täglich neu.",
+   "title": "Uhren in jeder Zelle"
+  }
+ },
+ {
+  "path": "facts/f099",
+  "data": {
+   "cat": "Weltall",
+   "n": 99,
+   "text": "Die Erde dreht sich in 23 Stunden, 56 Minuten und 4 Sekunden einmal um sich selbst. Dass ein Sonnentag trotzdem 24 Stunden hat, liegt daran, dass die Erde gleichzeitig ein Stück auf ihrer Bahn um die Sonne weiterwandert.",
+   "title": "Nicht ganz 24 Stunden"
+  }
+ },
+ {
+  "path": "facts/f100",
+  "data": {
+   "cat": "Biologie",
+   "n": 100,
+   "text": "Der Espenwald „Pando“ in Utah sieht aus wie rund 47.000 einzelne Bäume – ist aber ein einziges Lebewesen mit gemeinsamem Wurzelsystem. Er wiegt schätzungsweise 6.000 Tonnen.",
+   "title": "Ein Wald, ein Lebewesen"
+  }
+ },
+ {
+  "path": "facts/f101",
+  "data": {
+   "cat": "Biologie",
+   "n": 101,
+   "text": "Ein Liter Meerwasser enthält bis zu zehn Milliarden Viren. Die meisten befallen Bakterien und beeinflussen so, wie Nährstoffe im Meer zirkulieren.",
+   "title": "Ein Ozean voller Viren"
+  }
+ },
+ {
+  "path": "facts/f102",
+  "data": {
+   "cat": "Technik",
+   "n": 102,
+   "text": "Die erste SMS wurde 1992 verschickt – von einem Computer an ein Handy. Ihr Text: „Merry Christmas“.",
+   "title": "Die erste SMS"
+  }
+ },
+ {
+  "path": "facts/f103",
+  "data": {
+   "cat": "Technik",
+   "n": 103,
+   "text": "In Glasfasern ist Licht langsamer als im Vakuum: etwa 200.000 statt 300.000 Kilometer pro Sekunde. Deshalb können Richtfunkstrecken zwischen Börsen manchmal schneller sein als Glasfaserkabel.",
+   "title": "Langsames Licht im Kabel"
+  }
+ }
+]

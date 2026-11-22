@@ -1,0 +1,43 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "habit-tracker",
+  "title": "Habits",
+  "description": "Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves.",
+  "version": 1,
+  "status": "beta",
+  "language": "en",
+  "category": "health",
+  "themeColor": "#c2521f",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {
+    "db": {},
+    "ingest": {
+      "endpoints": [
+        {
+          "auth": "none",
+          "collection": "inbox",
+          "managedOrigins": true,
+          "maxBytes": 65536,
+          "maxPerDay": 5000,
+          "name": "activity",
+          "origins": [
+            "https://workout-tracker.${LAGER_APPS_DOMAIN}",
+            "https://stillwater.${LAGER_APPS_DOMAIN}"
+          ]
+        },
+        {
+          "auth": "token",
+          "collection": "inbox",
+          "maxBytes": 65536,
+          "maxPerDay": 5000,
+          "name": "activity-key"
+        }
+      ]
+    },
+    "user": {}
+  },
+  "integrations": {
+    "activity-api/v1": "receiver"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dm807cam/lager-apps/schema/lager-app.schema.json",
+  "title": "Lager app manifest (lager.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "title", "description", "version", "language", "category", "themeColor", "entry", "capabilities"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$", "description": "Lager app slug; must equal the folder name." },
+    "title": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 200, "description": "One plain sentence, as passed to deploy_app." },
+    "version": { "type": "integer", "minimum": 1, "description": "The Lager version this code was last deployed as." },
+    "status": { "enum": ["stable", "beta", "deprecated"], "default": "stable" },
+    "language": { "type": "string", "pattern": "^[a-z]{2}$" },
+    "category": { "enum": ["analytics", "education", "finance", "games", "health", "mindfulness", "privacy", "productivity", "publishing", "social", "tools", "writing"] },
+    "themeColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "entry": { "const": "index.html" },
+    "icon": { "type": "string", "description": "Square SVG in the subset of SVG Lager accepts for app icons." },
+    "capabilities": {
+      "type": "object",
+      "description": "Exactly what to pass as capabilities to deploy_app. Origins of apps on the same server are written as https://<slug>.${LAGER_APPS_DOMAIN}.",
+      "propertyNames": { "enum": ["db", "user", "permissions", "assets", "room", "page", "downloads", "ingest", "embed", "complete"] }
+    },
+    "seed": { "type": "array", "items": { "type": "string" }, "description": "JSON files of [{path, data}] to import after the first deploy (import_data). Never private data." },
+    "externalHosts": { "type": "array", "items": { "type": "string" }, "uniqueItems": true, "description": "Every host outside Lager the app loads from." },
+    "integrations": {
+      "type": "object",
+      "description": "Cross-app APIs, e.g. {\"activity-api/v1\": \"sender\"}.",
+      "additionalProperties": { "enum": ["sender", "receiver"] }
+    }
+  }
+}

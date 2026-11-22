@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b2a4d">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Gesichtsschutz</title>
+<style>
+:root{color-scheme:light;--bg:#f2f1ee;--surface:#fff;--surface-2:#f3f2ef;--surface-3:#e9e8e4;--border:rgba(0,0,0,.06);--text:#0b0b0b;--text-2:#52514e;--text-3:#8a8984;--grid:#eeede9;--good:#0b7a3e;--good-bg:rgba(11,122,62,.09);--bad:#c23a39;--bad-bg:rgba(194,58,57,.09);--shadow:0 1px 1px rgba(0,0,0,.03),0 6px 20px rgba(20,20,10,.06);--radius:22px}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0c0c0b;--surface:#171716;--surface-2:#212120;--surface-3:#2a2a28;--border:rgba(255,255,255,.06);--text:#f3f2ef;--text-2:#c3c2b7;--text-3:#8f8e86;--grid:#232321;--good:#4cc27e;--good-bg:rgba(76,194,126,.12);--bad:#e66767;--bad-bg:rgba(230,103,103,.12);--shadow:0 1px 1px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35)}}
+:root{--btn:#1b2a4d;--btn-ink:#fff;--hero-l:#2aa592;--hero-m:#1b2a4d;--hero-d:#111b33;--seg-on:var(--surface);--sab:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--btn:#2aa592;--seg-on:var(--surface-3)}}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+button,input,select{font:inherit;color:inherit}
+button{touch-action:manipulation;cursor:pointer}
+button:disabled{cursor:default}
+.hidden{display:none!important}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 4px 0}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:32px;height:32px;border-radius:9px;flex:none;box-shadow:0 4px 12px rgba(27,42,77,.35)}
+.brand h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;font-size:13px;font-weight:600;padding:8px 13px;background:var(--surface);
+  border:1px solid var(--border);box-shadow:var(--shadow);color:var(--text-2);white-space:nowrap}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--text-3);flex:none}
+.pill.ready .dot{background:var(--good)} .pill.error .dot{background:var(--bad)}
+.pill.loading .dot{background:#d29a1e;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.card-title{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0}
+.card-sub{font-size:12.5px;color:var(--text-3);margin:2px 0 0}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}
+
+/* Hero (empty state / drop zone) */
+.hero{position:relative;color:#fff;border-radius:22px;padding:22px 20px 18px;display:grid;gap:18px;overflow:hidden;cursor:pointer;
+  box-shadow:0 14px 34px rgba(17,27,51,.28);outline:none;transition:transform .2s ease,box-shadow .2s ease;
+  background:radial-gradient(110% 90% at 100% 0%,rgba(127,230,211,.45),transparent 60%),radial-gradient(80% 80% at 0% 100%,rgba(63,208,182,.22),transparent 60%),linear-gradient(160deg,var(--hero-l) 0%,var(--hero-m) 55%,var(--hero-d) 100%)}
+.hero > :not(.deco){position:relative}
+.hero .deco{position:absolute;top:-70px;right:-70px;width:280px;height:280px;opacity:.18;pointer-events:none}
+.hero.over{box-shadow:0 0 0 3px rgba(127,230,211,.9),0 14px 34px rgba(17,27,51,.35);transform:scale(1.01)}
+.hero:focus-visible{box-shadow:0 0 0 3px #fff,0 14px 34px rgba(17,27,51,.28)}
+.hero-icon{width:58px;height:58px;border-radius:16px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center}
+.hero-label{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px}
+.hero-big{font-size:clamp(30px,8.6vw,44px);font-weight:700;letter-spacing:-.035em;line-height:1.05;margin:0}
+.hero-sub{font-size:14px;color:rgba(255,255,255,.8);margin-top:10px;max-width:560px}
+.hchip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;font-size:12.5px;font-weight:650;padding:4px 10px;background:rgba(255,255,255,.14);margin:8px 6px 0 0;white-space:nowrap}
+.hchip.pos{background:rgba(132,232,174,.22);color:#b4f3cd}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 12px;min-width:0}
+.tile .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.6)}
+.tile .v{font-size:17px;font-weight:650;margin-top:2px}
+.tile .n{font-size:12px;color:rgba(255,255,255,.62)}
+.cta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cta{background:#fff;color:var(--hero-d);border:0;border-radius:999px;padding:12px 20px;font-weight:700;font-size:16px;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);transition:transform .15s ease}
+.cta:active{transform:scale(.97)}
+.cta-hint{font-size:13px;color:rgba(255,255,255,.7)}
+@media (max-width:520px){.tiles{grid-template-columns:1fr 1fr}.tiles .tile:last-child{grid-column:1 / -1}}
+
+/* Stage */
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.stage-head > div:first-child{min-width:0}
+.status{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-3);margin-top:3px;min-height:18px}
+.status.good{color:var(--good)} .status.bad{color:var(--bad)}
+.status span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tools{display:flex;gap:6px;flex:none}
+.tbtn{border:0;background:var(--surface-2);color:var(--text);border-radius:999px;font-size:13px;font-weight:600;padding:7px 13px;min-height:34px;white-space:nowrap;
+  transition:background .15s ease;user-select:none;-webkit-user-select:none}
+.tbtn:hover:not(:disabled){background:var(--surface-3)}
+.tbtn.on{background:var(--btn);color:var(--btn-ink)}
+.tbtn:disabled{opacity:.45}
+.canvas-wrap{position:relative;display:flex;justify-content:center;align-items:center;border-radius:14px;overflow:hidden;min-height:220px;
+  background:repeating-conic-gradient(var(--surface-2) 0 25%,var(--surface-3) 0 50%) 0 0/20px 20px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#view{display:block;max-width:100%;max-height:62vh;touch-action:none;cursor:crosshair}
+.busy{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#fff;
+  background:rgba(17,27,51,.5);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);text-align:center;padding:16px;overflow:hidden}
+.busy .title{font-weight:700;font-size:16px;letter-spacing:-.01em}
+.busy .detail{color:rgba(255,255,255,.82);font-size:13px;min-height:1.2em}
+.bar{width:min(280px,75%);height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:#7fe6d3;width:0;transition:width .25s ease;border-radius:3px}
+.bar.indet i{width:35%!important;animation:indet 1.2s ease-in-out infinite}
+@keyframes indet{0%{left:-35%}100%{left:100%}}
+.scan{position:absolute;left:0;right:0;height:60px;top:-60px;pointer-events:none;
+  background:linear-gradient(to bottom,transparent,rgba(63,208,182,.2),rgba(127,230,211,.75) 96%,transparent);animation:scan 2.2s linear infinite}
+@keyframes scan{to{top:100%}}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#7fe6d3;animation:spin .8s linear infinite;flex:none}
+.spin.sm{width:13px;height:13px;border-width:2px;border-color:var(--surface-3);border-top-color:var(--btn)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{color:var(--text-3);font-size:12.5px;margin-top:10px;display:flex;gap:4px 14px;flex-wrap:wrap}
+.hint b{color:var(--text-2);font-weight:600}
+.warn{margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--bad-bg);color:var(--bad);font-size:13px}
+
+.thumbs{display:flex;gap:10px;overflow-x:auto;padding:12px 4px 4px;margin:0 -4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.thumb{position:relative;flex:none;width:68px;height:68px;border-radius:12px;overflow:hidden;cursor:pointer;background:var(--surface-2);border:0;padding:0;
+  outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s ease}
+.thumb.active{outline-color:var(--btn);overflow:visible}
+.thumb.active img,.thumb.active .ph{border-radius:12px}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;border-radius:12px}
+.thumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(17,27,51,.35);border-radius:12px}
+.thumb .ph .spin{width:20px;height:20px;border-width:2px}
+.thumb .badge{position:absolute;left:4px;bottom:4px;font-size:11px;font-weight:650;padding:1px 7px;border-radius:999px;background:var(--surface);line-height:1.5}
+.thumb .badge.ok{color:var(--good)} .thumb .badge.none{color:var(--bad)}
+.thumb .x{position:absolute;right:3px;top:3px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:24px;padding:0}
+.thumb.add{display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--text-2);font-weight:300}
+.thumb.add:hover{background:var(--surface-3)}
+
+/* Segmented control + fields */
+.seg{display:flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:12px}
+.seg button{flex:1;border:0;background:transparent;font-size:13px;font-weight:550;color:var(--text-2);padding:7px 11px;border-radius:9px;min-height:34px;white-space:nowrap;transition:background .15s ease,color .15s ease}
+.seg button[aria-pressed="true"]{background:var(--seg-on);color:var(--text);font-weight:650;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.field{margin-bottom:16px} .field:last-child{margin-bottom:0}
+.flabel{display:flex;justify-content:space-between;font-size:12.5px;font-weight:550;color:var(--text-3);padding-left:4px;margin-bottom:6px}
+.flabel span{color:var(--text-2);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--btn);margin:4px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.sbtn{flex:1;border:0;background:var(--surface-2);color:var(--text);border-radius:12px;padding:12px;font-size:14.5px;font-weight:600;min-height:46px;white-space:nowrap;transition:background .15s ease,color .15s ease}
+.sbtn:hover:not(:disabled){background:var(--surface-3)}
+.sbtn.danger{background:var(--bad);color:#fff}
+.sbtn:disabled{opacity:.45}
+.foot{font-size:12px;color:var(--text-3);text-align:center;line-height:1.5;margin:4px 8px 0}
+.foot p{margin:0 0 6px}
+
+/* Sticky action bar */
+.abar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px max(14px,env(safe-area-inset-right)) calc(10px + var(--sab)) max(14px,env(safe-area-inset-left));
+  background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(18px);backdrop-filter:saturate(1.4) blur(18px);border-top:1px solid var(--border)}
+.abar-in{max-width:860px;margin:0 auto;display:flex;gap:10px}
+.abtn{border:0;border-radius:16px;min-height:54px;padding:0 16px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s ease,opacity .15s ease}
+.abtn:active:not(:disabled){transform:scale(.98)}
+.abtn:disabled{opacity:.5}
+.abtn.primary{flex:1.5;background:var(--btn);color:var(--btn-ink);font-size:17px;font-weight:700;box-shadow:0 8px 22px rgba(27,42,77,.28)}
+.abtn.secondary{flex:1;background:var(--surface-2);color:var(--text);font-size:15.5px;font-weight:650}
+
+/* Toast */
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));z-index:40;transform:translate(-50%,-140%);visibility:hidden;
+  background:var(--text);color:var(--bg);border-radius:999px;padding:11px 18px;font-size:14px;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,.25);
+  width:max-content;max-width:min(92vw,560px);text-align:center;transition:transform .3s cubic-bezier(.2,.9,.25,1),visibility .3s}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+
+@media (max-width:600px){
+  #view{max-height:54vh}
+  .stage-head{flex-direction:column;align-items:stretch}
+  .tools .tbtn{flex:1}
+  .card{padding:14px}
+}
+@media (pointer:coarse){
+  .tbtn{min-height:40px}
+  .seg button{min-height:40px;font-size:14px}
+  .thumb .x{width:28px;height:28px;line-height:28px}
+  input[type=range]{height:30px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:2.5s!important}
+  .scan{display:none}
+  .toast{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 512 512" aria-hidden="true">
+        <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2aa592"/><stop offset=".55" stop-color="#1b2a4d"/><stop offset="1" stop-color="#111b33"/></linearGradient></defs>
+        <rect width="512" height="512" fill="url(#hg)"/>
+        <rect x="186" y="96" width="70" height="70" fill="#ffffff"/><rect x="256" y="96" width="70" height="70" fill="#7fe6d3"/>
+        <rect x="146" y="166" width="70" height="70" fill="#7fe6d3"/><rect x="216" y="166" width="80" height="70" fill="#ffffff"/><rect x="296" y="166" width="70" height="70" fill="#bff3e9"/>
+        <rect x="146" y="236" width="70" height="70" fill="#ffffff"/><rect x="216" y="236" width="80" height="70" fill="#bff3e9"/><rect x="296" y="236" width="70" height="70" fill="#7fe6d3"/>
+        <rect x="186" y="306" width="70" height="60" fill="#bff3e9"/><rect x="256" y="306" width="70" height="60" fill="#ffffff"/>
+        <path d="M96 440c18-52 82-80 160-80s142 28 160 80z" fill="#ffffff" fill-opacity=".9"/>
+      </svg>
+      <h1>Gesichtsschutz</h1>
+    </div>
+    <div id="modelChip" class="pill loading" role="status"><span class="dot"></span><span id="modelText">Erkennung lädt …</span></div>
+  </header>
+
+  <input id="file" type="file" accept="image/*" multiple class="hidden">
+
+  <!-- Empty state: hero drop zone -->
+  <section id="drop" class="hero" tabindex="0" role="button" aria-label="Fotos auswählen">
+    <svg class="deco" viewBox="0 0 280 280" fill="none" stroke="#fff" stroke-width="1.5" aria-hidden="true">
+      <circle cx="140" cy="140" r="40"/><circle cx="140" cy="140" r="70"/><circle cx="140" cy="140" r="100"/><circle cx="140" cy="140" r="130"/>
+    </svg>
+    <div class="hero-icon">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3.2"/><path d="M6.5 19c1-3 3.1-4.4 5.5-4.4s4.5 1.4 5.5 4.4"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hero-label">Fotos anonymisieren</div>
+      <h2 class="hero-big">Gesichter unkenntlich machen</h2>
+      <div class="hero-sub">Gesichter werden automatisch erkannt und irreversibel verfremdet. Du kannst jede Markierung prüfen, verschieben, ergänzen oder entfernen.</div>
+      <div><span class="hchip pos">✓ Ohne Upload</span><span class="hchip">Unschärfe · Pixel · Balken</span></div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Verarbeitung</div><div class="v">Nur lokal</div><div class="n">Fotos bleiben auf dem Gerät</div></div>
+      <div class="tile"><div class="k">Metadaten</div><div class="v">Entfernt</div><div class="n">GPS-Ort &amp; Kameradaten</div></div>
+      <div class="tile"><div class="k">Fotos</div><div class="v">Mehrere</div><div class="n">auf einmal bearbeiten</div></div>
+    </div>
+    <div class="cta-row">
+      <button class="cta" id="pickBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span id="pickLabel">Fotos auswählen</span></button>
+      <span class="cta-hint" id="dropHint">oder hierher ziehen</span>
+    </div>
+  </section>
+
+  <!-- Workspace -->
+  <section id="work" class="card hidden" aria-label="Foto bearbeiten">
+    <div class="stage-head">
+      <div>
+        <div class="card-title num" id="stageTitle">Foto</div>
+        <div class="status num" id="statusLine"></div>
+      </div>
+      <div class="tools">
+        <button class="tbtn" id="holdOrig" type="button" title="Gedrückt halten zum Vergleichen">Original zeigen</button>
+        <button class="tbtn" id="redetect" type="button">Neu erkennen</button>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="view"></canvas>
+      <div class="busy hidden" id="busy">
+        <div class="scan" id="scan"></div>
+        <div class="spin"></div>
+        <div class="title" id="busyTitle">Bitte warten …</div>
+        <div class="bar indet" id="busyBar"><i></i></div>
+        <div class="detail num" id="busyDetail"></div>
+      </div>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="warn hidden" id="warn"></div>
+    <div class="thumbs" id="thumbs"></div>
+  </section>
+
+  <section id="settings" class="card hidden">
+    <div class="card-head"><div><h3 class="card-title">Verfremdung</h3><p class="card-sub">Gilt für alle Fotos</p></div></div>
+    <div class="field">
+      <div class="flabel">Art</div>
+      <div class="seg" id="modeSeg">
+        <button type="button" data-mode="blur" aria-pressed="true">Unschärfe</button>
+        <button type="button" data-mode="pixel" aria-pressed="false">Pixel</button>
+        <button type="button" data-mode="solid" aria-pressed="false">Balken</button>
+      </div>
+    </div>
+    <div class="field" id="strengthField">
+      <label class="flabel" for="strength">Stärke <span id="strengthVal"></span></label>
+      <input type="range" id="strength" min="1" max="5" step="1" value="3">
+    </div>
+    <div class="field">
+      <label class="flabel" for="pad">Rand um Gesicht <span id="padVal" class="num"></span></label>
+      <input type="range" id="pad" min="0" max="80" step="5" value="35">
+    </div>
+    <div class="field">
+      <div class="flabel">Erkennung</div>
+      <div class="seg" id="sensSeg">
+        <button type="button" data-sens="0" aria-pressed="false">Standard</button>
+        <button type="button" data-sens="1" aria-pressed="true">Gründlich</button>
+        <button type="button" data-sens="2" aria-pressed="false">Maximal</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="manage" class="card hidden">
+    <div class="card-head"><div><h3 class="card-title">Fotos</h3><p class="card-sub num" id="manageSub"></p></div></div>
+    <div class="row">
+      <button class="sbtn" id="zipAll" type="button">Alle als ZIP laden</button>
+      <button class="sbtn" id="clearAll" type="button">Alle entfernen</button>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p>🔒 Die Verarbeitung läuft vollständig in deinem Browser. Deine Fotos werden nirgendwohin hochgeladen.</p>
+    <p>Jedes Gesicht wird auf wenige Farbblöcke reduziert – das lässt sich nicht zurückrechnen. Beim Speichern werden Metadaten wie der GPS-Ort entfernt.</p>
+    <p>Die automatische Erkennung kann Gesichter übersehen (Profil, sehr klein, verdeckt). Prüfe jedes Foto vor dem Teilen.</p>
+  </div>
+</div>
+
+<div class="abar hidden" id="abar">
+  <div class="abar-in">
+    <button class="abtn secondary" id="bAll" type="button">Alle teilen</button>
+    <button class="abtn primary" id="bSave" type="button">Speichern</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+const FA_BASE = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15';
+const JSZIP_URL = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+const MODEL_BYTES = 5616957;
+
+const SENS = [
+  { minConf: 0.5,  grids: [2] },
+  { minConf: 0.35, grids: [2, 3] },
+  { minConf: 0.22, grids: [2, 3, 4] },
+];
+const STRENGTH_BLOCKS = [0, 14, 11, 8, 6, 4]; // blocks across the longer side
+const STRENGTH_LABEL = ['', 'leicht', 'mittel', 'stark', 'sehr stark', 'maximal'];
+const PREVIEW_MAX = 1600;
+const EXPORT_MAX_PIXELS = 16_000_000;
+
+const $ = s => document.querySelector(s);
+const coarse = matchMedia('(pointer: coarse)').matches;
+const canShareFiles = (() => {
+  try { return !!(navigator.canShare && navigator.canShare({ files: [new File([new Blob(['x'], { type: 'image/jpeg' })], 'a.jpg', { type: 'image/jpeg' })] })); }
+  catch (e) { return false; }
+})();
+// On phones "Speichern" opens the share sheet (→ "Bild sichern" puts it into Photos)
+const preferShare = coarse && canShareFiles;
+const settings = { mode: 'blur', strength: 3, pad: 35, sens: 1 };
+const items = [];
+let current = -1;
+let uid = 0;
+const isBusy = it => it.status !== 'done' && it.status !== 'failed';
+const tick = () => new Promise(r => setTimeout(r, 0));
+// wait until the browser has painted the latest progress (with a fallback for hidden tabs)
+const paint = () => new Promise(r => { let d = false; const f = () => { if (!d) { d = true; setTimeout(r, 0); } }; requestAnimationFrame(f); setTimeout(f, 80); });
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+/* ---------- Model ---------- */
+let fa = null, modelPromise = null;
+const modelState = { stage: 'idle', frac: 0, started: 0 };
+function setModelChip(state, text) {
+  $('#modelChip').className = 'pill ' + state;
+  $('#modelText').textContent = text;
+}
+async function fetchWithProgress(url, expected, onProgress) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  if (!res.body || !res.body.getReader) { const b = await res.arrayBuffer(); onProgress(1); return b; }
+  const total = (!res.headers.get('content-encoding') && +res.headers.get('content-length')) || expected;
+  const reader = res.body.getReader();
+  const chunks = []; let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value); got += value.length;
+    onProgress(Math.min(0.99, got / total));
+  }
+  const out = new Uint8Array(got); let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.length; }
+  onProgress(1);
+  return out.buffer;
+}
+function loadModel() {
+  if (modelPromise) return modelPromise;
+  setModelChip('loading', 'Erkennung lädt …');
+  modelState.started = Date.now();
+  modelState.stage = 'script'; modelState.frac = 0; updateBusy();
+  modelPromise = (async () => {
+    const m = await import(FA_BASE + '/dist/face-api.esm.js');
+    modelState.stage = 'backend'; updateBusy();
+    try { await m.tf.setBackend('webgl'); } catch (e) {}
+    await m.tf.ready();
+    modelState.stage = 'weights'; modelState.frac = 0; updateBusy();
+    try {
+      const manifest = await (await fetch(FA_BASE + '/model/ssd_mobilenetv1_model-weights_manifest.json')).json();
+      const buffers = [];
+      const paths = manifest.flatMap(g => g.paths);
+      for (const p of paths) {
+        buffers.push(new Uint8Array(await fetchWithProgress(FA_BASE + '/model/' + p, MODEL_BYTES, f => { modelState.frac = f; updateBusy(); })));
+      }
+      const all = new Uint8Array(buffers.reduce((a, b) => a + b.length, 0));
+      let o = 0; for (const b of buffers) { all.set(b, o); o += b.length; }
+      const weightMap = m.tf.io.decodeWeights(all.buffer, manifest.flatMap(g => g.weights));
+      await m.nets.ssdMobilenetv1.loadFromWeightMap(weightMap);
+    } catch (e) {
+      console.warn('progress loader failed, falling back', e);
+      await m.nets.ssdMobilenetv1.loadFromUri(FA_BASE + '/model');
+    }
+    // first inference compiles the GPU shaders and can block for a moment: announce it first
+    modelState.stage = 'warmup'; updateBusy();
+    await paint();
+    try {
+      const w = document.createElement('canvas'); w.width = w.height = 160;
+      await m.detectAllFaces(w, new m.SsdMobilenetv1Options({ minConfidence: 0.9 }));
+    } catch (e) {}
+    fa = m;
+    modelState.stage = 'ready';
+    setModelChip('ready', 'Erkennung bereit');
+    return m;
+  })().catch(err => {
+    console.error(err);
+    modelPromise = null;
+    modelState.stage = 'error';
+    setModelChip('error', 'Erkennung offline');
+    throw err;
+  });
+  return modelPromise;
+}
+
+/* ---------- Geometry ---------- */
+function clampRect(r, W, H) {
+  const x = Math.max(0, r.x), y = Math.max(0, r.y);
+  const x2 = Math.min(W, r.x + r.w), y2 = Math.min(H, r.y + r.h);
+  return { x, y, w: Math.max(0, x2 - x), h: Math.max(0, y2 - y) };
+}
+function effRect(b, item) {
+  if (!b.auto) return clampRect(b, item.w, item.h);
+  const p = settings.pad / 100;
+  return clampRect({
+    x: b.x - b.w * p,
+    y: b.y - b.h * p * 1.35,
+    w: b.w * (1 + 2 * p),
+    h: b.h * (1 + 2.25 * p),
+  }, item.w, item.h);
+}
+function overlap(a, b) {
+  const ix = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+  const iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+  const inter = ix * iy;
+  const ua = a.w * a.h + b.w * b.h - inter;
+  return { iou: inter / ua, cover: inter / Math.min(a.w * a.h, b.w * b.h) };
+}
+function mergeBoxes(list) {
+  list = [...list].sort((a, b) => b.score - a.score);
+  const kept = [];
+  for (const d of list) {
+    const hit = kept.find(k => { const o = overlap(k, d); return o.iou > 0.3 || o.cover > 0.55; });
+    if (hit) {
+      // keep the larger extent (a tile edge may cut a face in half)
+      const x = Math.min(hit.x, d.x), y = Math.min(hit.y, d.y);
+      const x2 = Math.max(hit.x + hit.w, d.x + d.w), y2 = Math.max(hit.y + hit.h, d.y + d.h);
+      const big = Math.max(hit.w * hit.h, d.w * d.h);
+      if ((x2 - x) * (y2 - y) < big * 1.8) Object.assign(hit, { x, y, w: x2 - x, h: y2 - y });
+      hit.score = Math.max(hit.score, d.score);
+    } else kept.push({ ...d });
+  }
+  return kept;
+}
+
+/* ---------- Detection ---------- */
+async function detectFaces(item, onProgress) {
+  const m = fa;
+  const cfg = SENS[settings.sens];
+  // On devices without GPU acceleration keep the work small
+  const slow = m.tf.getBackend() !== 'webgl';
+  const sc = Math.min(1, (slow ? 1280 : 2048) / Math.max(item.w, item.h));
+  const W = Math.round(item.w * sc), H = Math.round(item.h * sc);
+  const base = document.createElement('canvas');
+  base.width = W; base.height = H;
+  base.getContext('2d').drawImage(item.img, 0, 0, W, H);
+  const opts = new m.SsdMobilenetv1Options({ minConfidence: cfg.minConf, maxResults: 300 });
+  const found = [];
+  const tile = document.createElement('canvas');
+  const tctx = tile.getContext('2d');
+
+  const grids = Math.max(W, H) >= 600 ? (slow ? cfg.grids.slice(0, 1) : cfg.grids) : [];
+  const total = 1 + grids.reduce((a, n) => a + n * n, 0);
+  let done = 0;
+  const report = () => onProgress(done, total, mergeBoxes(found).length);
+  report();
+
+  async function run(sx, sy, sw, sh) {
+    tile.width = sw; tile.height = sh;
+    tctx.drawImage(base, sx, sy, sw, sh, 0, 0, sw, sh);
+    const res = await m.detectAllFaces(tile, opts);
+    for (const d of res) {
+      const b = d.box;
+      if (b.width < 4 || b.height < 4) continue;
+      found.push({ x: (b.x + sx) / sc, y: (b.y + sy) / sc, w: b.width / sc, h: b.height / sc, score: d.score });
+    }
+    done++; report();
+    await paint();
+  }
+
+  await paint();
+  try {
+    await run(0, 0, W, H);
+    for (const n of grids) {
+      const tw = Math.min(W, Math.ceil(W / n * 1.3)), th = Math.min(H, Math.ceil(H / n * 1.3));
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        await run(Math.round(i * (W - tw) / (n - 1)), Math.round(j * (H - th) / (n - 1)), tw, th);
+      }
+    }
+  } finally {
+    base.width = base.height = 0; tile.width = tile.height = 0; // free memory (important on iOS)
+  }
+  return mergeBoxes(found).filter(b => !(b.score < 0.5 && b.w * b.h > 0.5 * item.w * item.h));
+}
+
+let queue = Promise.resolve();
+function scheduleDetect(item) {
+  item.status = 'queued';
+  item.progress = null;
+  queue = queue.then(async () => {
+    if (!items.includes(item)) return;
+    try {
+      if (!fa) { item.status = 'model'; refreshUI(); await loadModel(); }
+      item.status = 'scanning';
+      item.progress = { done: 0, total: 1, found: 0 };
+      refreshUI();
+      const boxes = await detectFaces(item, (done, total, found) => { item.progress = { done, total, found }; updateBusy(); });
+      item.boxes = item.boxes.filter(b => !b.auto).concat(boxes.map(b => ({ ...b, auto: true, on: true })));
+      item.status = 'done';
+      announce(item);
+    } catch (e) {
+      console.error(e);
+      item.status = 'failed';
+      if (items[current] === item) toast('Erkennung nicht verfügbar – Gesichter bitte selbst markieren');
+    }
+    refreshUI();
+  });
+}
+function announce(item) {
+  if (items[current] !== item) return;
+  const n = item.boxes.filter(b => b.on).length;
+  const left = items.filter(isBusy).length;
+  const more = left ? ` · noch ${plural(left, 'Foto', 'Fotos')} in Arbeit` : '';
+  if (n) toast(`✓ ${plural(n, 'Gesicht', 'Gesichter')} gefunden und verfremdet${more}`);
+  else toast('⚠ Kein Gesicht gefunden – bitte prüfen' + more);
+}
+
+/* ---------- Loading files ---------- */
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve({ img, url });
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    img.src = url;
+  });
+}
+let openErrors = [];
+async function addFiles(fileList) {
+  const files = [...fileList].filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|heif|gif|bmp|avif)$/i.test(f.name));
+  if (!files.length) { toast('⚠ Das sind keine Bilddateien'); return; }
+  openErrors = [];
+  // show placeholders immediately so it is obvious something is happening
+  const placeholders = files.map(file => ({ id: ++uid, file, name: file.name || ('foto-' + uid + '.jpg'), boxes: [], status: 'opening' }));
+  const firstNew = items.length;
+  items.push(...placeholders);
+  current = firstNew;
+  refreshUI();
+  toast(`${plural(files.length, 'Foto', 'Fotos')} hinzugefügt – Analyse läuft …`);
+  if (!fa) loadModel().catch(() => {}); // start download in parallel
+
+  for (const item of placeholders) {
+    if (!items.includes(item)) continue;
+    try {
+      const { img, url } = await loadImage(item.file);
+      if (img.decode) { try { await img.decode(); } catch (e) {} }
+      const w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) throw new Error('empty');
+      const ps = Math.min(1, PREVIEW_MAX / Math.max(w, h));
+      const preview = document.createElement('canvas');
+      preview.width = Math.round(w * ps); preview.height = Math.round(h * ps);
+      const pctx = preview.getContext('2d');
+      pctx.imageSmoothingQuality = 'high';
+      pctx.drawImage(img, 0, 0, preview.width, preview.height);
+      Object.assign(item, { img, url, w, h, preview, ps });
+      scheduleDetect(item);
+    } catch (e) {
+      openErrors.push(item.name);
+      const i = items.indexOf(item);
+      if (i >= 0) items.splice(i, 1);
+      if (current >= items.length) current = items.length - 1;
+    }
+    refreshUI();
+    await tick();
+  }
+  if (openErrors.length) {
+    const heic = openErrors.some(n => /\.hei[cf]$/i.test(n));
+    toast(`⚠ ${openErrors.length === 1 ? '1 Foto konnte' : openErrors.length + ' Fotos konnten'} nicht geöffnet werden${heic ? ' (HEIC wird von diesem Browser nicht unterstützt – bitte als JPG exportieren)' : ''}`, 6000);
+  }
+}
+
+/* ---------- Rendering ---------- */
+let noiseCanvas = null;
+function getNoise() {
+  if (noiseCanvas) return noiseCanvas;
+  noiseCanvas = document.createElement('canvas');
+  noiseCanvas.width = noiseCanvas.height = 128;
+  const c = noiseCanvas.getContext('2d');
+  const d = c.createImageData(128, 128);
+  for (let i = 0; i < d.data.length; i += 4) {
+    const v = Math.random() * 255;
+    d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255;
+  }
+  c.putImageData(d, 0, 0);
+  return noiseCanvas;
+}
+const tiny = document.createElement('canvas');
+function roundRectPath(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+/** src: drawable whose pixel coords = image coords * s; r: rect in image coords; dst ctx uses the same scale s */
+function applyEffect(ctx, src, s, r) {
+  const x = r.x * s, y = r.y * s, w = r.w * s, h = r.h * s;
+  if (w < 1 || h < 1) return;
+  ctx.save();
+  roundRectPath(ctx, x, y, w, h, Math.min(w, h) * 0.16);
+  ctx.clip();
+  if (settings.mode === 'solid') {
+    ctx.fillStyle = '#10141f';
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+    return;
+  }
+  const blocks = STRENGTH_BLOCKS[settings.strength];
+  const bs = Math.max(w, h) / blocks;
+  const sw = Math.max(1, Math.round(w / bs)), sh = Math.max(1, Math.round(h / bs));
+  tiny.width = sw; tiny.height = sh;
+  const t = tiny.getContext('2d');
+  t.imageSmoothingEnabled = true; t.imageSmoothingQuality = 'high';
+  t.drawImage(src, x, y, w, h, 0, 0, sw, sh);
+  if (settings.mode === 'pixel') {
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tiny, 0, 0, sw, sh, x, y, w, h);
+  } else {
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(tiny, 0, 0, sw, sh, x - w / sw / 2, y - h / sh / 2, w + w / sw, h + h / sh);
+    ctx.globalAlpha = 0.07;
+    ctx.globalCompositeOperation = 'overlay';
+    const n = getNoise();
+    const step = Math.max(64, 128 * s);
+    for (let ny = y; ny < y + h; ny += step) for (let nx = x; nx < x + w; nx += step) ctx.drawImage(n, nx, ny, step, step);
+  }
+  ctx.restore();
+}
+function renderInto(ctx, item, src, s, withEffects) {
+  ctx.drawImage(src, 0, 0, item.w * s, item.h * s);
+  if (!withEffects) return;
+  for (const b of item.boxes) if (b.on) applyEffect(ctx, src, s, effRect(b, item));
+}
+
+const view = $('#view');
+const vctx = view.getContext('2d');
+let showOriginal = false;
+function cssScale() { return view.getBoundingClientRect().width / view.width || 1; }
+function draw() {
+  const item = items[current];
+  if (!item) return;
+  if (!item.preview) { // still opening
+    if (view.width !== 800 || view.height !== 600) { view.width = 800; view.height = 600; }
+    vctx.fillStyle = '#1b2a4d'; vctx.fillRect(0, 0, 800, 600);
+    return;
+  }
+  if (view.width !== item.preview.width || view.height !== item.preview.height) {
+    view.width = item.preview.width; view.height = item.preview.height;
+  }
+  const s = item.ps;
+  // while scanning show the untouched photo, effects appear when the result is ready
+  renderInto(vctx, item, item.preview, s, !showOriginal);
+  if (isBusy(item)) return;
+  const px = 1 / cssScale();
+  const hr = (coarse ? 13 : 9) * px;
+  for (const b of item.boxes) {
+    const r = effRect(b, item);
+    const x = r.x * s, y = r.y * s, w = r.w * s, h = r.h * s;
+    vctx.save();
+    vctx.lineWidth = 2 * px;
+    if (b.on) { vctx.strokeStyle = '#3fd0b6'; vctx.setLineDash([]); }
+    else { vctx.strokeStyle = '#ff6b6b'; vctx.setLineDash([6 * px, 5 * px]); }
+    roundRectPath(vctx, x, y, w, h, Math.min(w, h) * 0.16);
+    vctx.stroke();
+    vctx.setLineDash([]);
+    vctx.fillStyle = b.on ? '#3fd0b6' : '#ff6b6b';
+    vctx.beginPath(); vctx.arc(x + w, y, hr, 0, Math.PI * 2); vctx.fill();
+    vctx.strokeStyle = '#111b33'; vctx.lineWidth = 2 * px;
+    vctx.beginPath();
+    vctx.moveTo(x + w - hr * .45, y - hr * .45); vctx.lineTo(x + w + hr * .45, y + hr * .45);
+    vctx.moveTo(x + w + hr * .45, y - hr * .45); vctx.lineTo(x + w - hr * .45, y + hr * .45);
+    vctx.stroke();
+    const rs = (coarse ? 9 : 6) * px;
+    vctx.fillStyle = '#ffffff';
+    vctx.fillRect(x + w - rs, y + h - rs, rs * 2, rs * 2);
+    vctx.restore();
+  }
+}
+
+/* ---------- Busy / progress ---------- */
+function busyInfo(item) {
+  const mb = b => (b / 1048576).toFixed(1).replace('.', ',');
+  switch (item.status) {
+    case 'opening': return { title: 'Foto wird geöffnet …', short: 'Foto wird geöffnet …', frac: null, detail: item.name, scan: false };
+    case 'queued': {
+      const ahead = items.slice(0, items.indexOf(item)).filter(i => isBusy(i)).length;
+      return { title: 'Wartet auf Analyse …', short: 'Wartet auf Analyse …', frac: null, detail: ahead ? `${ahead} ${ahead === 1 ? 'Foto ist' : 'Fotos sind'} vorher dran` : 'Gleich geht’s los', scan: false };
+    }
+    case 'model': {
+      const slowNote = Date.now() - modelState.started > 9000 ? ' · dauert nur beim ersten Mal' : '';
+      if (modelState.stage === 'weights')
+        return { title: 'Gesichtserkennung wird geladen …', short: `Erkennung lädt · ${Math.round(modelState.frac * 100)} %`, frac: modelState.frac, detail: `${mb(modelState.frac * MODEL_BYTES)} von ${mb(MODEL_BYTES)} MB${slowNote}`, scan: false };
+      if (modelState.stage === 'warmup')
+        return { title: 'Erkennung wird gestartet …', short: 'Erkennung wird gestartet …', frac: null, detail: 'Einmalige Vorbereitung, dauert ein paar Sekunden', scan: false };
+      if (modelState.stage === 'error')
+        return { title: 'Erkennung konnte nicht geladen werden', short: 'Erkennung nicht verfügbar', frac: 0, detail: 'Internetverbindung prüfen', scan: false };
+      return { title: 'Gesichtserkennung wird vorbereitet …', short: 'Erkennung wird vorbereitet …', frac: null, detail: (modelState.stage === 'backend' ? 'Grafikbeschleunigung wird eingerichtet' : 'Programm wird geladen (einmalig, ca. 7 MB)') + slowNote, scan: false };
+    }
+    case 'scanning': {
+      const p = item.progress || { done: 0, total: 1, found: 0 };
+      const f = p.found ? ` · ${plural(p.found, 'Gesicht', 'Gesichter')} bisher` : '';
+      const pos = `Bildbereich ${Math.min(p.done + 1, p.total)} von ${p.total}`;
+      return { title: 'Suche Gesichter …', short: `Suche Gesichter · ${pos}`, frac: p.done / p.total, detail: pos + f, scan: true };
+    }
+  }
+  return null;
+}
+function setStatus(kind, html) {
+  const el = $('#statusLine');
+  el.className = 'status num' + (kind ? ' ' + kind : '');
+  el.innerHTML = html;
+}
+function updateBusy() {
+  const item = items[current];
+  const info = item && isBusy(item) ? busyInfo(item) : null;
+  $('#busy').classList.toggle('hidden', !info);
+  if (info) {
+    $('#busyTitle').textContent = info.title;
+    $('#busyDetail').textContent = info.detail;
+    const bar = $('#busyBar');
+    bar.classList.toggle('indet', info.frac == null);
+    bar.firstElementChild.style.width = info.frac == null ? '' : Math.round(info.frac * 100) + '%';
+    $('#scan').classList.toggle('hidden', !info.scan);
+  }
+  // status line on the stage card
+  const busy = items.filter(isBusy);
+  const others = items.length > 1 && busy.length ? ` · ${items.length - busy.length}/${items.length} fertig` : '';
+  if (item) {
+    if (info) setStatus('', `<div class="spin sm"></div><span>${esc(info.short)}${others}</span>`);
+    else if (item.status === 'failed') setStatus('bad', `<span>Erkennung nicht verfügbar – selbst markieren${others}</span>`);
+    else {
+      const on = item.boxes.filter(b => b.on).length, off = item.boxes.length - on;
+      if (on) setStatus('good', `<span>✓ ${plural(on, 'Bereich', 'Bereiche')} verfremdet${off ? ` · ${off} aus` : ''}${others}</span>`);
+      else setStatus('bad', `<span>Nichts verfremdet – bitte prüfen${others}</span>`);
+    }
+  }
+  setModelChipFromState(busy.length > 0);
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function setModelChipFromState(anyBusy) {
+  if (modelState.stage === 'error') return;
+  if (!fa) return;
+  setModelChip(anyBusy ? 'loading' : 'ready', anyBusy ? 'Analysiert …' : 'Erkennung bereit');
+}
+
+/* ---------- Interaction ---------- */
+let drag = null;
+function toImg(e) {
+  const r = view.getBoundingClientRect();
+  const item = items[current];
+  return { x: (e.clientX - r.left) / r.width * item.w, y: (e.clientY - r.top) / r.height * item.h, k: item.w / r.width };
+}
+function freeze(b, item) {
+  if (b.auto) { Object.assign(b, effRect(b, item)); b.auto = false; }
+}
+view.addEventListener('pointerdown', e => {
+  const item = items[current];
+  if (!item || isBusy(item)) return;
+  view.setPointerCapture(e.pointerId);
+  const p = toImg(e);
+  const tol = (e.pointerType === 'touch' || coarse ? 24 : 14) * p.k;
+  for (let i = item.boxes.length - 1; i >= 0; i--) {
+    const b = item.boxes[i], r = effRect(b, item);
+    if (Math.hypot(p.x - (r.x + r.w), p.y - r.y) < tol) { item.boxes.splice(i, 1); drag = null; refreshUI(); return; }
+    if (Math.abs(p.x - (r.x + r.w)) < tol && Math.abs(p.y - (r.y + r.h)) < tol) { drag = { type: 'resize', b, start: p, r0: r }; return; }
+  }
+  for (let i = item.boxes.length - 1; i >= 0; i--) {
+    const b = item.boxes[i], r = effRect(b, item);
+    if (p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h) { drag = { type: 'tap', b, start: p, r0: r, moved: false }; return; }
+  }
+  const nb = { x: p.x, y: p.y, w: 0, h: 0, auto: false, on: true, score: 1, fresh: true };
+  drag = { type: 'new', b: nb, start: p };
+});
+view.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const item = items[current];
+  const p = toImg(e);
+  const dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+  if (drag.type === 'tap') {
+    if (!drag.moved && Math.hypot(dx, dy) / p.k < (coarse ? 8 : 5)) return;
+    if (!drag.moved) { drag.moved = true; freeze(drag.b, item); }
+    drag.b.x = Math.min(Math.max(0, drag.r0.x + dx), item.w - drag.r0.w);
+    drag.b.y = Math.min(Math.max(0, drag.r0.y + dy), item.h - drag.r0.h);
+    drag.b.on = true;
+  } else if (drag.type === 'resize') {
+    freeze(drag.b, item);
+    drag.b.w = Math.max(8 * p.k, Math.min(item.w - drag.r0.x, drag.r0.w + dx));
+    drag.b.h = Math.max(8 * p.k, Math.min(item.h - drag.r0.y, drag.r0.h + dy));
+    drag.b.on = true;
+  } else if (drag.type === 'new') {
+    const b = drag.b;
+    b.x = Math.max(0, Math.min(drag.start.x, p.x)); b.y = Math.max(0, Math.min(drag.start.y, p.y));
+    b.w = Math.min(item.w, Math.max(drag.start.x, p.x)) - b.x; b.h = Math.min(item.h, Math.max(drag.start.y, p.y)) - b.y;
+    if (b.fresh && b.w / p.k > 6 && b.h / p.k > 6) { b.fresh = false; item.boxes.push(b); }
+  }
+  draw();
+});
+function endDrag() {
+  if (!drag) return;
+  if (drag.type === 'tap' && !drag.moved) drag.b.on = !drag.b.on;
+  drag = null;
+  refreshUI();
+}
+view.addEventListener('pointerup', endDrag);
+view.addEventListener('pointercancel', endDrag);
+
+/* ---------- UI ---------- */
+function refreshUI() {
+  const has = items.length > 0;
+  $('#drop').classList.toggle('hidden', has);
+  ['#work', '#settings', '#manage', '#abar'].forEach(s => $(s).classList.toggle('hidden', !has));
+  if (!has) return;
+  if (current >= items.length) current = items.length - 1;
+  if (current < 0) current = 0;
+  const item = items[current];
+  const n = items.length;
+
+  // thumbs
+  const th = $('#thumbs');
+  th.innerHTML = '';
+  items.forEach((it, i) => {
+    const d = document.createElement('div');
+    d.className = 'thumb' + (i === current ? ' active' : '');
+    d.setAttribute('role', 'button');
+    d.setAttribute('aria-label', `Foto ${i + 1}`);
+    if (it.url) { const img = document.createElement('img'); img.src = it.url; img.alt = ''; d.appendChild(img); }
+    if (isBusy(it)) {
+      const ph = document.createElement('div'); ph.className = 'ph'; ph.innerHTML = '<div class="spin"></div>'; d.appendChild(ph);
+    } else {
+      const on = it.boxes.filter(b => b.on).length;
+      const badge = document.createElement('span');
+      if (it.status === 'failed' && !on) { badge.className = 'badge none'; badge.textContent = '!'; }
+      else if (on === 0) { badge.className = 'badge none'; badge.textContent = '0'; }
+      else { badge.className = 'badge ok'; badge.textContent = on + ' ✓'; }
+      d.appendChild(badge);
+    }
+    const x = document.createElement('button'); x.className = 'x'; x.type = 'button'; x.textContent = '×'; x.title = 'Entfernen'; x.setAttribute('aria-label', 'Foto entfernen');
+    x.onclick = ev => { ev.stopPropagation(); removeItem(i); toast('Foto entfernt'); };
+    d.appendChild(x);
+    d.onclick = () => { current = i; refreshUI(); };
+    th.appendChild(d);
+  });
+  const add = document.createElement('button');
+  add.type = 'button'; add.className = 'thumb add'; add.textContent = '+'; add.title = 'Weitere Fotos'; add.setAttribute('aria-label', 'Weitere Fotos hinzufügen');
+  add.onclick = () => $('#file').click();
+  th.appendChild(add);
+  th.children[current]?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+
+  const busy = isBusy(item);
+  $('#stageTitle').textContent = n > 1 ? `Foto ${current + 1} von ${n}` : 'Dein Foto';
+  $('#holdOrig').disabled = busy; $('#redetect').disabled = busy;
+  $('#hint').classList.toggle('hidden', busy);
+
+  const on = item.boxes.filter(b => b.on).length;
+  const warn = $('#warn');
+  if (!busy && item.status === 'failed') {
+    warn.textContent = 'Die automatische Erkennung ist gerade nicht verfügbar (Internetverbindung?). Tippe auf „Neu erkennen“ oder ziehe Rechtecke über die Gesichter, um sie selbst zu verfremden.';
+    warn.classList.remove('hidden');
+  } else if (!busy && on === 0) {
+    warn.textContent = 'In diesem Foto ist nichts verfremdet. Falls Personen zu sehen sind: Ziehe ein Rechteck über jedes Gesicht oder stelle die Erkennung auf „Maximal“.';
+    warn.classList.remove('hidden');
+  } else warn.classList.add('hidden');
+
+  const busyAny = items.some(isBusy);
+  const doneN = n - items.filter(isBusy).length;
+  $('#manageSub').textContent = `${plural(n, 'Foto', 'Fotos')} · ${doneN} fertig`;
+  $('#zipAll').disabled = busyAny;
+  $('#zipAll').textContent = n > 1 ? `Alle ${n} als ZIP laden` : 'Als ZIP laden';
+  if (!clearArmed) $('#clearAll').textContent = n > 1 ? `Alle ${n} entfernen` : 'Foto entfernen';
+
+  const bSave = $('#bSave'), bAll = $('#bAll');
+  if (!bSave.dataset.working) {
+    bSave.disabled = busy;
+    bSave.textContent = busy ? 'Wird analysiert …' : 'Speichern';
+  }
+  bAll.classList.toggle('hidden', n < 2);
+  if (!bAll.dataset.working) {
+    bAll.disabled = busyAny;
+    bAll.textContent = busyAny ? `${doneN}/${n} fertig` : (canShareFiles ? `Alle ${n} teilen` : `Alle ${n} als ZIP`);
+  }
+  updateBusy();
+  draw();
+}
+function removeItem(i) {
+  const [it] = items.splice(i, 1);
+  if (it.url) URL.revokeObjectURL(it.url);
+  if (current >= items.length) current = items.length - 1;
+  else if (i < current) current--;
+  if (current < 0 && items.length) current = 0;
+  refreshUI();
+}
+function syncControls() {
+  document.querySelectorAll('#modeSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === settings.mode)));
+  document.querySelectorAll('#sensSeg button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.sens === settings.sens)));
+  $('#strengthField').classList.toggle('hidden', settings.mode === 'solid');
+  $('#strengthVal').textContent = STRENGTH_LABEL[settings.strength];
+  $('#padVal').textContent = settings.pad + ' %';
+}
+$('#modeSeg').addEventListener('click', e => {
+  const m = e.target.closest('button')?.dataset.mode; if (!m) return;
+  settings.mode = m; syncControls(); draw();
+});
+$('#sensSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const v = +b.dataset.sens; if (v === settings.sens) return;
+  settings.sens = v; syncControls();
+  items.filter(i => i.img).forEach(scheduleDetect); refreshUI();
+  toast('Erkennung wird mit neuer Einstellung wiederholt …');
+});
+$('#strength').addEventListener('input', e => { settings.strength = +e.target.value; syncControls(); draw(); });
+$('#pad').addEventListener('input', e => { settings.pad = +e.target.value; syncControls(); draw(); });
+$('#redetect').onclick = () => { const it = items[current]; if (it && it.img) { scheduleDetect(it); refreshUI(); toast('Erkennung wird wiederholt …'); } };
+const holdBtn = $('#holdOrig');
+const setOrig = v => { showOriginal = v; holdBtn.classList.toggle('on', v); draw(); };
+holdBtn.addEventListener('pointerdown', e => { e.preventDefault(); setOrig(true); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => holdBtn.addEventListener(ev, () => showOriginal && setOrig(false)));
+holdBtn.addEventListener('contextmenu', e => e.preventDefault());
+
+// "Alle entfernen": tap once to arm, tap again within 3 s to confirm (no confirm() dialog)
+let clearArmed = false, clearTimer;
+$('#clearAll').onclick = () => {
+  const btn = $('#clearAll');
+  if (!clearArmed && items.length > 1) {
+    clearArmed = true;
+    btn.classList.add('danger');
+    btn.textContent = 'Wirklich alle entfernen?';
+    clearTimeout(clearTimer);
+    clearTimer = setTimeout(() => { clearArmed = false; btn.classList.remove('danger'); refreshUI(); }, 3000);
+    return;
+  }
+  clearTimeout(clearTimer);
+  clearArmed = false; btn.classList.remove('danger');
+  const n = items.length;
+  while (items.length) removeItem(0);
+  current = -1; refreshUI();
+  toast(n > 1 ? 'Alle Fotos entfernt' : 'Foto entfernt');
+};
+
+/* ---------- Files in ---------- */
+if (coarse) {
+  $('#pickLabel').textContent = 'Fotos auswählen';
+  $('#dropHint').classList.add('hidden');
+  $('#hint').innerHTML = '<span><b>Finger ziehen:</b> Bereich hinzufügen</span><span><b>Antippen:</b> an/aus</span><span><b>↘</b> Größe · <b>×</b> löschen</span>';
+} else {
+  $('#hint').innerHTML = '<span><b>Ziehen</b> auf freier Fläche: Bereich hinzufügen</span><span><b>Klicken</b> auf Markierung: an/aus</span><span><b>Ecke ↘</b> Größe · <b>×</b> löschen</span>';
+}
+$('#pickBtn').onclick = e => { e.stopPropagation(); $('#file').click(); };
+$('#drop').onclick = () => $('#file').click();
+$('#drop').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#file').click(); } };
+$('#file').onchange = e => { const f = [...e.target.files]; e.target.value = ''; addFiles(f); };
+let dragDepth = 0;
+window.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; $('#drop').classList.add('over'); });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('over'); } });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; $('#drop').classList.remove('over'); if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
+window.addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])]; if (f.length) addFiles(f); });
+
+/* ---------- Export ---------- */
+function outName(item) {
+  const base = item.name.replace(/\.[^.]+$/, '') || 'foto';
+  return base + '_anonym.' + (item.file.type === 'image/png' ? 'png' : 'jpg');
+}
+function exportBlob(item) {
+  const s = Math.min(1, Math.sqrt(EXPORT_MAX_PIXELS / (item.w * item.h)));
+  const c = document.createElement('canvas');
+  c.width = Math.round(item.w * s); c.height = Math.round(item.h * s);
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  let src = item.img;
+  if (s < 1) {
+    const sc = document.createElement('canvas'); sc.width = c.width; sc.height = c.height;
+    sc.getContext('2d').drawImage(item.img, 0, 0, c.width, c.height);
+    src = sc;
+  }
+  renderInto(ctx, item, src, s, true);
+  const png = item.file.type === 'image/png';
+  return new Promise((res, rej) => c.toBlob(b => {
+    c.width = c.height = 0;
+    b ? res(b) : rej(new Error('export'));
+  }, png ? 'image/png' : 'image/jpeg', 0.92));
+}
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+function uniqueNames(list) {
+  const seen = {};
+  return list.map(it => { let n = outName(it); if (seen[n]) n = n.replace(/(\.\w+)$/, `_${++seen[n]}$1`); else seen[n] = 1; return n; });
+}
+async function withButton(btn, label, fn) {
+  btn.dataset.working = '1'; btn.disabled = true; btn.textContent = label;
+  try { await fn(); } finally { delete btn.dataset.working; refreshUI(); }
+}
+async function shareFiles(files) {
+  try { await navigator.share({ files }); return true; }
+  catch (e) { if (e.name === 'AbortError') return true; return false; }
+}
+async function saveCurrent(btn) {
+  const it = items[current]; if (!it || isBusy(it)) return;
+  await withButton(btn, 'Wird erstellt …', async () => {
+    const blob = await exportBlob(it);
+    const name = outName(it);
+    if (preferShare) {
+      if (await shareFiles([new File([blob], name, { type: blob.type })])) return;
+    }
+    download(blob, name);
+    toast('✓ Gespeichert: ' + name);
+  });
+}
+async function makeZip(btn, files) {
+  if (!window.JSZip) await loadScript(JSZIP_URL);
+  const zip = new window.JSZip();
+  if (files) files.forEach(f => zip.file(f.name, f));
+  else {
+    const names = uniqueNames(items);
+    for (let i = 0; i < items.length; i++) {
+      btn.textContent = `Verarbeite ${i + 1}/${items.length} …`;
+      zip.file(names[i], await exportBlob(items[i]));
+      await tick();
+    }
+  }
+  btn.textContent = 'Packe ZIP …';
+  return zip.generateAsync({ type: 'blob', compression: 'STORE' });
+}
+async function saveAllZip(btn) {
+  if (!items.length || items.some(isBusy)) return;
+  await withButton(btn, 'Wird erstellt …', async () => {
+    try {
+      if (items.length === 1) { download(await exportBlob(items[0]), outName(items[0])); toast('✓ Gespeichert: ' + outName(items[0])); return; }
+      download(await makeZip(btn), 'fotos_anonym.zip');
+      toast(`✓ ${items.length} Fotos als ZIP gespeichert`);
+    } catch (e) {
+      console.error(e); toast('⚠ ZIP konnte nicht erstellt werden – speichere die Fotos einzeln');
+    }
+  });
+}
+async function shareAll(btn) {
+  if (!items.length || items.some(isBusy)) return;
+  await withButton(btn, 'Wird erstellt …', async () => {
+    const names = uniqueNames(items);
+    const files = [];
+    for (let i = 0; i < items.length; i++) {
+      btn.textContent = `Erstelle ${i + 1}/${items.length} …`;
+      const b = await exportBlob(items[i]);
+      files.push(new File([b], names[i], { type: b.type }));
+      await tick();
+    }
+    if (!(await shareFiles(files))) {
+      toast('Teilen nicht möglich – Fotos werden als ZIP gespeichert');
+      try { download(await makeZip(btn, files), 'fotos_anonym.zip'); }
+      catch (e) { toast('⚠ ZIP konnte nicht erstellt werden – speichere die Fotos einzeln'); }
+    }
+  });
+}
+function loadScript(src) {
+  return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+}
+$('#bSave').onclick = () => saveCurrent($('#bSave'));
+$('#bAll').onclick = () => canShareFiles ? shareAll($('#bAll')) : saveAllZip($('#bAll'));
+$('#zipAll').onclick = () => saveAllZip($('#zipAll'));
+
+/* ---------- misc ---------- */
+let toastTimer;
+function toast(msg, ms = 3000) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+window.addEventListener('resize', () => draw());
+setInterval(() => { const it = items[current]; if (it && it.status === 'model') updateBusy(); }, 1000);
+syncControls();
+loadModel().catch(() => {});
+window.__gs = { items, settings, exportBlob }; // for debugging
+</script>
+</body>
+</html>
+

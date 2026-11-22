@@ -1,0 +1,83 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "ghostberry",
+  "title": "Ghostberry",
+  "description": "A Ghost-style blog: write with cards, publish or schedule, tags, authors, members, Ghost themes. Almanac is the default theme.",
+  "version": 1,
+  "status": "beta",
+  "language": "en",
+  "category": "publishing",
+  "themeColor": "#2f5d46",
+  "entry": "index.html",
+  "capabilities": {
+    "assets": {},
+    "db": {
+      "rules": [
+        {
+          "path": "settings",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "themes",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "posts",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "html",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "tags",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "authors",
+          "read": "view",
+          "write": "admin"
+        },
+        {
+          "path": "system",
+          "read": "view",
+          "write": "owner"
+        },
+        {
+          "path": "drafts",
+          "read": "admin",
+          "write": "admin"
+        },
+        {
+          "path": "draftbody",
+          "read": "admin",
+          "write": "admin"
+        },
+        {
+          "path": "revisions",
+          "read": "admin",
+          "write": "admin"
+        },
+        {
+          "path": "subscribers",
+          "read": "admin",
+          "write": "anyone"
+        }
+      ]
+    },
+    "downloads": {},
+    "user": {}
+  },
+  "seed": [
+    "seed/system.json"
+  ],
+  "externalHosts": [
+    "cdn.jsdelivr.net",
+    "data.jsdelivr.com"
+  ]
+}

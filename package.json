@@ -1,0 +1,18 @@
+{
+  "name": "lager-apps",
+  "private": true,
+  "description": "Single-file web apps for Lager, one folder per app.",
+  "type": "module",
+  "scripts": {
+    "validate": "node tools/validate.mjs",
+    "catalog": "node tools/build-catalog.mjs",
+    "catalog:check": "node tools/build-catalog.mjs --check",
+    "test": "playwright test",
+    "test:app": "playwright test --grep",
+    "check": "npm run validate && npm run catalog:check && npm test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  },
+  "engines": { "node": ">=20" }
+}
