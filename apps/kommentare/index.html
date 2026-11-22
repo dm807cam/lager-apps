@@ -175,6 +175,42 @@ if (!db) { root.append(h('p', {class: 'note'}, t('noDb'))); return; }
 
 const visitor = (() => { try { let v = localStorage.getItem('lc_v'); if (!v) { v = rid(); localStorage.setItem('lc_v', v); } return v; } catch { return rid(); } })();
 
+/* A query returns at most 1000 documents, so everything is read page by page, ordered by a time field.
+   The first 1000 (in the server's own order) and the newest 50 are followed live. Append-only collections
+   (votes are never changed or deleted) take new documents straight from there; for the others any change
+   reads the whole set again. */
+function liveAll(q, field, onData, {appendOnly = false, onError = null, wait = 300} = {}) {
+  const all = new Map(); let base = [], timer = 0, busy = false, again = false, ready = false;
+  const emit = () => { const m = new Map(all); for (const d of base) m.set(d.id, d); onData([...m.values()]); };
+  async function load() {
+    if (busy) { again = true; return; } busy = true;
+    try {
+      const out = new Map(); let last = null;
+      for (let n = 0; n < 500; n++) {
+        const snap = await (last == null ? q : q.where(field, '>=', last)).orderBy(field).limit(1000).get();
+        let fresh = 0; for (const d of snap.docs) if (!out.has(d.id)) { out.set(d.id, {id: d.id, ...d.data()}); fresh++; }
+        if (snap.size < 1000 || !fresh) break;
+        const nl = snap.docs[snap.docs.length - 1].data()[field]; if (nl == null || nl === last) break; last = nl;
+      }
+      all.clear(); for (const [k, v] of out) all.set(k, v); ready = true; emit();
+    } catch (e) { setTimeout(schedule, 15000); }
+    finally { busy = false; if (again) { again = false; schedule(); } }
+  }
+  const schedule = () => { clearTimeout(timer); timer = setTimeout(load, wait); };
+  let capped = false;
+  q.limit(1000).onSnapshot(snap => {
+    base = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    if (snap.size >= 1000) capped = true;
+    if (!capped) { all.clear(); ready = true; emit(); return; }   // below the cap this is everything
+    emit(); if (!ready || !appendOnly) schedule();
+  }, e => { if (onError) onError(e); });
+  q.orderBy(field, 'desc').limit(50).onSnapshot(snap => {
+    if (!capped) return;
+    if (appendOnly && ready) { for (const d of snap.docs) all.set(d.id, {id: d.id, ...d.data()}); emit(); }
+    else schedule();
+  }, () => {});
+  return {reload: () => { if (capped) schedule(); }};
+}
 function tallyOf(votes, page, site) {
   const latest = new Map();
   for (const v of votes) {
@@ -332,14 +368,15 @@ function widgetApp() {
 
   const defaults = {moderation: true, instantSince: 0};
   db.doc('settings/main').onSnapshot(s => { st.settings = s.exists ? s.data() : defaults; renderList(); }, () => { st.settings = defaults; renderList(); });
-  db.collection('approved').where('site', '==', SITE).where('page', '==', PAGE).onSnapshot(s => {
-    st.approved = s.docs.map(d => ({id: d.id, ...d.data()}));
+  const wApproved = liveAll(db.collection('approved').where('site', '==', SITE).where('page', '==', PAGE), 'createdAt', docs => {
+    st.approved = docs;
     const ids = new Set(st.approved.map(c => c.id));
     const n = st.mine.length; st.mine = st.mine.filter(c => !ids.has(c.id)); if (st.mine.length !== n) saveMine();
     renderList();
-  }, () => {});
-  db.collection('open').where('site', '==', SITE).where('page', '==', PAGE).onSnapshot(s => { st.open = s.docs.map(d => ({id: d.id, ...d.data()})); renderList(); }, () => {});
-  db.collection('votes').where('site', '==', SITE).where('page', '==', PAGE).limit(1000).onSnapshot(s => { st.votes = s.docs.map(d => ({id: d.id, ...d.data()})); renderVotes(); }, () => {});
+  });
+  const wOpen = liveAll(db.collection('open').where('site', '==', SITE).where('page', '==', PAGE), 'createdAt', docs => { st.open = docs; renderList(); });
+  setInterval(() => { wApproved.reload(); wOpen.reload(); }, 120000);
+  liveAll(db.collection('votes').where('site', '==', SITE).where('page', '==', PAGE), 'ts', docs => { st.votes = docs; renderVotes(); }, {appendOnly: true});
   setInterval(renderList, 60000);
   // Lager shows its small "Made with Lager" badge in the bottom right corner for visitors; keep room for it below the
   // last comment, and give the room back when the visitor hides it.
@@ -425,25 +462,29 @@ async function adminApp() {
   }
   const pageLabel = c => { const u = safeUrl(c.url); return u ? h('a', {href: u, target: '_blank', rel: 'noopener noreferrer'}, c.page) : h('span', {}, c.page); };
 
-  async function approve(c) { await db.doc('approved/' + c.id).set(clean(c)); await db.doc('inbox/' + c.id).delete(); }
+  // After its own changes the admin view reads the lists again (an older comment is not among the newest that are watched).
+  const reloadAll = () => { for (const k of ['inbox', 'approved', 'open']) if (subs[k]) subs[k].reload(); };
+  async function approve(c) { await db.doc('approved/' + c.id).set(clean(c)); await db.doc('inbox/' + c.id).delete(); reloadAll(); }
   async function removeComment(c) {
     const all = [...everything().values()];
     const del = new Map([[c.id, c.col]]);
     let grew = true;
     while (grew) { grew = false; for (const x of all) if (x.parentId && del.has(x.parentId) && !del.has(x.id)) { del.set(x.id, x.col); grew = true; } }
     for (const [id, col] of del) await db.doc(col + '/' + id).delete();
+    reloadAll();
     toast(del.size > 1 ? del.size + ' Kommentare gelöscht' : 'Gelöscht');
   }
   async function adminReply(parent, text) {
     const name = (await safe(() => user.name())) || 'Autor';
     await db.collection('approved').add({site: normSite(parent.site), page: parent.page, url: parent.url || '', parentId: parent.id, name: String(name).slice(0, 60), text: text.slice(0, 1500), createdAt: Date.now(), byAdmin: true});
   }
-  async function saveEdit(c, text) { await db.doc(c.col + '/' + c.id).update({text: text.slice(0, 1500), editedAt: Date.now()}); }
+  async function saveEdit(c, text) { await db.doc(c.col + '/' + c.id).update({text: text.slice(0, 1500), editedAt: Date.now()}); reloadAll(); }
   async function setModeration(v) {
     try {
       if (v && instant()) for (const c of A.open) if (openVisible(c)) await db.doc('approved/' + c.id).set(clean(c));
       await db.doc('settings/main').set({moderation: v, instantSince: v ? since() : Date.now()});
       if (v) for (const c of A.open) await db.doc('open/' + c.id).delete();
+      reloadAll();
       toast(v ? 'Moderation aktiviert' : 'Kommentare erscheinen jetzt sofort');
     } catch (e) { toast(errMsg(e)); draw(); }
   }
@@ -490,7 +531,7 @@ async function adminApp() {
     const shown = items.filter(c => (!filterPage || c.page === filterPage) && (!search || (c.text + ' ' + c.name).toLowerCase().includes(search.toLowerCase())));
     const exp = dl ? abtn('CSV exportieren', async () => {
       const rows = [['Site', 'Seite', 'URL', 'Name', 'Kommentar', 'Datum', 'Autor', 'Antwort auf'], ...shown.map(c => [c.site || '', c.page, c.url || '', c.name, c.text, new Date(c.createdAt).toISOString(), c.byAdmin ? 'ja' : '', c.parentId || ''])];
-      await dl.save({filename: 'kommentare' + (siteSel ? '-' + siteSel.replace(/[^a-z0-9.-]/g, '-') : '') + '.csv', data: '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n')});
+      await dl.save({filename: 'kommentare' + (siteSel ? '-' + siteSel.replace(/[^a-z0-9.-]/g, '-') : '') + '.csv', data: '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n')});
     }, 'btn sec small') : null;
     return h('div', {}, h('div', {class: 'toolbar'}, sel, q, exp),
       h('p', {class: 'meta'}, shown.length + ' Kommentar' + (shown.length === 1 ? '' : 'e') + (shown.length > 200 ? ' (die neuesten 200 werden angezeigt)' : '')),
@@ -511,7 +552,7 @@ async function adminApp() {
     const open = r => { if (showSite) { siteSel = r.site; const u = new URL(location.href); u.searchParams.set('admin', ''); u.searchParams.set('site', r.site); history.replaceState(null, '', u); } filterPage = r.page; tab = 'all'; draw(); };
     return h('div', {}, h('table', {}, h('thead', {}, h('tr', {}, [showSite && 'Site', 'Seite', 'Kommentare', 'Offen', '👍', '👎', ''].filter(x => x !== false).map(x => h('th', {}, x)))),
       h('tbody', {}, rows.map(r => h('tr', {}, showSite ? h('td', {}, siteName(r.site), A.embed && r.site && !siteEmbedded(r.site) ? [' ', h('span', {class: 'warnbadge', title: 'Nicht als Website freigegeben'}, '!')] : null) : null, h('td', {}, pageLabel(r)), h('td', {}, r.comments), h('td', {}, r.pending), h('td', {}, r.up), h('td', {}, r.down), h('td', {}, r.comments ? h('button', {class: 'link', type: 'button', onclick: () => open(r)}, 'Anzeigen') : ''))))),
-      A.votes.length >= 1000 ? h('p', {class: 'meta'}, 'Hinweis: Es werden maximal 1000 Abstimmungs-Ereignisse gelesen; bei sehr vielen Stimmen können Zahlen abweichen.') : null);
+      null);
   }
 
   function snippet(preset) {
@@ -572,7 +613,7 @@ async function adminApp() {
         h('p', {class: 'meta'}, 'Auf jeder Seite einfügen, wo Kommentare erscheinen sollen. Die Site ist standardmäßig der Hostname (ohne www.), die Seite der Pfad. Mit data-site="…" und data-page="…" am div legst du beides fest – praktisch für Apps, deren URLs sich ändern. Optional: data-theme="light|dark|auto", data-accent="#2f5bea", data-lang="de|en".'),
         ta, h('div', {class: 'row', style: 'margin-top:8px'}, abtn('Snippet kopieren', async () => { try { await navigator.clipboard.writeText(snip); toast('Kopiert'); } catch { ta.focus(); toast('Bitte mit Strg/Cmd+C kopieren'); } }, 'btn small'))),
       h('div', {class: 'card'}, h('strong', {}, 'Gut zu wissen'), h('p', {class: 'meta'}, 'Die Instanz muss „öffentlich“ sein, damit Besucher lesen und schreiben können. Im Kommentarfeld sind alle Besucher Gäste, auch du; antworten, freigeben und löschen kannst du hier. Freigegebene Websites erscheinen sofort in der Site-Auswahl oben. Unten rechts im Kommentarfeld zeigt Lager ein kleines „Made with Lager“-Abzeichen; es lässt sich auf der Lager-Seite der Instanz abschalten. Diese Verwaltung erreichst du direkt unter ' + location.origin + '/')),
-      stray.length ? h('div', {class: 'card'}, h('p', {class: 'meta'}, stray.length + ' nicht angezeigte Direkt-Einträge (z. B. aus der Zeit vor einer Umstellung oder Spam).'), cbtn('Aufräumen', async () => { for (const c of stray) await db.doc('open/' + c.id).delete(); toast('Aufgeräumt'); }, 'btn danger small')) : null);
+      stray.length ? h('div', {class: 'card'}, h('p', {class: 'meta'}, stray.length + ' nicht angezeigte Direkt-Einträge (z. B. aus der Zeit vor einer Umstellung oder Spam).'), cbtn('Aufräumen', async () => { for (const c of stray) await db.doc('open/' + c.id).delete(); reloadAll(); toast('Aufgeräumt'); }, 'btn danger small')) : null);
   }
 
   function draw() { keepFocus(wrap, drawInner); }
@@ -593,9 +634,12 @@ async function adminApp() {
   }
   const schedule = () => { clearTimeout(timer); timer = setTimeout(draw, 120); };
 
-  const sub = (col, key, limit) => { let q = db.collection(col); if (limit) q = q.limit(limit); return q.onSnapshot(s => { A[key] = s.docs.map(d => ({id: d.id, ...d.data()})); schedule(); }, () => { if (col === 'inbox') { denied = true; draw(); } }); };
+  const subs = {};
+  const sub = (col, field, opts = {}) => { subs[col] = liveAll(db.collection(col), field, docs => { A[col] = docs; schedule(); }, {...opts, onError: () => { if (col === 'inbox') { denied = true; draw(); } }}); };
   db.doc('settings/main').onSnapshot(s => { A.settings = s.exists ? s.data() : null; schedule(); }, () => {});
-  sub('inbox', 'inbox', 1000); sub('approved', 'approved', 1000); sub('open', 'open', 1000); sub('votes', 'votes', 1000);
+  sub('inbox', 'createdAt'); sub('approved', 'createdAt'); sub('open', 'createdAt'); sub('votes', 'ts', {appendOnly: true});
+  // Deleting an older comment changes nothing among the newest, so the lists are read again now and then.
+  setInterval(() => { for (const k of ['inbox', 'approved', 'open']) subs[k].reload(); }, 60000);
   setInterval(() => { if (!document.querySelector('textarea:focus,input:focus,select:focus')) draw(); }, 60000);
   // Websites are added on the Lager page in another tab: read the list again when the owner comes back.
   window.addEventListener('focus', loadEmbed);

@@ -6,7 +6,7 @@
       "slug": "byline",
       "title": "Byline",
       "description": "Cookie-free blog analytics: readers, read time, read-through, sources, trending posts and the best time to publish.",
-      "version": 1,
+      "version": 2,
       "status": "beta",
       "language": "en",
       "category": "analytics",
@@ -23,7 +23,7 @@
       "externalHosts": [],
       "integrations": {},
       "seed": [],
-      "tests": 0
+      "tests": 1
     },
     {
       "slug": "deutsch-dino",
@@ -124,7 +124,7 @@
       "slug": "kommentare",
       "title": "Kommentare",
       "description": "Einbettbares Kommentarsystem mit verschachtelten Antworten, Daumen hoch/runter, Moderation und Site-Auswahl für mehrere Websites.",
-      "version": 4,
+      "version": 5,
       "status": "stable",
       "language": "de",
       "category": "publishing",
@@ -141,7 +141,7 @@
       "externalHosts": [],
       "integrations": {},
       "seed": [],
-      "tests": 0
+      "tests": 1
     },
     {
       "slug": "leanline",
@@ -234,7 +234,7 @@
       "slug": "stillwater",
       "title": "Stillwater",
       "description": "A calm meditation timer with breathing guide, synthesised bells and ambience, a journal, and stats with streaks and a yearly heatmap.",
-      "version": 4,
+      "version": 5,
       "status": "stable",
       "language": "en",
       "category": "health",
@@ -252,7 +252,7 @@
         "activity-api/v1": "sender"
       },
       "seed": [],
-      "tests": 1
+      "tests": 2
     },
     {
       "slug": "wissensfunke",
@@ -281,7 +281,7 @@
       "slug": "workout-tracker",
       "title": "Workout Tracker",
       "description": "Workout tracker: plans, custom exercises, workouts from a plan or on the go, records, charts, a yearly heatmap and an AI coach.",
-      "version": 5,
+      "version": 6,
       "status": "stable",
       "language": "en",
       "category": "health",
