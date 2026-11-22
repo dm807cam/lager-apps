@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3efe9">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0b0a">
+<title>Habits</title>
+<style>
+:root{color-scheme:light;--bg:#f3efe9;--surface:#fff;--surface-2:#f4f0ea;--surface-3:#e9e3da;--border:rgba(40,20,0,.07);--text:#16110d;--text-2:#564b42;--text-3:#8f857c;--grid:#eee8df;--good:#2f7d4f;--good-bg:rgba(47,125,79,.1);--bad:#c0392b;--bad-bg:rgba(192,57,43,.09);--shadow:0 1px 1px rgba(0,0,0,.03),0 6px 20px rgba(40,20,0,.06);--radius:22px;
+  --btn:#c2521f;--btn-ink:#fff;--hero-l:#e88a3c;--hero-m:#c2521f;--hero-d:#8a2f12;--seg-on:var(--surface);--h0:#ece5db;--h1:#f6c9a3;--h2:#ee9d63;--h3:#d6692c;--h4:#a8401a}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0d0b0a;--surface:#181513;--surface-2:#221e1b;--surface-3:#2c2724;--border:rgba(255,255,255,.06);--text:#f4efe9;--text-2:#c9bfb5;--text-3:#91877e;--grid:#26211e;--good:#5cc488;--good-bg:rgba(92,196,136,.12);--bad:#ea7b6c;--bad-bg:rgba(234,123,108,.12);--shadow:0 1px 1px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  --btn:#f08a4b;--btn-ink:#1a0d05;--hero-l:#b8602a;--hero-m:#8f3c17;--hero-d:#4d1d0a;--seg-on:var(--surface-3);--h0:#28221e;--h1:#5a2f17;--h2:#8f461d;--h3:#c96229;--h4:#f39456}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
+a{color:var(--btn)}
+.col{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.num{font-variant-numeric:tabular-nums}
+.h3{font-size:12.5px;font-weight:600;color:var(--text-3);margin:6px 4px -6px}
+
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 0}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:32px;height:32px;border-radius:9px;flex:none;box-shadow:0 4px 12px rgba(194,82,31,.35)}
+.brand span{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.iconbtn{position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:grid;place-items:center;padding:0;flex:none}
+.iconbtn svg{width:19px;height:19px;fill:none;stroke:var(--text-2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn i{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--text-3);box-shadow:0 0 0 2px var(--surface)}
+.iconbtn[data-s="ok"] i{background:var(--good)}
+.iconbtn[data-s="error"] i{background:var(--bad)}
+.iconbtn[data-s="busy"] i{background:var(--btn)}
+
+.seg{display:flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:12px}
+.seg button{flex:1;border:0;background:transparent;font-size:13px;font-weight:550;color:var(--text-2);padding:7px 11px;border-radius:9px;min-height:34px;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--seg-on);color:var(--text);font-weight:650;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;min-width:0}
+.card-t{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.sub{display:block;font-size:12.5px;color:var(--text-3);margin-top:2px}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1;min-width:0}
+
+/* Hero */
+.hero{position:relative;color:#fff;border:0;border-radius:22px;padding:20px 18px 16px;display:grid;gap:16px;overflow:hidden;
+  background:radial-gradient(110% 90% at 100% 0%,rgba(255,214,150,.45),transparent 60%),radial-gradient(80% 80% at 0% 100%,rgba(255,120,90,.25),transparent 60%),linear-gradient(160deg,var(--hero-l) 0%,var(--hero-m) 55%,var(--hero-d) 100%);
+  box-shadow:0 14px 34px rgba(138,47,18,.28)}
+.hero-top{display:flex;align-items:center;gap:16px}
+.hero-top h1{margin:0;font-size:24px;letter-spacing:-.02em;line-height:1.15}
+.hero-top p{margin:3px 0 0;font-size:14px;opacity:.85}
+.ring{flex:none;width:68px;height:68px}
+.ring circle{fill:none;stroke-width:7}
+.ring .bgc{stroke:rgba(255,255,255,.22)}
+.ring .fgc{stroke:#fff;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring text{fill:#fff;font-size:17px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wd{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:14px;padding:7px 0 8px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;font-weight:600;min-height:62px}
+.wd[aria-pressed="true"]{background:rgba(255,255,255,.28);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.65)}
+.wd:disabled{opacity:.4;cursor:default}
+.wd.wnav{min-height:0;padding:4px 11px;flex-direction:row;font-size:12px;background:rgba(255,255,255,.14)}
+.wd span{opacity:.85}
+.wd svg{width:26px;height:26px}
+.wd svg circle{fill:none;stroke-width:3.4}
+
+/* Habit list */
+.hlist{display:flex;flex-direction:column}
+.habit{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--grid);min-width:0}
+.habit:first-child{border-top:0}
+.habit.dim{opacity:.55}
+.hico{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:21px;color:#fff;font-weight:700}
+.hmain{flex:1;min-width:0;border:0;background:none;padding:0;text-align:left}
+.hname{font-weight:650;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hmeta{font-size:12.5px;color:var(--text-3);display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:1px}
+.hmeta b{font-weight:600;color:var(--text-2)}
+.auto{display:inline-flex;align-items:center;gap:4px;color:var(--good);font-weight:600}
+.auto svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chk{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--surface-3);background:var(--surface);display:grid;place-items:center;padding:0;transition:transform .12s}
+.chk:active{transform:scale(.92)}
+.chk svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.chk.on{border-color:transparent}
+.chk.on svg{opacity:1}
+.chk .pc{font-size:12px;font-weight:700;color:var(--text-2)}
+.flame{display:inline-flex;align-items:center;gap:3px}
+.flame svg{width:12px;height:12px;fill:var(--btn)}
+
+.btn{border:0;background:var(--btn);color:var(--btn-ink);font-weight:650;border-radius:14px;padding:12px 16px;min-height:46px}
+.btn2{border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-weight:600;border-radius:14px;padding:10px 14px;min-height:42px}
+.btn2.sm{padding:6px 11px;min-height:34px;font-size:13px;border-radius:11px}
+.btn2.bad{color:var(--bad)}
+.fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));z-index:20;border:0;background:var(--btn);color:var(--btn-ink);font-weight:700;border-radius:999px;padding:0 20px 0 16px;height:52px;display:flex;align-items:center;gap:6px;box-shadow:0 10px 26px rgba(138,47,18,.35)}
+.fab svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:8px max(14px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:linear-gradient(to top,var(--bg) 60%,transparent)}
+.nav .seg{max-width:420px;margin:0 auto;box-shadow:var(--shadow);background:var(--surface-2);border:1px solid var(--border)}
+.nav .seg button{min-height:42px;font-size:14px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:8px 13px;font-size:13.5px;font-weight:550;display:inline-flex;align-items:center;gap:6px;text-align:left}
+.chip small{color:var(--text-3);font-weight:500}
+
+/* Stats */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (min-width:560px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{background:var(--surface-2);border-radius:16px;padding:11px 12px}
+.tile b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.tile span{font-size:12px;color:var(--text-3)}
+.hm{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px;overflow-x:auto;padding-bottom:4px;margin-top:12px;direction:rtl}
+.hm i{display:block;width:11px;height:11px;border-radius:3px;background:var(--h0);direction:ltr}
+.hm i.l1{background:var(--h1)}.hm i.l2{background:var(--h2)}.hm i.l3{background:var(--h3)}.hm i.l4{background:var(--h4)}
+.hm i.x{background:transparent}
+.legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:11px;color:var(--text-3);margin-top:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:block}
+.bars{display:flex;align-items:flex-end;gap:5px;height:120px;margin-top:14px}
+.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;min-width:0}
+.bars i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:var(--h3);min-height:3px}
+.bars i.cur{background:var(--h2)}
+.bars span{font-size:10px;color:var(--text-3);white-space:nowrap}
+.strip{display:flex;gap:3px;margin-top:6px}
+.strip i{width:10px;height:10px;border-radius:3px;background:var(--h0);display:block}
+.strip i.on{background:var(--h3)}
+.strip i.off{background:transparent;box-shadow:inset 0 0 0 1px var(--grid)}
+.prow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--grid);border-left:0;border-right:0;border-bottom:0;background:none;width:100%;text-align:left}
+.prow:first-of-type{border-top:0}
+.pnums{text-align:right;font-size:12.5px;color:var(--text-3);flex:none}
+.pnums b{display:block;font-size:15px;color:var(--text)}
+
+/* Apps */
+.app{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--grid)}
+.app:first-of-type{border-top:0}
+.aico{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:17px}
+.pill{display:inline-block;font-size:11.5px;font-weight:650;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--text-2)}
+.pill.ok{background:var(--good-bg);color:var(--good)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.feed div{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--grid);font-size:13.5px;align-items:baseline}
+.feed div:first-child{border-top:0}
+.feed time{color:var(--text-3);font-size:12px;flex:none;width:78px}
+code,.code{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre.code{background:var(--surface-2);border-radius:12px;padding:10px 12px;overflow-x:auto;margin:10px 0 0;white-space:pre}
+.kv{display:flex;gap:8px;align-items:center;background:var(--surface-2);border-radius:12px;padding:8px 10px;margin-top:8px}
+.kv code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+details summary{cursor:pointer;font-weight:650;list-style:none;display:flex;align-items:center;justify-content:space-between}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--text-3);border-bottom:2px solid var(--text-3);transform:rotate(45deg);margin-right:4px;transition:transform .2s}
+details[open] summary::after{transform:rotate(-135deg)}
+.doc p,.doc li{font-size:13.5px;color:var(--text-2)}
+.doc h4{margin:14px 0 4px;font-size:14px}
+.doc table{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:6px}
+.doc td{border-top:1px solid var(--grid);padding:5px 6px 5px 0;vertical-align:top}
+.doc td:first-child{white-space:nowrap}
+
+/* Sheet */
+.backdrop{position:fixed;inset:0;background:rgba(10,6,3,.42);z-index:40;opacity:0;transition:opacity .2s;pointer-events:none}
+.backdrop.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:92vh;overflow-y:auto;background:var(--surface);border-radius:24px 24px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);visibility:hidden;transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s .26s;max-width:640px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+.sheet.on{transform:none;visibility:visible;transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--surface-3);margin:0 auto 12px}
+.sheet h2{margin:0 0 4px;font-size:20px;letter-spacing:-.01em}
+.lab{display:block;font-size:12.5px;font-weight:600;color:var(--text-3);margin:14px 2px 6px}
+.tf{width:100%;border:1px solid var(--border);background:var(--surface-2);border-radius:12px;padding:11px 12px;min-height:46px;outline:none}
+.tf:focus{border-color:var(--btn)}
+select.tf{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;flex:1;min-width:0}
+.sw{width:28px;height:28px;border-radius:50%;border:0;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--text)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px}
+.days button{border:1px solid var(--border);background:var(--surface-2);border-radius:10px;min-height:38px;font-size:13px;font-weight:600;padding:0}
+.days button[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink);border-color:transparent}
+.stepper{display:flex;align-items:center;gap:10px;margin-top:8px}
+.stepper button{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2);font-size:20px;padding:0}
+.stepper b{min-width:28px;text-align:center;font-size:18px}
+.sheet .foot{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.sheet .foot .btn{flex:1}
+.hint{font-size:12.5px;color:var(--text-3);margin:6px 2px 0}
+.empty{text-align:center;padding:10px 6px 4px}
+.empty p{color:var(--text-3);margin:6px 0 0}
+
+.toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:550;opacity:0;transition:.2s;z-index:60;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="col">
+  <header class="hdr">
+    <div class="brand">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="bgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ee8f43"/><stop offset="1" stop-color="#a8381a"/></linearGradient></defs><rect width="512" height="512" fill="url(#bgb)"/><path d="M256 116a140 140 0 1 0 140 140" fill="none" stroke="#fff" stroke-width="44" stroke-linecap="round" opacity=".45"/><path d="M396 256a140 140 0 0 0-140-140" fill="none" stroke="#fff" stroke-width="44" stroke-linecap="round"/><path d="M196 262l44 44 80-92" fill="none" stroke="#fff" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Habits</span>
+    </div>
+    <button class="iconbtn" id="syncbtn" data-s="busy" aria-label="Sync status"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15"/><path d="M4 20v-5h5"/></svg><i></i></button>
+  </header>
+  <main id="main" class="col" style="width:100%"></main>
+</div>
+<button class="fab" id="fab" hidden><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New habit</button>
+<nav class="nav"><div class="seg main" role="tablist">
+  <button data-view="today" aria-pressed="true">Today</button>
+  <button data-view="stats" aria-pressed="false">Stats</button>
+  <button data-view="apps" aria-pressed="false">Apps</button>
+</div></nav>
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(()=>{
+"use strict";
+const R=window.lager||null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const plural=(n,w,p)=>n+" "+(n===1?w:(p||w+"s"));
+
+/* ---------- dates: everything is keyed by the local day, "YYYY-MM-DD" ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>keyOf(new Date());
+const dOf=k=>{const p=k.split("-").map(Number);return new Date(p[0],p[1]-1,p[2],12)};
+const addD=(k,n)=>{const d=dOf(k);d.setDate(d.getDate()+n);return keyOf(d)};
+const wd=k=>(dOf(k).getDay()+6)%7+1;          /* Mon=1 … Sun=7 */
+const wkStart=k=>addD(k,1-wd(k));
+const diffD=(a,b)=>Math.round((dOf(b)-dOf(a))/864e5);
+const isKey=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&!isNaN(dOf(s));
+const DN=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const fmtDay=(k,o)=>dOf(k).toLocaleDateString(undefined,o||{weekday:"long",day:"numeric",month:"long"});
+const ago=t=>{const s=(Date.now()-t)/1000;if(s<90)return"just now";if(s<3600)return Math.round(s/60)+" min ago";if(s<86400)return Math.round(s/3600)+" h ago";const d=Math.round(s/86400);return d===1?"yesterday":d+" days ago"};
+const WINDOW=400;                               /* days of history loaded */
+
+/* ---------- state ---------- */
+const S={habits:{},checks:{},acts:{},apps:{},settings:{},loaded:{habits:0,checks:0,acts:0,apps:0}};
+let db=null,ing=null,canManage=false,endpointInfo=[],ver=0,memo={v:-1},sel=today(),sync="busy";
+function cached(k,f){if(memo.v!==ver)memo={v:ver};if(!(k in memo))memo[k]=f();return memo[k]}
+function bump(){ver++;schedule()}
+let raf=0;function schedule(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;render();if(sheetOn&&sheetLive){const y=$("sheet").scrollTop;sheetLive();$("sheet").scrollTop=y}})}
+
+/* Known apps on this server. They announce themselves with every batch they send; this list only covers the time before the first one arrives. */
+const sib=s=>{const h=location.hostname.split(".");return h.length>2?location.protocol+"//"+s+"."+h.slice(1).join(".")+"/":null};
+const KNOWN={
+  "workout-tracker":{name:"Workout Tracker",color:"#1b4f8c",letter:"W",url:sib("workout-tracker"),kinds:[{kind:"workout",label:"Workout",unit:"min"}],
+    suggest:{name:"Work out",icon:"💪",color:"#2f6fbf",freq:{t:"week",n:3},kind:"workout",min:0}},
+  "stillwater":{name:"Stillwater",color:"#3d6c67",letter:"S",url:sib("stillwater"),kinds:[{kind:"meditation",label:"Meditation",unit:"min"}],
+    suggest:{name:"Meditate",icon:"🧘",color:"#3d8a7f",freq:{t:"daily"},kind:"meditation",min:5}}
+};
+const GENERIC=[{name:"Read",icon:"📖",color:"#8a5cc2",freq:{t:"daily"}},{name:"Walk outside",icon:"🚶",color:"#5f8f3a",freq:{t:"daily"}},{name:"No phone in bed",icon:"🌙",color:"#4b5aa8",freq:{t:"daily"}},{name:"Stretch",icon:"🤸",color:"#d08a1f",freq:{t:"days",days:[1,3,5]}}];
+const COLORS=["#c2521f","#d08a1f","#5f8f3a","#3d8a7f","#2f6fbf","#4b5aa8","#8a5cc2","#c24f7a"];
+function appInfo(id){const a=S.apps[id]||{},k=KNOWN[id]||{};return{id,name:a.name||k.name||id,url:a.url||k.url||"",kinds:(a.kinds&&a.kinds.length?a.kinds:k.kinds)||[],color:k.color||"#7a6a5d",letter:(a.name||k.name||id).trim().charAt(0).toUpperCase(),lastAt:a.lastAt||0,rejected:a.rejected||0,lastError:a.lastError||"",seen:!!S.apps[id]}}
+function appIds(){return[...new Set(Object.keys(KNOWN).concat(Object.keys(S.apps)))]}
+const blocked=id=>!!(S.settings.blocked&&S.settings.blocked[id]);
+function kindLabel(app,kind){const k=appInfo(app).kinds.find(x=>x.kind===kind);return k?k.label:kind?kind.charAt(0).toUpperCase()+kind.slice(1):"Any activity"}
+
+/* ---------- habit logic ---------- */
+const habits=()=>cached("hs",()=>Object.values(S.habits).filter(h=>h&&!h.archived).sort((a,b)=>(a.order||0)-(b.order||0)||(a.createdAt||0)-(b.createdAt||0)));
+const actsByDay=()=>cached("abd",()=>{const m={};Object.values(S.acts).forEach(a=>{if(a&&isKey(a.date))(m[a.date]=m[a.date]||[]).push(a)});return m});
+const checksSet=()=>cached("cs",()=>{const m={};Object.values(S.checks).forEach(c=>{if(c&&c.habit&&isKey(c.date))m[c.habit+"~"+c.date]=c});return m});
+function matches(h,a){const L=h.link;return !!L&&a.app===L.app&&(!L.kind||a.kind===L.kind)}
+/* status of one habit on one day */
+function st(h,k){return cached("st:"+h.id+":"+k,()=>{
+  const acts=h.link?(actsByDay()[k]||[]).filter(a=>matches(h,a)):[];
+  const minutes=acts.reduce((s,a)=>s+(+a.minutes||0),0);
+  const auto=acts.length>0&&minutes>=(+h.link?.min||0);
+  const manual=!!checksSet()[h.id+"~"+k];
+  return{done:auto||manual,auto,manual,acts,minutes};
+})}
+const scheduled=(h,k)=>h.freq.t!=="days"||(h.freq.days||[]).includes(wd(k));
+function weekCount(h,ws){let n=0;for(let i=0;i<7;i++){const k=addD(ws,i);if(k>today())break;if(st(h,k).done)n++}return n}
+/* first day worth looking at: the habit's creation, or earlier linked activity (so history from the apps counts from day one) */
+function startKey(h){return cached("sk:"+h.id,()=>{
+  let s=h.createdAt?keyOf(new Date(h.createdAt)):today();
+  if(h.link)Object.keys(actsByDay()).forEach(k=>{if(k<s&&actsByDay()[k].some(a=>matches(h,a)))s=k});
+  Object.values(S.checks).forEach(c=>{if(c.habit===h.id&&isKey(c.date)&&c.date<s)s=c.date});
+  const lim=addD(today(),-WINDOW+1);return s<lim?lim:s;
+})}
+function stats(h){return cached("sx:"+h.id,()=>{
+  const T=today(),s0=startKey(h);let cur=0,best=0,run=0,total=0,rateN=0,rateD=0;
+  if(h.freq.t==="week"){
+    const n=h.freq.n||1,weeks=[];for(let w=wkStart(s0);w<=T;w=addD(w,7))weeks.push(weekCount(h,w));
+    weeks.forEach(c=>{run=c>=n?run+1:0;best=Math.max(best,run)});
+    let i=weeks.length-1;if(i>=0&&weeks[i]<n)i--;while(i>=0&&weeks[i]>=n){cur++;i--}
+    for(let k=s0;k<=T;k=addD(k,1))if(st(h,k).done)total++;
+    const last=weeks.slice(-5),past=last.slice(0,-1),curMet=last.length&&last[last.length-1]>=n?1:0;
+    rateD=past.length+curMet;rateN=past.filter(c=>c>=n).length+curMet;
+    return{cur,best,total,rate:rateD?rateN/rateD:0,unit:"week",thisWeek:weeks[weeks.length-1]||0};
+  }
+  const arr=[];for(let k=s0;k<=T;k=addD(k,1))if(scheduled(h,k))arr.push([k,st(h,k).done]);
+  arr.forEach(x=>{run=x[1]?run+1:0;best=Math.max(best,run);if(x[1])total++});
+  let i=arr.length-1;if(i>=0&&arr[i][0]===T&&!arr[i][1])i--;while(i>=0&&arr[i][1]){cur++;i--}
+  const from=addD(T,-29);arr.forEach(x=>{if(x[0]>=from&&!(x[0]===T&&!x[1])){rateD++;if(x[1])rateN++}});
+  return{cur,best,total,rate:rateD?rateN/rateD:0,unit:"day"};
+})}
+function freqText(h){const f=h.freq;if(f.t==="daily")return"Every day";if(f.t==="week")return f.n+"× a week";const d=(f.days||[]).slice().sort();if(d.length===5&&d.every((x,i)=>x===i+1))return"Weekdays";if(d.length===2&&d[0]===6)return"Weekends";return d.map(x=>DN[x-1]).join(", ")}
+function streakText(h){const x=stats(h);if(!x.cur)return"";return plural(x.cur,x.unit)+" in a row"}
+function linkText(h){if(!h.link)return"";const a=appInfo(h.link.app);return kindLabel(h.link.app,h.link.kind)+" in "+a.name+(+h.link.min?" · "+h.link.min+"+ min":"")}
+/* how many of the day's habits are done (habits due that day; a weekly habit counts once its week is complete) */
+function dayProgress(k){return cached("dp:"+k,()=>{let n=0,d=0;habits().forEach(h=>{if(k<startKey(h))return;
+  if(h.freq.t==="week"){const met=weekCount(h,wkStart(k))>=(h.freq.n||1);if(met&&!st(h,k).done)return;n++;if(st(h,k).done)d++;return}
+  if(!scheduled(h,k))return;n++;if(st(h,k).done)d++});return{n,d}})}
+
+/* ---------- inbox: turn what the apps sent into activities (Activity API v1) ---------- */
+const seg=s=>{s=String(s).replace(/[^A-Za-z0-9_\-~:@+]/g,"-").slice(0,100);return s||"x"};
+const str=(v,max)=>typeof v==="string"&&v.trim()?v.trim().slice(0,max):"";
+const SLUG=/^[a-z0-9][a-z0-9-]{0,39}$/;
+function parseEnvelope(raw){
+  if(!raw||typeof raw!=="object")return{error:"not a JSON object"};
+  if(raw.v!==1)return{error:"unsupported version "+JSON.stringify(raw.v)};
+  const src=typeof raw.source==="string"?{app:raw.source}:raw.source;
+  if(!src||typeof src.app!=="string"||!SLUG.test(src.app))return{error:"source.app must be a lowercase slug"};
+  const source={app:src.app,name:str(src.name,60),url:/^https?:\/\//.test(src.url||"")?String(src.url).slice(0,200):"",kinds:Array.isArray(src.kinds)?src.kinds.filter(k=>k&&SLUG.test(k.kind||"")).slice(0,20).map(k=>({kind:k.kind,label:str(k.label,40)||k.kind,unit:str(k.unit,12)})):[]};
+  const list=Array.isArray(raw.events)?raw.events:raw.event?[raw.event]:[];
+  if(!list.length&&!source.kinds.length)return{error:"no events"};
+  const ok=[],bad=[];
+  list.slice(0,500).forEach(e=>{const r=parseEvent(e);if(r.error)bad.push(r.error);else ok.push(r)});
+  return{source,events:ok,bad};
+}
+function parseEvent(e){
+  if(!e||typeof e!=="object")return{error:"event is not an object"};
+  const id=str(e.id,120);if(!id)return{error:"event without id"};
+  const op=e.op==null?"upsert":e.op;
+  if(op==="delete")return{op,id};
+  if(op!=="upsert")return{error:"unknown op "+String(op).slice(0,20)};
+  const kind=typeof e.kind==="string"&&SLUG.test(e.kind)?e.kind:"";if(!kind)return{error:"event "+id+": kind must be a lowercase slug"};
+  const start=typeof e.start==="string"&&!isNaN(Date.parse(e.start))?new Date(Date.parse(e.start)).toISOString():"";
+  const date=isKey(e.date)?e.date:start?keyOf(new Date(start)):"";if(!date)return{error:"event "+id+": needs date (YYYY-MM-DD) or start"};
+  const num=v=>typeof v==="number"&&isFinite(v)?v:null;
+  const ev={op,id,kind,date};
+  if(start)ev.start=start;
+  if(typeof e.end==="string"&&!isNaN(Date.parse(e.end)))ev.end=new Date(Date.parse(e.end)).toISOString();
+  const m=num(e.minutes);if(m!=null&&m>=0)ev.minutes=Math.min(m,1440);
+  const v=num(e.value);if(v!=null){ev.value=v;ev.unit=str(e.unit,12)}
+  const t=str(e.title,80);if(t)ev.title=t;
+  if(typeof e.url==="string"&&/^https?:\/\//.test(e.url))ev.url=e.url.slice(0,300);
+  return ev;
+}
+let procBusy=false,procAgain=null;
+async function processInbox(docs){
+  if(procBusy){procAgain=docs;return}procBusy=true;
+  try{
+    for(const d of docs){
+      const p=parseEnvelope(d.data());const w=[];
+      if(p.error){w.push(db.doc("apps/_rejected").set({at:Date.now(),error:p.error}).catch(()=>{}))}
+      else{
+        const app=p.source.app,info={lastAt:Date.now()};if(p.source.name)info.name=p.source.name;
+        if(p.source.url)info.url=p.source.url;if(p.source.kinds.length)info.kinds=p.source.kinds;
+        if(p.bad.length){info.rejected=(S.apps[app]&&S.apps[app].rejected||0)+p.bad.length;info.lastError=p.bad[0]}
+        if(!blocked(app))p.events.forEach(e=>{const ref=db.doc("activities/"+seg(app)+"~"+seg(e.id));
+          if(e.op==="delete")w.push(ref.delete());
+          else{const doc=Object.assign({app},e,{receivedAt:Date.now()});delete doc.op;w.push(ref.set(doc))}});
+        else info.droppedAt=Date.now();
+        w.push(db.doc("apps/"+seg(app)).update(info));
+      }
+      await Promise.all(w);
+      await db.collection("inbox").doc(d.id).delete();
+    }
+  }catch(e){setSync("error")}
+  finally{procBusy=false;if(procAgain){const n=procAgain;procAgain=null;processInbox(n)}}
+}
+
+/* ---------- writes ---------- */
+function setSync(s){sync=s;$("syncbtn").dataset.s=s}
+async function w(p,label){setSync("busy");try{await p;setSync("ok")}catch(e){setSync("error");toast(e&&e.code==="not_granted"?"You can only look at these habits.":"Couldn’t save"+(label?" "+label:"")+". Try again.")}}
+function toggle(h,k){
+  const id=seg(h.id)+"~"+k,s=st(h,k);
+  if(s.manual){delete S.checks[id];bump();w(db.doc("checks/"+id).delete())}
+  else if(s.auto){const a=s.acts[0];toast("Ticked by "+appInfo(a.app).name+(s.minutes?" · "+Math.round(s.minutes)+" min":""))}
+  else{const c={habit:h.id,date:k,at:Date.now()};S.checks[id]=c;bump();w(db.doc("checks/"+id).set(c));if(navigator.vibrate)navigator.vibrate(8)}
+}
+async function saveHabit(h){S.habits[h.id]=h;bump();await w(db.doc("habits/"+h.id).set(h),"the habit")}
+async function deleteHabit(h){delete S.habits[h.id];Object.keys(S.checks).forEach(k=>{if(S.checks[k].habit===h.id)delete S.checks[k]});bump();
+  await w((async()=>{const q=await db.collection("checks").where("habit","==",h.id).get();await Promise.all(q.docs.map(d=>db.doc("checks/"+d.id).delete()));await db.doc("habits/"+h.id).delete()})())}
+function newHabit(p){const id="h_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  return Object.assign({id,name:"",icon:"",color:COLORS[Object.keys(S.habits).length%COLORS.length],freq:{t:"daily"},link:null,createdAt:Date.now(),order:Date.now(),archived:false},p||{})}
+function fromSuggestion(app,sg){return newHabit({name:sg.name,icon:sg.icon,color:sg.color,freq:JSON.parse(JSON.stringify(sg.freq)),link:app?{app,kind:sg.kind||null,min:sg.min||0}:null})}
+
+/* ---------- render ---------- */
+const view=()=>(location.hash.slice(1)||"today").split("/")[0];
+function go(v){location.hash=v==="today"?"":v}
+const IC={check:'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',link:'<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',flame:'<svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-6 1-9.5z"/></svg>'};
+const hico=(h,sz)=>`<div class="hico" style="background:${esc(h.color)};${sz?`width:${sz}px;height:${sz}px;font-size:${Math.round(sz/2)}px`:""}">${esc(h.icon||(h.name||"?").trim().charAt(0).toUpperCase())}</div>`;
+function ringSvg(fr,size,stroke,label){const r=(size-stroke)/2,c=2*Math.PI*r;return`<svg class="ring" viewBox="0 0 ${size} ${size}" style="width:${size}px;height:${size}px"><circle class="bgc" cx="${size/2}" cy="${size/2}" r="${r}" style="stroke-width:${stroke}"/><circle class="fgc" cx="${size/2}" cy="${size/2}" r="${r}" style="stroke-width:${stroke}" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(1,fr))}" transform="rotate(-90 ${size/2} ${size/2})"/>${label!=null?`<text x="50%" y="50%">${label}</text>`:""}</svg>`}
+function render(){
+  const v=view();document.querySelectorAll(".seg.main button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===v)));
+  const loaded=S.loaded.habits&&S.loaded.checks;
+  $("fab").hidden=v!=="today"||!db||!loaded||!habits().length;
+  if(!db){$("main").innerHTML=`<div class="card empty"><h2 class="card-t">${R?"Loading…":"Open this app on your Lager server"}</h2><p>${R?"":"Habits keeps its data in your Lager account."}</p></div>`;return}
+  ({today:renderToday,stats:renderStats,apps:renderApps}[v]||renderToday)();
+}
+function renderToday(){
+  const T=today();if(sel>T)sel=T;
+  const ws=wkStart(sel),P=dayProgress(sel),fr=P.n?P.d/P.n:0;
+  const title=sel===T?"Today":sel===addD(T,-1)?"Yesterday":fmtDay(sel,{weekday:"long"});
+  const msg=!habits().length?"No habits yet":P.n===0?"Nothing due":P.d===P.n?"All done. Nice.":plural(P.n-P.d,"habit")+" to go";
+  let wk="";for(let i=0;i<7;i++){const k=addD(ws,i),p=dayProgress(k),f=p.n?p.d/p.n:0,r=10.3,c=2*Math.PI*r;
+    wk+=`<button class="wd" data-day="${k}" aria-pressed="${k===sel}"${k>T?" disabled":""}><span>${DN[i].charAt(0)}</span><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="${r}" stroke="rgba(255,255,255,.25)"/>${k<=T&&f>0?`<circle cx="13" cy="13" r="${r}" stroke="#fff" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-f)}" transform="rotate(-90 13 13)"/>`:""}${f>=1?`<path d="M8.5 13.3l3 3 6-6.4" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`:""}</svg><span class="num">${dOf(k).getDate()}</span></button>`}
+  const hero=`<section class="hero"><div class="hero-top">${ringSvg(fr,68,7,P.n?P.d+"/"+P.n:"–")}<div><h1>${esc(title)}</h1><p>${esc(fmtDay(sel,sel===T?undefined:{day:"numeric",month:"long"}))} · ${esc(msg)}</p></div></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:-8px"><button class="wd wnav" data-week="-7" aria-label="Previous week">‹ Earlier</button>${ws<wkStart(T)?`<button class="wd wnav" data-week="7" aria-label="Next week">Later ›</button>`:""}</div>
+    <div class="week">${wk}</div></section>`;
+  if(!S.loaded.habits||!S.loaded.checks){$("main").innerHTML=hero+`<div class="card empty"><p>Loading your habits…</p></div>`;return}
+  const H=habits();
+  if(!H.length){$("main").innerHTML=hero+starter();return}
+  const due=[],later=[];H.forEach(h=>{(h.freq.t==="week"||scheduled(h,sel)?due:later).push(h)});
+  const rowH=(h,dim)=>{const s=st(h,sel),x=stats(h),stk=streakText(h);
+    let meta=[];
+    if(h.freq.t==="week"){const c=weekCount(h,ws);meta.push(`<b>${c}/${h.freq.n}</b> this week`)}else meta.push(esc(freqText(h)));
+    if(stk)meta.push(`<span class="flame">${IC.flame}${esc(stk)}</span>`);
+    if(s.auto){const a=s.acts[0];meta.push(`<span class="auto">${IC.link}${esc(appInfo(a.app).name)}${s.minutes?" · "+Math.round(s.minutes)+" min":""}</span>`)}
+    else if(h.link&&!s.done)meta.push(`<span>${IC.link.replace("<svg",'<svg style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-1px"')} ${esc(appInfo(h.link.app).name)}${+h.link.min?" · "+h.link.min+"+ min":""}</span>`);
+    else if(h.link&&s.acts.length&&!s.auto)meta.push(`<span>${Math.round(s.minutes)} of ${h.link.min} min</span>`);
+    return`<div class="habit${dim?" dim":""}">${hico(h)}<button class="hmain" data-open="${esc(h.id)}"><div class="hname">${esc(h.name)}</div><div class="hmeta">${meta.join("")}</div></button>
+      <button class="chk${s.done?" on":""}" data-check="${esc(h.id)}" style="${s.done?"background:"+esc(h.color):""}" aria-label="${esc(h.name)}: ${s.done?"done":"not done"}" aria-pressed="${s.done}">${IC.check}</button></div>`};
+  $("main").innerHTML=hero+`<section class="card"><div class="hlist">${due.map(h=>rowH(h)).join("")||`<p class="sub" style="margin:4px 0">Nothing due ${sel===T?"today":"that day"}.</p>`}</div></section>`
+    +(later.length?`<div class="h3">Not due ${sel===T?"today":"that day"}</div><section class="card"><div class="hlist">${later.map(h=>rowH(h,true)).join("")}</div></section>`:"")
+    +suggestCard();
+}
+function suggestions(){const have=new Set(habits().filter(h=>h.link).map(h=>h.link.app+"/"+(h.link.kind||"")));
+  return Object.keys(KNOWN).filter(id=>!blocked(id)&&!have.has(id+"/"+KNOWN[id].suggest.kind)).map(id=>({app:id,sg:KNOWN[id].suggest}))}
+function starter(){const sg=suggestions();
+  return`<section class="card"><h2 class="card-t">Start with a habit</h2><span class="sub">Habits linked to your apps tick themselves when you finish a workout or a meditation, including everything you logged before.</span>
+  <div class="chips">${sg.map((x,i)=>`<button class="chip" data-sg="a${i}">${esc(x.sg.icon)} ${esc(x.sg.name)} <small>${esc(freqText(x.sg))} · ${esc(KNOWN[x.app].name)}</small></button>`).join("")}
+  ${GENERIC.map((g,i)=>`<button class="chip" data-sg="g${i}">${esc(g.icon)} ${esc(g.name)}</button>`).join("")}</div>
+  <div style="margin-top:14px"><button class="btn" data-new="1">Create your own</button></div></section>`}
+function suggestCard(){const sg=suggestions();if(!sg.length)return"";
+  return`<section class="card"><h2 class="card-t" style="font-size:15px">Let your apps tick habits</h2><div class="chips" style="margin-top:8px">${sg.map((x,i)=>`<button class="chip" data-sg="a${i}">${esc(x.sg.icon)} ${esc(x.sg.name)} <small>${esc(freqText(x.sg))} · ${esc(KNOWN[x.app].name)}</small></button>`).join("")}</div></section>`}
+
+/* column-major from the right: build week columns newest first, so the grid (rtl) shows today at the right edge */
+function heatmap(weeks,levelOf){let s="";const T=today();let ws=wkStart(T);
+  for(let w=0;w<weeks;w++){for(let d=0;d<7;d++){const k=addD(ws,d);if(k>T){s+=`<i class="x"></i>`;continue}const l=levelOf(k);s+=`<i class="${l<0?"x":l?"l"+l:""}" title="${esc(fmtDay(k,{day:"numeric",month:"short",year:"numeric"}))}"></i>`}ws=addD(ws,-7)}
+  return`<div class="hm" style="grid-template-rows:repeat(7,11px)">${s}</div><div class="legend">Less <i style="background:var(--h0)"></i><i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i><i style="background:var(--h4)"></i> More</div>`}
+function weekScore(ws){let sum=0,n=0;habits().forEach(h=>{const s0=startKey(h);if(addD(ws,6)<s0)return;
+  if(h.freq.t==="week"){sum+=Math.min(1,weekCount(h,ws)/(h.freq.n||1));n++;return}
+  let due=0,done=0;for(let i=0;i<7;i++){const k=addD(ws,i);if(k<s0||k>today())continue;if(scheduled(h,k)){due++;if(st(h,k).done)done++}}if(due){sum+=done/due;n++}});return n?sum/n:null}
+function renderStats(){
+  const H=habits();if(!S.loaded.habits){$("main").innerHTML=`<div class="card empty"><p>Loading…</p></div>`;return}
+  if(!H.length){$("main").innerHTML=`<section class="card empty"><h2 class="card-t">No habits yet</h2><p>Your streaks and a year of progress show up here.</p><div style="margin-top:12px"><button class="btn" data-go="today">Add a habit</button></div></section>`;return}
+  const T=today();let d7=0,n7=0,d30=0,n30=0,perfect=0;
+  for(let i=0;i<30;i++){const k=addD(T,-i),p=dayProgress(k);if(k===T&&p.d<p.n)continue;if(i<7){d7+=p.d;n7+=p.n}d30+=p.d;n30+=p.n;if(p.n&&p.d===p.n)perfect++}
+  const bestCur=H.reduce((m,h)=>stats(h).cur>m.v?{v:stats(h).cur,h}:m,{v:0,h:null});
+  const lvl=k=>{const p=dayProgress(k);if(!p.n)return 0;const f=p.d/p.n;return f<=0?0:f<.34?1:f<.67?2:f<1?3:4};
+  const W=[];for(let i=11;i>=0;i--){const ws=addD(wkStart(T),-7*i);W.push({ws,v:weekScore(ws)})}
+  $("main").innerHTML=`<section class="card"><h2 class="card-t">Consistency</h2><span class="sub">Share of due habits you completed</span>
+    <div class="tiles"><div class="tile"><b class="num">${n7?Math.round(d7/n7*100):0}%</b><span>last 7 days</span></div><div class="tile"><b class="num">${n30?Math.round(d30/n30*100):0}%</b><span>last 30 days</span></div>
+    <div class="tile"><b class="num">${perfect}</b><span>perfect days (30)</span></div><div class="tile"><b class="num">${bestCur.v}</b><span>${bestCur.h?"best streak · "+esc(bestCur.h.name):"best streak"}</span></div></div>
+    ${heatmap(53,lvl)}</section>
+  <section class="card"><h2 class="card-t">Week by week</h2><span class="sub">Average completion per week</span>
+    <div class="bars">${W.map((x,i)=>`<div title="${esc("Week of "+fmtDay(x.ws,{day:"numeric",month:"short"})+": "+(x.v==null?"–":Math.round(x.v*100)+"%"))}">${x.v==null?"":`<i class="${i===W.length-1?"cur":""}" style="height:${Math.max(3,x.v*100)}%"></i>`}<span>${i%2===1?"":esc(dOf(x.ws).toLocaleDateString(undefined,{day:"numeric",month:"short"}))}</span></div>`).join("")}</div></section>
+  <section class="card"><h2 class="card-t">Habits</h2>${H.map(h=>{const x=stats(h);let strip="";for(let i=13;i>=0;i--){const k=addD(T,-i);strip+=`<i class="${k<startKey(h)?"off":st(h,k).done?"on":h.freq.t!=="week"&&!scheduled(h,k)?"off":""}"></i>`}
+    return`<button class="prow" data-open="${esc(h.id)}">${hico(h,38)}<div class="sp"><div class="hname" style="font-size:14.5px">${esc(h.name)}</div><div class="strip">${strip}</div></div>
+    <div class="pnums"><b class="num">${x.cur}</b>${x.unit==="week"?"weeks":"days"} · best ${x.best}<br>${Math.round(x.rate*100)}% ${x.unit==="week"?"5 wk":"30 d"}</div></button>`}).join("")}</section>`;
+}
+function endpointUrl(name){const e=endpointInfo.find(x=>x.name===name);return e?e.url:location.origin+"/_ingest/"+name}
+function renderApps(){
+  const ids=appIds(),T=Date.now();
+  const actsBy={};Object.values(S.acts).forEach(a=>{(actsBy[a.app]=actsBy[a.app]||[]).push(a)});
+  const rows=ids.map(id=>{const a=appInfo(id),list=actsBy[id]||[],linked=habits().filter(h=>h.link&&h.link.app===id),b=blocked(id);
+    const status=b?`<span class="pill bad">Disconnected</span>`:a.seen?`<span class="pill ok">Connected</span>`:`<span class="pill">Waiting for first sync</span>`;
+    const sg=KNOWN[id]&&KNOWN[id].suggest;const hasSg=sg&&linked.some(h=>h.link.kind===sg.kind);
+    return`<div class="app"><div class="aico" style="background:${esc(a.color)}">${esc(a.letter)}</div><div class="sp">
+      <div class="row" style="gap:8px;flex-wrap:wrap"><b>${esc(a.name)}</b>${status}</div>
+      <div class="sub">${a.seen?esc(plural(list.length,"activity","activities"))+" · last sync "+esc(ago(a.lastAt)):"Opens once and sends everything you have logged."}${linked.length?" · "+esc(plural(linked.length,"linked habit")):""}</div>
+      ${a.rejected?`<div class="sub" style="color:var(--bad)">${esc(plural(a.rejected,"event"))} rejected. Last reason: ${esc(a.lastError)}</div>`:""}
+      <div class="acts">${a.url?`<a class="btn2 sm" href="${esc(a.url)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--text)">Open</a>`:""}
+      ${sg&&!hasSg&&!b?`<button class="btn2 sm" data-sgapp="${esc(id)}">${esc(sg.icon)} Add “${esc(sg.name)}”</button>`:""}
+      ${!sg&&a.kinds.length&&!b?`<button class="btn2 sm" data-linkapp="${esc(id)}">Make a habit</button>`:""}
+      ${canManage?`<button class="btn2 sm${b?"":" bad"}" data-block="${esc(id)}">${b?"Reconnect":"Disconnect"}</button>`:""}</div></div></div>`}).join("");
+  const feed=Object.values(S.acts).sort((a,b)=>(b.start||b.date).localeCompare(a.start||a.date)).slice(0,12);
+  const key=endpointInfo.find(e=>e.name==="activity-key");
+  $("main").innerHTML=`<section class="card"><h2 class="card-t">Connected apps</h2><span class="sub">Apps on your Lager server send their finished sessions here, and linked habits tick themselves.</span>${rows}</section>
+  ${feed.length?`<section class="card"><h2 class="card-t">Recent activity</h2><div class="feed" style="margin-top:8px">${feed.map(a=>`<div><time>${esc(fmtDay(a.date,{day:"numeric",month:"short"}))}</time><span class="sp">${esc(a.title||kindLabel(a.app,a.kind))}${a.minutes?" · "+Math.round(a.minutes)+" min":""}${a.value!=null&&a.unit?" · "+esc(Math.round(a.value).toLocaleString())+" "+esc(a.unit):""}</span><span class="sub" style="margin:0">${esc(appInfo(a.app).name)}</span></div>`).join("")}</div></section>`:""}
+  <section class="card"><details><summary>Connect something else</summary><div class="doc">
+    <p>Any app, script or phone shortcut can tick habits by posting <b>Activity API v1</b> batches. Apps on this server post to:</p>
+    <div class="kv"><code>${esc(endpointUrl("activity"))}</code><button class="btn2 sm" data-copy="${esc(endpointUrl("activity"))}">Copy</button></div>
+    ${canManage&&key?`<p style="margin-top:12px">Scripts and Shortcuts use this address with the header <code>Authorization: Bearer &lt;key&gt;</code>:</p>
+    <div class="kv"><code>${esc(key.url)}</code><button class="btn2 sm" data-copy="${esc(key.url)}">Copy</button></div>
+    <div class="kv"><code id="keyv">${key.token?"••••••••••••••••":"Turn the endpoint on under “Data from outside” on the instance page."}</code>${key.token?`<button class="btn2 sm" data-reveal="1">Show</button><button class="btn2 sm" data-copy="${esc(key.token)}">Copy</button>`:""}</div>`:""}
+    <h4>Example</h4>
+<pre class="code">POST ${esc(endpointUrl("activity-key"))}
+Authorization: Bearer &lt;key&gt;
+
+{"v": 1,
+ "source": {"app": "reading-log", "name": "Reading log",
+            "kinds": [{"kind": "reading", "label": "Reading", "unit": "min"}]},
+ "events": [{"id": "2026-11-22-evening", "kind": "reading",
+             "date": "2026-11-22", "minutes": 25,
+             "title": "The Overstory"}]}</pre>
+    <h4>Events</h4>
+    <table><tr><td><code>id</code></td><td>Required. Stable and unique within your app; sending the same id again updates the activity.</td></tr>
+    <tr><td><code>op</code></td><td><code>"upsert"</code> (default) or <code>"delete"</code>.</td></tr>
+    <tr><td><code>kind</code></td><td>Required for upsert. Lowercase slug such as <code>workout</code>, <code>meditation</code>, <code>reading</code>.</td></tr>
+    <tr><td><code>date</code></td><td>The local day it counts for, <code>YYYY-MM-DD</code>. Required unless <code>start</code> is given.</td></tr>
+    <tr><td><code>start</code>, <code>end</code></td><td>Optional ISO 8601 times.</td></tr>
+    <tr><td><code>minutes</code></td><td>Optional duration; habits can require a minimum per day.</td></tr>
+    <tr><td><code>value</code>, <code>unit</code></td><td>Optional main number, e.g. 12400 kg of volume.</td></tr>
+    <tr><td><code>title</code>, <code>url</code></td><td>Optional label and deep link.</td></tr></table>
+    <p>Up to 500 events and 64 KB per request. The answer is <code>202</code> without a body; a habit tracker that isn’t there answers <code>404</code>, a disconnected website <code>403</code>.</p>
+    ${canManage?`<h4>Websites allowed to send</h4><p>Apps on this server are allowed already. Add another website (scheme and host) to let its pages send without a key.</p>
+    <form id="origf" class="row" style="margin-top:8px"><input class="tf" id="origin" placeholder="https://example.com" inputmode="url" autocomplete="off"><button class="btn2">Add</button></form>
+    <div class="sub" id="origlist" style="margin-top:6px">${esc(((endpointInfo.find(e=>e.name==="activity")||{}).instanceOrigins||[]).join(", ")||"")}</div>`:""}
+  </div></details></section>`;
+}
+
+/* ---------- sheets ---------- */
+let sheetOn=false,sheetLive=null,sheetFn=null,sheetChange=null;
+function openSheet(html,fn,live,change){$("sheet").innerHTML=`<div class="grab"></div>`+html;sheetFn=fn||null;sheetLive=live||null;sheetChange=change||null;sheetOn=true;$("sheet").classList.add("on");$("backdrop").classList.add("on");$("sheet").scrollTop=0}
+function closeSheet(){if(!sheetOn)return;sheetOn=false;sheetLive=null;sheetChange=null;$("sheet").classList.remove("on");$("backdrop").classList.remove("on");schedule()}
+$("backdrop").addEventListener("click",closeSheet);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
+$("sheet").addEventListener("click",e=>{if(sheetFn)sheetFn(e)});
+$("sheet").addEventListener("change",e=>{if(sheetChange)sheetChange(e)});
+$("sheet").addEventListener("submit",e=>{e.preventDefault();if(sheetFn)sheetFn({target:e.target,submit:true})});
+
+function linkOptions(cur){let o=`<option value="">No, I tick it myself</option>`;
+  appIds().forEach(id=>{if(blocked(id))return;const a=appInfo(id);const kinds=a.kinds.length?a.kinds:[{kind:"",label:"Any activity"}];
+    kinds.forEach(k=>{const v=id+"/"+k.kind;o+=`<option value="${esc(v)}"${cur===v?" selected":""}>${esc(k.label)} in ${esc(a.name)}</option>`});
+    if(a.kinds.length>1){const v=id+"/";o+=`<option value="${esc(v)}"${cur===v?" selected":""}>Anything in ${esc(a.name)}</option>`}});
+  if(cur&&!o.includes(`value="${esc(cur)}"`))o+=`<option value="${esc(cur)}" selected>${esc(cur)}</option>`;
+  return o}
+function editHabit(h0,isNew){
+  const h=JSON.parse(JSON.stringify(h0));
+  const draw=()=>{const f=h.freq,lv=h.link?h.link.app+"/"+(h.link.kind||""):"";
+    openSheet(`<h2>${isNew?"New habit":"Edit habit"}</h2>
+    <form id="hf"><label class="lab" for="hn">Name</label><input class="tf" id="hn" value="${esc(h.name)}" maxlength="60" placeholder="e.g. Read 10 pages" autocomplete="off" required>
+    <label class="lab">Icon and colour</label><div class="row"><input class="tf" id="hi" value="${esc(h.icon)}" maxlength="4" placeholder="${esc((h.name||"A").charAt(0).toUpperCase())}" style="width:64px;text-align:center;font-size:20px;padding:6px" aria-label="Icon (an emoji or a letter)">
+    <div class="swatches">${COLORS.map(c=>`<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-pressed="${h.color===c}" aria-label="Colour ${c}"></button>`).join("")}</div></div>
+    <label class="lab">How often</label><div class="seg" id="hfq"><button type="button" data-fq="daily" aria-pressed="${f.t==="daily"}">Every day</button><button type="button" data-fq="days" aria-pressed="${f.t==="days"}">Some days</button><button type="button" data-fq="week" aria-pressed="${f.t==="week"}">Times a week</button></div>
+    ${f.t==="days"?`<div class="days">${DN.map((d,i)=>`<button type="button" data-dd="${i+1}" aria-pressed="${(f.days||[]).includes(i+1)}">${d.slice(0,2)}</button>`).join("")}</div>`:""}
+    ${f.t==="week"?`<div class="stepper"><button type="button" data-n="-1" aria-label="Fewer">−</button><b class="num">${f.n}</b><button type="button" data-n="1" aria-label="More">+</button><span class="sub" style="margin:0">times a week, any days</span></div>`:""}
+    <label class="lab" for="hl">Ticks itself when</label><select class="tf" id="hl">${linkOptions(lv)}</select>
+    ${h.link?`<div class="row" style="margin-top:8px"><span class="sub" style="margin:0">At least</span><input class="tf" id="hm" type="number" min="0" max="600" inputmode="numeric" value="${+h.link.min||0}" style="width:84px;min-height:40px;padding:8px 10px"><span class="sub" style="margin:0">minutes that day</span></div>
+    <p class="hint">Past ${esc(appInfo(h.link.app).name)} sessions count too, so your streak starts with your history.</p>`:`<p class="hint">Link a habit to one of your apps and it ticks itself when you log a session there.</p>`}
+    <div class="foot"><button class="btn" type="submit">${isNew?"Add habit":"Save"}</button>${isNew?"":`<button type="button" class="btn2" data-act="archive">Archive</button><button type="button" class="btn2 bad" data-act="del">Delete</button>`}</div></form>`,onClick,null,onChange)};
+  const keep=()=>{const n=$("hn"),i=$("hi"),m=$("hm");if(n)h.name=n.value;if(i)h.icon=i.value.trim();if(m&&h.link)h.link.min=Math.max(0,Math.min(600,parseInt(m.value,10)||0))};
+  const onClick=async e=>{const t=e.target.closest?e.target.closest("button,form"):e.target;if(!t)return;
+    if(e.submit){keep();h.name=h.name.trim();if(!h.name){$("hn").focus();return}if(h.freq.t==="days"&&!(h.freq.days||[]).length){toast("Pick at least one day");return}
+      closeSheet();await saveHabit(h);toast(isNew?"Added “"+h.name+"”":"Saved");return}
+    if(t.dataset.color){keep();h.color=t.dataset.color;draw();return}
+    if(t.dataset.fq){keep();const v=t.dataset.fq;h.freq=v==="daily"?{t:"daily"}:v==="days"?{t:"days",days:h.freq.days&&h.freq.days.length?h.freq.days:[1,2,3,4,5]}:{t:"week",n:h.freq.n||3};draw();return}
+    if(t.dataset.dd){keep();const d=+t.dataset.dd,s=new Set(h.freq.days||[]);s.has(d)?s.delete(d):s.add(d);h.freq.days=[...s].sort();draw();return}
+    if(t.dataset.n){keep();h.freq.n=Math.max(1,Math.min(7,(h.freq.n||1)+(+t.dataset.n)));draw();return}
+    if(t.dataset.act==="archive"){keep();h.archived=true;closeSheet();await saveHabit(h);toast("Archived. Its history stays.");return}
+    if(t.dataset.act==="del"){if(t.dataset.sure){closeSheet();await deleteHabit(h);toast("Deleted");return}t.dataset.sure="1";t.textContent="Delete for good?";return}
+  };
+  const onChange=e=>{if(e.target.id!=="hl")return;keep();const v=e.target.value;if(!v)h.link=null;else{const p=v.split("/");h.link={app:p[0],kind:p[1]||null,min:h.link?h.link.min:0};
+      if(!h.name.trim())h.name=kindLabel(p[0],p[1])}draw()};
+  draw();
+}
+function showHabit(id){
+  const draw=()=>{const h=S.habits[id];if(!h){closeSheet();return}const x=stats(h),T=today();
+    const recent=[];for(let i=0;i<60&&recent.length<8;i++){const k=addD(T,-i),s=st(h,k);if(s.done)recent.push([k,s])}
+    const lvl=k=>{if(k<startKey(h))return -1;const s=st(h,k);if(s.done)return h.freq.t==="week"?3:4;return 0};
+    openSheet(`<div class="row" style="gap:14px">${hico(h,52)}<div class="sp"><h2>${esc(h.name)}</h2><span class="sub">${esc(freqText(h))}${h.link?" · "+esc(linkText(h)):""}</span></div></div>
+    <div class="tiles"><div class="tile"><b class="num">${x.cur}</b><span>${x.unit==="week"?"weeks":"days"} in a row</span></div><div class="tile"><b class="num">${x.best}</b><span>best streak</span></div>
+    <div class="tile"><b class="num">${Math.round(x.rate*100)}%</b><span>${x.unit==="week"?"last 5 weeks":"last 30 days"}</span></div><div class="tile"><b class="num">${x.total}</b><span>times done</span></div></div>
+    ${heatmap(26,lvl)}
+    <label class="lab">Recent</label><div class="feed">${recent.map(([k,s])=>`<div><time>${esc(fmtDay(k,{weekday:"short",day:"numeric",month:"short"}))}</time><span class="sp">${s.auto?s.acts.map(a=>esc(a.title||kindLabel(a.app,a.kind))+(a.minutes?" · "+Math.round(a.minutes)+" min":"")).join(", "):"Ticked by you"}</span>${s.auto&&s.acts[0].url?`<a href="${esc(s.acts[0].url)}" target="_blank" rel="noopener" class="sub" style="margin:0">Open</a>`:""}</div>`).join("")||`<p class="sub">Nothing in the last 60 days.</p>`}</div>
+    <div class="foot"><button class="btn" data-act="edit">Edit</button><button class="btn2" data-act="close">Close</button></div>`,e=>{const t=e.target.closest("button");if(!t)return;
+      if(t.dataset.act==="edit"){editHabit(S.habits[id],false)}else if(t.dataset.act==="close")closeSheet()},draw)};
+  draw();
+}
+
+/* ---------- events ---------- */
+document.querySelector(".seg.main").addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(b){go(b.dataset.view);if(b.dataset.view==="today"&&view()==="today"){sel=today();render()}}});
+window.addEventListener("hashchange",()=>{closeSheet();render();scrollTo(0,0)});
+$("fab").addEventListener("click",()=>editHabit(newHabit(),true));
+$("syncbtn").addEventListener("click",()=>toast({ok:"Saved to your account.",busy:"Syncing…",error:"Something didn’t save. Check your connection."}[sync]||""));
+$("main").addEventListener("click",async e=>{
+  const t=e.target.closest("button,a");if(!t)return;
+  if(t.dataset.day){sel=t.dataset.day;render();return}
+  if(t.dataset.week){const k=addD(sel,+t.dataset.week);sel=k>today()?today():k;render();return}
+  if(t.dataset.check){const h=S.habits[t.dataset.check];if(h)toggle(h,sel);return}
+  if(t.dataset.open){showHabit(t.dataset.open);return}
+  if(t.dataset.new){editHabit(newHabit(),true);return}
+  if(t.dataset.go){go(t.dataset.go);return}
+  if(t.dataset.sg){const sg=suggestions(),i=+t.dataset.sg.slice(1);
+    const h=t.dataset.sg[0]==="a"?fromSuggestion(sg[i].app,sg[i].sg):fromSuggestion(null,GENERIC[i]);editHabit(h,true);return}
+  if(t.dataset.sgapp){const id=t.dataset.sgapp;editHabit(fromSuggestion(id,KNOWN[id].suggest),true);return}
+  if(t.dataset.linkapp){const id=t.dataset.linkapp,a=appInfo(id),k=a.kinds[0];editHabit(newHabit({name:k?k.label:a.name,link:{app:id,kind:k?k.kind:null,min:0}}),true);return}
+  if(t.dataset.block){const id=t.dataset.block,b=Object.assign({},S.settings.blocked||{});if(b[id])delete b[id];else b[id]=true;S.settings=Object.assign({},S.settings,{blocked:b});bump();
+    await w(db.doc("settings/main").set(S.settings));toast(b[id]?appInfo(id).name+" can’t tick habits now":appInfo(id).name+" is connected again");return}
+  if(t.dataset.copy){try{await navigator.clipboard.writeText(t.dataset.copy);toast("Copied")}catch(err){toast("Couldn’t copy")}return}
+  if(t.dataset.reveal){const k=endpointInfo.find(x=>x.name==="activity-key");if(k&&k.token)$("keyv").textContent=k.token;return}
+});
+$("main").addEventListener("submit",async e=>{if(e.target.id!=="origf")return;e.preventDefault();const v=$("origin").value.trim().replace(/\/+$/,"");
+  if(!/^https?:\/\/[^\/\s]+$/.test(v)){toast("Enter scheme and host, e.g. https://example.com");return}
+  const cur=((endpointInfo.find(x=>x.name==="activity")||{}).instanceOrigins)||[];
+  try{await ing.setOrigins("activity",[...new Set(cur.concat(v))]);endpointInfo=await ing.endpoints();toast("Added "+v);render()}catch(err){toast(err&&err.message||"Couldn’t add that website")}});
+
+let toastT=0;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2800)}
+/* the day rolls over while the app is open */
+let lastDay=today();setInterval(()=>{if(today()!==lastDay){if(sel===lastDay)sel=today();lastDay=today();bump()}},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&today()!==lastDay){if(sel===lastDay)sel=today();lastDay=today();bump()}});
+
+/* ---------- start ---------- */
+async function init(){
+  render();
+  if(!R||!R.use){render();return}
+  db=await R.use("db");
+  if(!db){$("main").innerHTML=`<div class="card empty"><h2 class="card-t">No access</h2><p>This copy of Habits isn’t shared with you.</p></div>`;return}
+  const from=addD(today(),-WINDOW);
+  const listen=(q,key,fill)=>q.onSnapshot(snap=>{const m={};snap.docs.forEach(d=>{let v=d.data();if(v&&fill)v=fill(d.id,v);if(v)m[d.id]=v});S[key]=m;S.loaded[key]=1;setSync("ok");bump()},err=>{setSync("error");S.loaded[key]=1;bump()});
+  listen(db.collection("habits"),"habits",(id,v)=>Object.assign({},v,{id,freq:v.freq&&v.freq.t?v.freq:{t:"daily"}}));
+  listen(db.collection("checks").where("date",">=",from),"checks");
+  listen(db.collection("activities").where("date",">=",from).orderBy("date","desc").limit(1000),"acts");
+  listen(db.collection("apps"),"apps",(id,v)=>id==="_rejected"?null:v);
+  db.doc("settings/main").onSnapshot(s=>{S.settings=s.exists?s.data():{};bump()},()=>{});
+  ing=await R.use("ingest");
+  if(ing){try{endpointInfo=await ing.endpoints()||[];canManage=endpointInfo.some(e=>e.canManage)}catch(e){endpointInfo=[]}}
+  if(canManage)db.collection("inbox").orderBy("_receivedAt").limit(50).onSnapshot(snap=>{if(snap.size)processInbox(snap.docs)},()=>{});
+  bump();
+}
+init();
+})();
+</script>
+</body>
+</html>
+

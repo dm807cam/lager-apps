@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f2f1ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0c0b" media="(prefers-color-scheme: dark)">
+<title>Wissensfunke</title>
+<style>
+:root{color-scheme:light;--bg:#f2f1ee;--surface:#fff;--surface-2:#f3f2ef;--surface-3:#e9e8e4;--border:rgba(0,0,0,.06);--text:#0b0b0b;--text-2:#52514e;--text-3:#8a8984;--grid:#eeede9;--good:#0b7a3e;--good-bg:rgba(11,122,62,.09);--bad:#c23a39;--bad-bg:rgba(194,58,57,.09);--shadow:0 1px 1px rgba(0,0,0,.03),0 6px 20px rgba(20,20,10,.06);--radius:22px}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0c0c0b;--surface:#171716;--surface-2:#212120;--surface-3:#2a2a28;--border:rgba(255,255,255,.06);--text:#f3f2ef;--text-2:#c3c2b7;--text-3:#8f8e86;--grid:#232321;--good:#4cc27e;--good-bg:rgba(76,194,126,.12);--bad:#e66767;--bad-bg:rgba(230,103,103,.12);--shadow:0 1px 1px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35)}}
+
+/* App-Farben */
+:root{
+  --btn:#2a3a8f; --btn-ink:#fff; --amber:#ffc94d;
+  --star-bg:rgba(214,152,0,.13); --star:#9a6a00;
+  --c-weltall:#4f63e0; --c-physik:#0a8fc2; --c-biologie:#1f9d5f; --c-mensch:#d9486a;
+  --c-erde:#b7791f; --c-chemie:#8b5cf6; --c-mathe:#d99a00; --c-technik:#2f8f7f;
+}
+@media (prefers-color-scheme:dark){:root{
+  --btn:#6f82ff; --star-bg:rgba(255,201,77,.14); --star:#ffc94d;
+  --c-weltall:#8fa2ff; --c-physik:#5fd4ff; --c-biologie:#6ee7a8; --c-mensch:#ff8fa3;
+  --c-erde:#e8b86a; --c-chemie:#c79bff; --c-mathe:#ffc94d; --c-technik:#9ad0c2;
+}}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+h1,h2,h3,p{margin:0}
+.col{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.num{font-variant-numeric:tabular-nums}
+
+/* 1 Header */
+header{display:flex;align-items:center;justify-content:space-between;padding:6px 4px 0}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+.brand svg{width:32px;height:32px;border-radius:9px;box-shadow:0 4px 12px rgba(42,58,143,.35);flex:none}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:grid;place-items:center;padding:0;transition:transform .15s}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn svg{width:19px;height:19px}
+
+/* 4 Segmented control */
+.seg{display:flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:12px}
+.seg button{flex:1;border:0;background:transparent;font-size:13px;font-weight:550;color:var(--text-2);padding:7px 11px;border-radius:9px;min-height:34px;white-space:nowrap;transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);font-weight:650;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+@media (prefers-color-scheme:dark){.seg button[aria-pressed="true"]{background:var(--surface-3)}}
+.seg-wrap{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:0;box-shadow:var(--shadow)}
+.seg-wrap .seg{background:var(--surface)}
+.seg-wrap .seg button[aria-pressed="true"]{background:var(--surface-2);box-shadow:none}
+@media (prefers-color-scheme:dark){.seg-wrap .seg button[aria-pressed="true"]{background:var(--surface-3)}}
+
+.view{display:none;flex-direction:column;gap:14px}
+.view.on{display:flex;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 3 Hero */
+.hero{position:relative;color:#fff;border-radius:22px;padding:22px 20px 18px;display:grid;gap:18px;overflow:hidden;
+  box-shadow:0 14px 34px rgba(18,26,63,.28);
+  background:radial-gradient(110% 90% at 100% 0%,rgba(255,201,77,.42),transparent 60%),radial-gradient(80% 80% at 0% 100%,rgba(111,130,255,.22),transparent 60%),linear-gradient(160deg,#3a4fbf 0%,#2a3a8f 55%,#121a3f 100%)}
+.hero>*:not(.deco){position:relative}
+.hero .deco{position:absolute;top:-96px;right:-96px;width:250px;height:250px;opacity:.18;pointer-events:none}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hero .label{font-size:13px;color:rgba(255,255,255,.7);line-height:1.35}
+.hero .label b{display:block}
+.hero .label b{color:#fff;font-weight:650}
+.glass{display:flex;gap:8px;flex:none}
+.glass button{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;padding:0;transition:transform .15s,background .2s}
+.glass button:active{transform:scale(.92)}
+.glass button svg{width:19px;height:19px}
+.glass button.on{background:var(--amber);border-color:var(--amber);color:#2a1d00}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:650;padding:5px 11px 5px 9px;border-radius:999px;background:rgba(255,255,255,.14);white-space:nowrap}
+.chip i{width:9px;height:9px;border-radius:50%;flex:none}
+.fact-title{font-family:ui-serif,"New York",Georgia,serif;font-weight:700;font-size:clamp(28px,8vw,40px);line-height:1.1;letter-spacing:-.02em;margin:12px 0 10px;text-wrap:balance}
+.fact-text{font-size:16px;line-height:1.55;color:rgba(255,255,255,.86);max-width:62ch}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 12px;min-width:0}
+.tile .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.6)}
+.tile .v{font-size:17px;font-weight:650;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .n{font-size:12px;color:rgba(255,255,255,.62)}
+@media (max-width:520px){.tiles{grid-template-columns:1fr 1fr}.tiles .tile:last-child{grid-column:1/-1}}
+.hero .cta{justify-self:start;background:#fff;color:#121a3f;border:0;border-radius:999px;padding:12px 20px;font-weight:700}
+.skel{height:14px;border-radius:7px;background:rgba(255,255,255,.14);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.5}}
+
+/* Unter dem Hero */
+.below{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 4px}
+.below .note{font-size:13px;color:var(--text-3)}
+.pill-btn{display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:999px;padding:10px 16px 10px 13px;font-size:14px;font-weight:650;white-space:nowrap;transition:transform .15s}
+.pill-btn:active{transform:scale(.97)}
+.pill-btn svg{width:17px;height:17px;color:var(--btn)}
+
+/* 2 Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:16px 12px 10px}
+.card-head{padding:0 6px 8px}
+.card-title{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.card-sub{font-size:12.5px;color:var(--text-3);margin-top:1px}
+
+/* 5 List rows */
+.group{font-size:12.5px;font-weight:600;color:var(--text-3);padding:12px 10px 4px}
+.rowi{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px;border-radius:14px;cursor:pointer;transition:background .15s}
+.rowi:hover,.rowi.open{background:var(--surface-2)}
+.bubble{width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center}
+.rowi:hover .bubble,.rowi.open .bubble{background:var(--surface)}
+.bubble i{width:14px;height:14px;border-radius:5px;transform:rotate(45deg)}
+.main{min-width:0}
+.main .t{font-size:16px;font-weight:650;line-height:1.3;letter-spacing:-.005em}
+.main .s{font-size:12.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.pill{font-size:12.5px;font-weight:650;padding:4px 9px;border-radius:999px;background:var(--surface-2);color:var(--text-3);white-space:nowrap}
+.rowi.open .pill{background:var(--surface)}
+.pill.star{background:var(--star-bg);color:var(--star)}
+.pill.today{background:color-mix(in srgb,var(--btn) 12%,transparent);color:var(--btn)}
+.del{display:none;border:0;background:var(--bad);color:#fff;font-size:13px;font-weight:650;border-radius:999px;padding:6px 12px}
+.rowi.open .del{display:inline-block}
+.rowi.open .del + .pill,.rowi.open .pill.hide-open{display:none}
+.more{display:none;grid-column:2/-1;font-size:15px;line-height:1.55;color:var(--text-2);padding:0 2px 4px}
+.rowi.open .more{display:block}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.mini{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:8px 13px;font-size:13px;font-weight:650;background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.mini svg{width:15px;height:15px}
+.mini.on{background:var(--star-bg);color:var(--star);box-shadow:none}
+.show-more{width:100%;border:0;background:var(--surface-2);border-radius:12px;padding:12px;font-weight:600;color:var(--text-2);margin:8px 0 4px}
+.empty{color:var(--text-3);text-align:center;padding:30px 16px 26px;line-height:1.55}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+
+/* 11 Footnote */
+.foot{font-size:12px;color:var(--text-3);text-align:center;line-height:1.5;padding:4px 20px}
+
+/* 9 Toast */
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-140%);visibility:hidden;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .3s cubic-bezier(.2,.9,.25,1),visibility .3s;z-index:50;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.toast.on{transform:translate(-50%,0);visibility:visible}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="col">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="hb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a4fbf"/><stop offset=".55" stop-color="#2a3a8f"/><stop offset="1" stop-color="#121a3f"/></linearGradient></defs><rect width="512" height="512" fill="url(#hb)"/><g fill="none" stroke="#ffc94d" stroke-width="24"><ellipse cx="256" cy="256" rx="160" ry="60"/><ellipse cx="256" cy="256" rx="160" ry="60" transform="rotate(60 256 256)"/><ellipse cx="256" cy="256" rx="160" ry="60" transform="rotate(120 256 256)"/></g><circle cx="256" cy="256" r="38" fill="#ffc94d"/></svg>
+      Wissensfunke
+    </div>
+    <button class="icon-btn" id="shuffleBtn" aria-label="Zufälliger Bonus-Fakt" title="Bonus-Fakt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+    </button>
+  </header>
+
+  <div class="seg-wrap"><div class="seg" role="group" aria-label="Ansicht">
+    <button data-v="heute" aria-pressed="true">Heute</button>
+    <button data-v="archiv" aria-pressed="false">Archiv</button>
+    <button data-v="gemerkt" aria-pressed="false">Gemerkt</button>
+  </div></div>
+
+  <section class="view on" id="v-heute">
+    <article class="hero" id="hero">
+      <svg class="deco" viewBox="0 0 280 280" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><circle cx="140" cy="140" r="40"/><circle cx="140" cy="140" r="70"/><circle cx="140" cy="140" r="100"/><circle cx="140" cy="140" r="130"/></g></svg>
+      <div class="hero-top"><span class="label" id="heroLabel">Funfact des Tages</span></div>
+      <div><div class="skel" style="width:34%;height:24px;border-radius:12px"></div><div class="skel" style="width:85%;height:30px;margin:16px 0 14px"></div><div class="skel"></div><div class="skel" style="margin-top:8px"></div><div class="skel" style="width:60%;margin-top:8px"></div></div>
+    </article>
+    <div class="below">
+      <span class="note" id="belowNote">Morgen gibt’s den nächsten.</span>
+      <button class="pill-btn" id="bonusBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></svg>Bonus-Fakt</button>
+      <button class="pill-btn" id="backBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Zurück zum Fakt des Tages</button>
+    </div>
+    <p class="foot">Tipp: Über „Teilen → Zum Home-Bildschirm“ im Browser wird Wissensfunke zur App auf deinem Handy.</p>
+  </section>
+
+  <section class="view" id="v-archiv">
+    <div class="card">
+      <div class="card-head"><h2 class="card-title">Archiv</h2><p class="card-sub">Alle bisherigen Fakten · zum Lesen antippen</p></div>
+      <div id="archiv"></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-gemerkt">
+    <div class="card">
+      <div class="card-head"><h2 class="card-title">Gemerkt</h2><p class="card-sub">Deine Lieblingsfakten – auf all deinen Geräten</p></div>
+      <div id="gemerkt"></div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const START = Date.UTC(2026, 10, 18); // erster Tag der App
+const CATS = {
+  "Weltall":["--c-weltall","#8fa2ff"],"Physik":["--c-physik","#5fd4ff"],"Biologie":["--c-biologie","#6ee7a8"],"Mensch":["--c-mensch","#ff8fa3"],
+  "Erde":["--c-erde","#e8b86a"],"Chemie":["--c-chemie","#c79bff"],"Mathe":["--c-mathe","#ffc94d"],"Technik":["--c-technik","#9ad0c2"]
+};
+const catVar = c => CATS[c] ? `var(${CATS[c][0]})` : "var(--text-3)";
+const catHero = c => CATS[c] ? CATS[c][1] : "#fff";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let db = null, uid = null, facts = [], favs = new Map(), shown = null, bonus = false, lastDay = null, archLimit = 30;
+
+function dayNum(d = new Date()) {
+  return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - START) / 864e5);
+}
+function dateOf(n) { const t = new Date(START + n * 864e5); return new Date(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()); }
+function fmt(d, long) { return d.toLocaleDateString("de-DE", long ? {weekday:"long", day:"numeric", month:"long"} : {weekday:"short", day:"numeric", month:"short"}); }
+function factFor(n) { if (!facts.length) return null; return facts[((n % facts.length) + facts.length) % facts.length]; }
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 3000); }
+
+function docsOf(r) {
+  const arr = Array.isArray(r) ? r : (r && (r.docs || r.results || r.items)) || [];
+  return arr.map(d => {
+    const data = typeof d.data === "function" ? d.data() : (d.data && typeof d.data === "object" ? d.data : d);
+    const id = d.id ?? (d.path ? String(d.path).split("/").pop() : data.id);
+    return { id, ...data };
+  });
+}
+
+const ICON = {
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>',
+  starOn: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>',
+  share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/></svg>'
+};
+const DECO = '<svg class="deco" viewBox="0 0 280 280" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><circle cx="140" cy="140" r="40"/><circle cx="140" cy="140" r="70"/><circle cx="140" cy="140" r="100"/><circle cx="140" cy="140" r="130"/></g></svg>';
+
+function heroEmpty(title, text) {
+  $("#hero").innerHTML = `${DECO}
+    <div class="hero-top"><span class="label">Funfact des Tages</span></div>
+    <div><h1 class="fact-title">${esc(title)}</h1><p class="fact-text">${esc(text)}</p></div>
+    <button class="cta" onclick="location.reload()">Erneut laden</button>`;
+}
+
+function renderToday() {
+  const today = dayNum(); lastDay = today;
+  if (!facts.length) { heroEmpty("Noch keine Fakten da", "Die Fakten konnten gerade nicht geladen werden. Versuch es gleich noch einmal."); return; }
+  const f = bonus ? shown : factFor(today);
+  shown = f;
+  const on = favs.has(f.n);
+  const inCat = facts.filter(x => x.cat === f.cat).length;
+  const label = bonus ? `<b>Bonus-Fakt</b>Zufällig ausgewählt` : `<b>Funfact des Tages</b>${esc(fmt(new Date(), true))}`;
+  const glass = `<div class="glass">
+      ${uid ? `<button class="${on ? "on" : ""}" data-fav="${f.n}" aria-label="${on ? "Nicht mehr merken" : "Merken"}" aria-pressed="${on}">${on ? ICON.starOn : ICON.star}</button>` : ""}
+      <button data-share="${f.n}" aria-label="Teilen">${ICON.share}</button></div>`;
+  $("#hero").innerHTML = `${DECO}
+    <div class="hero-top"><span class="label">${label}</span>${glass}</div>
+    <div>
+      <span class="chip"><i style="background:${catHero(f.cat)}"></i>${esc(f.cat)}</span>
+      <h1 class="fact-title">${esc(f.title)}</h1>
+      <p class="fact-text">${esc(f.text)}</p>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Fakt</div><div class="v num">Nr. ${f.n}</div><div class="n num">von ${facts.length}</div></div>
+      <div class="tile"><div class="k">Kategorie</div><div class="v">${esc(f.cat)}</div><div class="n num">${inCat} Fakten</div></div>
+      <div class="tile"><div class="k">Merkliste</div><div class="v num">${uid ? favs.size : "–"}</div><div class="n">${uid ? (favs.size === 1 ? "Fakt gemerkt" : "Fakten gemerkt") : "nach Anmeldung"}</div></div>
+    </div>`;
+  $("#bonusBtn").hidden = bonus;
+  $("#backBtn").hidden = !bonus;
+  $("#belowNote").textContent = bonus ? "Dein Fakt des Tages bleibt dir." : "Morgen gibt’s den nächsten.";
+}
+
+function rowHTML(f, sub, mode, rightPill) {
+  const on = favs.has(f.n);
+  const favMini = uid && mode !== "fav" ? `<button class="mini ${on ? "on" : ""}" data-fav="${f.n}">${on ? ICON.starOn + "Gemerkt" : ICON.star + "Merken"}</button>` : "";
+  const right = mode === "fav"
+    ? `<button class="del" data-fav="${f.n}">Entfernen</button><span class="pill star">★</span>`
+    : rightPill;
+  return `<div class="rowi" data-open tabindex="0" role="button" aria-expanded="false">
+    <div class="bubble"><i style="background:${catVar(f.cat)}"></i></div>
+    <div class="main"><div class="t">${esc(f.title)}</div><div class="s">${esc(sub)}</div></div>
+    <div>${right}</div>
+    <div class="more">${esc(f.text)}<div class="acts">${favMini}<button class="mini" data-share="${f.n}">${ICON.share}Teilen</button></div></div>
+  </div>`;
+}
+
+function renderArchiv() {
+  const today = dayNum(), out = [];
+  if (!facts.length) { $("#archiv").innerHTML = `<div class="empty">Noch keine Fakten geladen.</div>`; return; }
+  let month = "", count = 0;
+  for (let d = today; d >= 0 && count < archLimit; d--, count++) {
+    const f = factFor(d); if (!f) continue;
+    const date = dateOf(d);
+    const m = date.toLocaleDateString("de-DE", {month:"long", year:"numeric"});
+    if (m !== month) { out.push(`<div class="group">${esc(m)}</div>`); month = m; }
+    const pill = d === today ? `<span class="pill today">Heute</span>`
+      : favs.has(f.n) ? `<span class="pill star">★</span>` : `<span class="pill num">Nr. ${f.n}</span>`;
+    out.push(rowHTML(f, `${f.cat} · ${fmt(date)}`, "arch", pill));
+  }
+  if (today + 1 > archLimit) out.push(`<button class="show-more" id="moreBtn">Ältere anzeigen</button>`);
+  if (today === 0) out.push(`<p class="foot" style="padding-top:10px">Das Archiv wächst ab morgen um einen Fakt pro Tag.</p>`);
+  $("#archiv").innerHTML = out.join("");
+}
+
+function renderGemerkt() {
+  if (!uid) { $("#gemerkt").innerHTML = `<div class="empty"><b>Nicht angemeldet</b>Melde dich an, um Fakten zu merken.</div>`; return; }
+  const list = [...favs.values()].sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0))
+    .map(v => facts.find(f => f.n === v.n)).filter(Boolean);
+  $("#gemerkt").innerHTML = list.map(f => rowHTML(f, `${f.cat} · Nr. ${f.n}`, "fav")).join("")
+    || `<div class="empty"><b>Noch nichts gemerkt</b>Tippe beim Fakt auf den Stern, um ihn hier zu sammeln.</div>`;
+}
+
+function renderAll() {
+  const openTitles = new Set([...document.querySelectorAll(".rowi.open .t")].map(e => e.textContent));
+  renderToday(); renderArchiv(); renderGemerkt();
+  document.querySelectorAll(".rowi").forEach(r => { if (openTitles.has(r.querySelector(".t").textContent)) { r.classList.add("open"); r.setAttribute("aria-expanded", "true"); } });
+}
+
+async function toggleFav(n) {
+  if (!db || !uid) return;
+  const path = `data/users/${uid}/favs/items/f${n}`;
+  try {
+    if (favs.has(n)) { favs.delete(n); renderAll(); await db.doc(path).delete(); toast("Aus der Merkliste entfernt"); }
+    else { const v = { n, savedAt: Date.now() }; favs.set(n, v); renderAll(); await db.doc(path).set(v); toast("Gemerkt ★"); }
+  } catch (e) { console.error(e); toast("Speichern hat nicht geklappt"); await loadFavs(); renderAll(); }
+}
+
+async function share(n) {
+  const f = facts.find(x => x.n === n); if (!f) return;
+  const text = `🔬 ${f.title}\n\n${f.text}`;
+  try {
+    if (navigator.share) await navigator.share({ title: f.title, text });
+    else { await navigator.clipboard.writeText(text); toast("In die Zwischenablage kopiert"); }
+  } catch (e) { if (e && e.name !== "AbortError") toast("Teilen nicht möglich"); }
+}
+
+function showView(v) {
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+  document.querySelectorAll(".view").forEach(s => s.classList.toggle("on", s.id === "v-" + v));
+  window.scrollTo(0, 0);
+}
+
+function showBonus() {
+  if (!facts.length) return;
+  const todayN = factFor(dayNum())?.n; let f;
+  do { f = facts[Math.floor(Math.random() * facts.length)]; } while (facts.length > 1 && (f.n === todayN || (shown && bonus && f.n === shown.n)));
+  bonus = true; shown = f; showView("heute"); renderToday();
+}
+
+document.addEventListener("click", e => {
+  const fb = e.target.closest("[data-fav]"); if (fb) { e.stopPropagation(); toggleFav(+fb.dataset.fav); return; }
+  const sb = e.target.closest("[data-share]"); if (sb) { e.stopPropagation(); share(+sb.dataset.share); return; }
+  if (e.target.closest("#moreBtn")) { archLimit += 30; renderArchiv(); return; }
+  const it = e.target.closest("[data-open]");
+  if (it) { const o = it.classList.toggle("open"); it.setAttribute("aria-expanded", String(o)); return; }
+  const nb = e.target.closest(".seg button"); if (nb) showView(nb.dataset.v);
+});
+document.addEventListener("keydown", e => {
+  const it = e.target.closest && e.target.closest("[data-open]");
+  if (it && (e.key === "Enter" || e.key === " ") && e.target === it) { e.preventDefault(); it.click(); }
+});
+$("#bonusBtn").onclick = showBonus;
+$("#shuffleBtn").onclick = showBonus;
+$("#backBtn").onclick = () => { bonus = false; renderToday(); };
+document.addEventListener("visibilitychange", () => { if (!document.hidden && lastDay !== dayNum()) { bonus = false; renderAll(); } });
+
+async function loadFavs() {
+  favs = new Map();
+  if (!db || !uid) return;
+  try { for (const d of docsOf(await db.collection(`data/users/${uid}/favs/items`).get())) if (typeof d.n === "number") favs.set(d.n, d); }
+  catch (e) { console.warn("favs", e); }
+}
+
+(async function init() {
+  try {
+    db = window.lager ? await window.lager.use("db") : undefined;
+    const user = window.lager ? await window.lager.use("user") : undefined;
+    if (user) { try { uid = await user.id(); } catch { uid = null; } }
+    if (!db) { heroEmpty("Datenbank nicht erreichbar", "Die Fakten liegen in der Datenbank der App, die gerade nicht antwortet."); return; }
+    facts = docsOf(await db.collection("facts").get())
+      .filter(f => typeof f.n === "number" && f.title)
+      .sort((a, b) => a.n - b.n);
+    await loadFavs();
+    renderAll();
+  } catch (e) {
+    console.error(e);
+    heroEmpty("Laden fehlgeschlagen", "Die Fakten konnten nicht geladen werden. Bitte versuch es gleich noch einmal.");
+  }
+})();
+</script>
+</body>
+</html>

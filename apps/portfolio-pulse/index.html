@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portfolio Pulse</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f2f1ee;
+    --surface: #ffffff;
+    --surface-2: #f3f2ef;
+    --surface-3: #e9e8e4;
+    --border: rgba(0,0,0,.06);
+    --text: #0b0b0b;
+    --text-2: #52514e;
+    --text-3: #8a8984;
+    --grid: #eeede9;
+    --accent: #eb6834;
+    --fund: #6b7a90;
+    --good: #0b7a3e;
+    --good-bg: rgba(11,122,62,.09);
+    --bad: #c23a39;
+    --bad-bg: rgba(194,58,57,.09);
+    --btn: #0d366b;
+    --btn-ink: #ffffff;
+    --shadow: 0 1px 1px rgba(0,0,0,.03), 0 6px 20px rgba(20,20,10,.06);
+    --radius: 22px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0c0c0b;
+      --surface: #171716;
+      --surface-2: #212120;
+      --surface-3: #2a2a28;
+      --border: rgba(255,255,255,.06);
+      --text: #f3f2ef;
+      --text-2: #c3c2b7;
+      --text-3: #8f8e86;
+      --grid: #232321;
+      --accent: #f07a45;
+      --fund: #9aa8bc;
+      --good: #4cc27e;
+      --good-bg: rgba(76,194,126,.12);
+      --bad: #e66767;
+      --bad-bg: rgba(230,103,103,.12);
+      --btn: #3987e5;
+      --btn-ink: #ffffff;
+      --shadow: 0 1px 1px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  button, input, select { font: inherit; color: inherit; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .num { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--text-3); }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 4px 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 20px; }
+  .brand svg { width: 32px; height: 32px; border-radius: 9px; box-shadow: 0 2px 8px rgba(13,54,107,.35); }
+  .currency-wrap { position: relative; }
+  select.currency {
+    appearance: none; -webkit-appearance: none; background: var(--surface); color: var(--text-2);
+    border: 1px solid var(--border); border-radius: 999px; padding: 7px 28px 7px 13px; font-size: 13px; font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+  .currency-wrap::after { content: ''; position: absolute; right: 12px; top: 50%; width: 6px; height: 6px; border-right: 1.6px solid var(--text-3); border-bottom: 1.6px solid var(--text-3); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+
+  .stack { display: grid; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  /* hero */
+  .hero {
+    position: relative; overflow: hidden; color: #fff; border: 0;
+    padding: 22px 20px 18px; display: grid; gap: 18px;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(57,135,229,.55) 0%, rgba(57,135,229,0) 60%),
+      radial-gradient(80% 80% at 0% 100%, rgba(240,122,69,.22) 0%, rgba(240,122,69,0) 60%),
+      linear-gradient(160deg, #11427f 0%, #0a2a55 55%, #071d3d 100%);
+    box-shadow: 0 14px 34px rgba(10,42,85,.28);
+  }
+  .hero-fan { position: absolute; right: -10px; top: -6px; width: 62%; height: 120px; opacity: .22; pointer-events: none; }
+  .hero > div { position: relative; }
+  .hero-label { color: rgba(255,255,255,.7); font-size: 13px; font-weight: 500; }
+  .hero-value { font-size: clamp(40px, 11.5vw, 56px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; margin-top: 4px; }
+  .hero-sub { color: rgba(255,255,255,.78); font-size: 14px; margin-top: 8px; }
+  .hero-sub.small { font-size: 12.5px; margin-top: 4px; color: rgba(255,255,255,.6); }
+  .hero .delta-up { color: #84e8ae; font-weight: 650; }
+  .hero .delta-down { color: #ffa3a3; font-weight: 650; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 10px 12px; min-width: 0; backdrop-filter: blur(6px); }
+  .stat .k { color: rgba(255,255,255,.6); font-size: 11.5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+  .stat .v { font-weight: 650; font-size: 16px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat .v small { font-weight: 500; font-size: 12px; color: rgba(255,255,255,.6); }
+  .hero-cta { justify-self: start; background: #fff; color: #0a2a55; border: 0; border-radius: 999px; padding: 12px 20px; font-weight: 700; cursor: pointer; }
+  @media (max-width: 520px) { .stats { grid-template-columns: 1fr 1fr; } .stats .stat:last-child { grid-column: 1 / -1; } }
+
+  /* segmented control */
+  .seg { display: flex; gap: 2px; background: var(--surface-2); padding: 3px; border-radius: 12px; }
+  .seg button {
+    flex: 1; border: 0; background: transparent; color: var(--text-2); font-size: 13px; font-weight: 550;
+    padding: 7px 12px; border-radius: 9px; cursor: pointer; min-height: 34px; white-space: nowrap; transition: background .15s, color .15s;
+  }
+  .seg button[aria-pressed=true] { background: var(--surface); color: var(--text); font-weight: 650; box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 0 0 .5px rgba(0,0,0,.04); }
+  @media (prefers-color-scheme: dark) { .seg button[aria-pressed=true] { background: var(--surface-3); } }
+
+  /* chart */
+  .chart-card { padding: 16px 10px 10px; }
+  .chart-head { display: flex; align-items: center; justify-content: space-between; gap: 10px 12px; flex-wrap: wrap; padding: 0 8px 6px; }
+  .chart-title { font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
+  .chart-sub { color: var(--text-3); font-size: 12.5px; margin-top: 1px; }
+  .legend { display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; padding: 8px 8px 6px; color: var(--text-2); font-size: 12px; }
+  .legend .item { display: flex; align-items: center; gap: 7px; }
+  .legend .ramp { width: 64px; height: 6px; border-radius: 3px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+  .legend .tri { width: 0; height: 0; border-left: 5.5px solid transparent; border-right: 5.5px solid transparent; border-bottom: 9px solid var(--fund); }
+  .plot { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .plot svg { display: block; width: 100%; overflow: visible; }
+  .tick { fill: var(--text-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .rate-label { font-size: 11px; font-weight: 650; fill: var(--text-2); font-variant-numeric: tabular-nums; }
+  .tooltip {
+    position: absolute; pointer-events: none; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--text);
+    border: 1px solid var(--border); border-radius: 14px; padding: 9px 11px; font-size: 12px;
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.18); min-width: 160px; opacity: 0; transition: opacity .12s; z-index: 2;
+  }
+  .tooltip .t-date { color: var(--text-2); margin-bottom: 5px; font-weight: 650; }
+  .tooltip .row { display: flex; justify-content: space-between; gap: 14px; line-height: 1.65; }
+  .tooltip .row .l { display: flex; align-items: center; gap: 6px; color: var(--text-2); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tooltip .sw { width: 10px; height: 2.5px; border-radius: 2px; display: inline-block; flex: none; }
+  .tooltip .sw.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .tooltip .sw.tri { width: 0; height: 0; border-radius: 0; border-left: 4.5px solid transparent; border-right: 4.5px solid transparent; border-bottom: 8px solid var(--fund); }
+  .tooltip .row .r { font-weight: 650; font-variant-numeric: tabular-nums; }
+  .empty { padding: 48px 24px; text-align: center; color: var(--text-2); }
+  .empty b { color: var(--text); display: block; font-size: 16px; margin-bottom: 4px; }
+
+  /* history */
+  .history { padding: 6px 0 4px; overflow: hidden; }
+  .history h2 { font-size: 17px; margin: 12px 18px 6px; font-weight: 700; letter-spacing: -.01em; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .history h2 small { font-size: 12.5px; font-weight: 500; color: var(--text-3); letter-spacing: 0; }
+  .history ul { list-style: none; margin: 0; padding: 0 6px; }
+  .history li { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 10px 10px; border-radius: 14px; cursor: pointer; transition: background .15s; }
+  .history li:hover { background: var(--surface-2); }
+  .history li.open { background: var(--surface-2); }
+  .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); }
+  .history li.open .ico, .history li:hover .ico { background: var(--surface-3); }
+  .ico.v::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+  .ico.f::before { content: ''; width: 0; height: 0; border-left: 6.5px solid transparent; border-right: 6.5px solid transparent; border-bottom: 11px solid var(--fund); }
+  .ico.w::before { content: ''; width: 0; height: 0; border-left: 6.5px solid transparent; border-right: 6.5px solid transparent; border-top: 11px solid var(--fund); }
+  .h-main { min-width: 0; }
+  .h-val { font-weight: 650; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .h-sub { color: var(--text-3); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pill { font-size: 12.5px; font-weight: 650; font-variant-numeric: tabular-nums; padding: 4px 9px; border-radius: 999px; background: var(--surface-2); color: var(--text-3); }
+  .pill.up { background: var(--good-bg); color: var(--good); }
+  .pill.down { background: var(--bad-bg); color: var(--bad); }
+  .del { display: none; border: 0; background: var(--bad); color: #fff; cursor: pointer; font-size: 13px; font-weight: 650; padding: 8px 14px; border-radius: 999px; min-height: 34px; }
+  .history li.open .pill { display: none; }
+  .history li.open .del { display: inline-block; }
+  .more { display: block; width: calc(100% - 24px); margin: 6px 12px 10px; border: 0; border-radius: 12px; background: var(--surface-2); color: var(--text); font-weight: 600; padding: 12px; cursor: pointer; }
+  .footnote { color: var(--text-3); font-size: 12px; text-align: center; padding: 6px 18px 0; line-height: 1.5; }
+  .status { text-align: center; color: var(--text-3); padding: 40px; }
+
+  /* floating action button */
+  .fab {
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 20;
+    display: flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
+    background: var(--btn); color: var(--btn-ink); font-weight: 700; font-size: 16px; padding: 15px 26px 15px 20px; border-radius: 999px;
+    box-shadow: 0 10px 28px rgba(13,54,107,.38), 0 2px 6px rgba(0,0,0,.15);
+    transition: transform .15s;
+  }
+  .fab:active { transform: translateX(-50%) scale(.96); }
+  .fab svg { width: 20px; height: 20px; }
+
+  /* bottom sheet */
+  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.38); opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 30; }
+  .backdrop.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; margin: 0 auto; max-width: 560px;
+    background: var(--surface); border-radius: 26px 26px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,.2);
+    padding: 8px 18px calc(18px + env(safe-area-inset-bottom));
+    transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.9,.25,1); visibility: hidden;
+  }
+  .sheet.open { transform: translateY(0); visibility: visible; }
+  @media (min-width: 640px) {
+    .sheet { bottom: 50%; border-radius: 26px; transform: translateY(calc(50% + 30px)) scale(.98); opacity: 0; transition: transform .25s, opacity .2s; }
+    .sheet.open { transform: translateY(50%); opacity: 1; }
+  }
+  .grab { width: 38px; height: 5px; border-radius: 3px; background: var(--surface-3); margin: 2px auto 10px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .sheet-head h3 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
+  .x { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--surface-2); color: var(--text-2); cursor: pointer; display: grid; place-items: center; }
+  form.entry { display: grid; gap: 12px; }
+  .field { display: grid; gap: 6px; min-width: 0; }
+  .field label { font-size: 12.5px; color: var(--text-3); font-weight: 550; padding-left: 4px; }
+  .field input {
+    width: 100%; background: var(--surface-2); color: var(--text); border: 1.5px solid transparent;
+    border-radius: 14px; padding: 13px 14px; font-size: 17px; outline: none; min-height: 52px;
+    font-variant-numeric: tabular-nums; -webkit-appearance: none; appearance: none;
+  }
+  .field input:focus { border-color: var(--btn); background: var(--surface); }
+  .amount-wrap { position: relative; }
+  .amount-wrap .cur { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 22px; font-weight: 600; pointer-events: none; }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  .amount-wrap input { font-size: 28px; font-weight: 700; letter-spacing: -.02em; padding-left: 44px; min-height: 64px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  form.entry.mode-value .f-note { display: none; }
+  form.entry.mode-value .row2 { grid-template-columns: 1fr; }
+  button.primary {
+    background: var(--btn); color: var(--btn-ink); border: 0; border-radius: 16px; min-height: 54px;
+    font-size: 17px; font-weight: 700; cursor: pointer; transition: transform .1s, opacity .15s;
+  }
+  button.primary:active { transform: scale(.98); }
+  button.primary:disabled { opacity: .5; }
+  .form-hint { color: var(--text-3); font-size: 12.5px; padding: 0 4px; min-height: 18px; line-height: 1.45; }
+  .form-hint.err { color: var(--bad); }
+  .form-hint.ok { color: var(--good); }
+
+  .toast {
+    position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translate(-50%, -140%); z-index: 40;
+    background: var(--text); color: var(--bg); padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25); transition: transform .3s cubic-bezier(.2,.9,.25,1); max-width: calc(100% - 28px); text-align: center;
+  }
+  .toast { visibility: hidden; }
+  .toast.show { transform: translate(-50%, 0); visibility: visible; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#0d366b"/><path d="M96 380 C200 360 300 300 416 150" stroke="#6da7ec" stroke-width="22" fill="none" stroke-linecap="round" opacity=".55"/><path d="M96 380 C200 380 300 340 416 250" stroke="#3987e5" stroke-width="22" fill="none" stroke-linecap="round" opacity=".55"/><circle cx="170" cy="352" r="30" fill="#f07a45"/><circle cx="262" cy="318" r="30" fill="#f07a45"/><circle cx="352" cy="240" r="30" fill="#f07a45"/></svg>
+      Portfolio Pulse
+    </div>
+    <div class="currency-wrap"><select class="currency" id="currency" aria-label="Currency">
+      <option>EUR</option><option>USD</option><option>GBP</option><option>CHF</option><option>JPY</option>
+    </select></div>
+  </header>
+
+  <div id="app"><div class="status">Loading…</div></div>
+</div>
+
+<script>
+(async function () {
+  const $ = (s, el = document) => el.querySelector(s);
+  const app = $('#app');
+  const DAY = 86400000;
+  const YEAR = 365.25 * DAY;
+  const RATES = [1,2,3,4,5,6,7,8,9,10];
+
+  // Sequential blue ramp, ordinal: higher rate = stronger step.
+  const RAMP_LIGHT = ['#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#184f95','#104281','#0d366b'];
+  const RAMP_DARK  = ['#1c5cab','#256abf','#2a78d6','#3987e5','#5598e7','#6da7ec','#86b6ef','#9ec5f4','#b7d3f6','#cde2fb'];
+  const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+  const ramp = () => darkMQ.matches ? RAMP_DARK : RAMP_LIGHT;
+
+  // ---------- storage ----------
+  const db = window.lager && window.lager.use ? await window.lager.use('db') : null;
+  if (!db) {
+    app.innerHTML = '<div class="card status">Storage isn\'t available for this page. Open it from your Lager app link while signed in.</div>';
+    return;
+  }
+
+  function normalize(res) {
+    const arr = Array.isArray(res) ? res : (res && (res.docs || res.documents)) || [];
+    return arr.map(d => {
+      const data = typeof d.data === 'function' ? d.data() : (d.data !== undefined ? d.data : d);
+      return Object.assign({ id: d.id }, data || {});
+    });
+  }
+
+  let entries = [];
+  let deposits = [];   // added (+) or withdrawn (−) funds
+  let active = [];     // deposits after the first entry (they shift the growth lines)
+  let settings = { currency: 'EUR', horizon: null };
+
+  async function loadEntries() {
+    const [res, dres] = await Promise.all([db.collection('entries').get(), db.collection('deposits').get()]);
+    entries = normalize(res)
+      .filter(e => e && typeof e.value === 'number' && /^\d{4}-\d{2}-\d{2}$/.test(e.date || ''))
+      .map(e => ({ date: e.date, value: e.value, t: dateToT(e.date) }))
+      .sort((a, b) => a.t - b.t);
+    deposits = normalize(dres)
+      .filter(d => d && typeof d.amount === 'number' && d.amount !== 0 && /^\d{4}-\d{2}-\d{2}$/.test(d.date || ''))
+      .map(d => ({ id: d.key || d.id, date: d.date, t: dateToT(d.date), amount: d.amount, note: d.note || '' }))
+      .sort((a, b) => a.t - b.t);
+    active = entries.length ? deposits.filter(d => d.t > entries[0].t) : [];
+  }
+
+  // Value of the start amount plus every later deposit, each compounding at `rate` % per year.
+  // inclusive=false gives the value just before a deposit that lands exactly on t.
+  function model(rate, t, inclusive = true) {
+    const t0 = entries[0].t, g = 1 + rate / 100;
+    let v = entries[0].value * Math.pow(g, (t - t0) / YEAR);
+    for (const d of active) {
+      if (inclusive ? d.t <= t : d.t < t) v += d.amount * Math.pow(g, (t - d.t) / YEAR);
+    }
+    return v;
+  }
+  // Net funds added in the window (a, b]
+  const flowsBetween = (a, b) => deposits.reduce((s, d) => s + (d.t > a && d.t <= b ? d.amount : 0), 0);
+  // Growth between two value entries, with funds added in between taken out.
+  function periodChange(a, b) {
+    const flow = flowsBetween(a.t, b.t);
+    const base = a.value + flow;
+    return base > 0 ? (b.value - base) / base : 0;
+  }
+
+  // Annual rate r (in %) at which start value + deposits would reach the latest value.
+  function impliedRate() {
+    const last = entries[entries.length - 1];
+    const f = r => model(r, last.t) - last.value;
+    let lo = -99, hi = 1000;
+    if (f(lo) > 0 || f(hi) < 0) return null;
+    for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (f(mid) > 0) hi = mid; else lo = mid; }
+    return (lo + hi) / 200;
+  }
+  async function loadSettings() {
+    try {
+      const res = await db.doc('settings/main').get();
+      const data = res && (typeof res.data === 'function' ? res.data() : (res.data !== undefined ? res.data : res));
+      if (data && typeof data === 'object') settings = Object.assign(settings, data);
+    } catch (_) {}
+  }
+  async function saveSettings(patch) {
+    Object.assign(settings, patch);
+    try { await db.doc('settings/main').set({ currency: settings.currency, horizon: settings.horizon }); } catch (_) {}
+  }
+
+  // ---------- helpers ----------
+  function dateToT(s) { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d); }
+  function todayStr() {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+  }
+  const money = (v, compact) => {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency', currency: settings.currency,
+        notation: compact ? 'compact' : 'standard',
+        maximumFractionDigits: compact ? 1 : (Math.abs(v) >= 1000 ? 0 : 2)
+      }).format(v);
+    } catch (_) { return v.toFixed(0); }
+  };
+  const pct = (v, digits = 1) => (v >= 0 ? '+' : '−') + Math.abs(v * 100).toFixed(digits) + '%';
+  const fmtDate = (t, opts) => new Date(t).toLocaleDateString(undefined, Object.assign({ timeZone: 'UTC' }, opts || { day: 'numeric', month: 'short', year: 'numeric' }));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function durationLabel(days) {
+    if (days < 1) return 'today';
+    if (days < 60) return `${Math.round(days)} day${Math.round(days) === 1 ? '' : 's'}`;
+    if (days < 730) return `${Math.round(days / 30.44)} months`;
+    return `${(days / 365.25).toFixed(1)} years`;
+  }
+
+  // ---------- UI skeleton ----------
+  app.innerHTML = `
+    <div class="stack">
+      <section class="card hero" id="hero"></section>
+      <section class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Your growth</div>
+            <div class="chart-sub">vs. 1–10% per year</div>
+          </div>
+          <div class="seg" id="chips" role="group" aria-label="Projection horizon">
+            <button data-h="fit" type="button">Fit</button>
+            <button data-h="1" type="button">1Y</button>
+            <button data-h="5" type="button">5Y</button>
+            <button data-h="10" type="button">10Y</button>
+          </div>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="plot" id="plot"></div>
+      </section>
+      <section class="card history" id="history"></section>
+      <div class="footnote">Growth lines start at your first entry and compound yearly at 1% to 10%. Added or withdrawn funds move every line by that amount and are never counted as growth.</div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <button class="fab" id="fab" type="button" aria-label="New entry">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      New entry
+    </button>
+    <div class="backdrop" id="backdrop"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="grab"></div>
+      <div class="sheet-head">
+        <h3 id="sheet-title">New entry</h3>
+        <button class="x" id="close" type="button" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <form class="entry mode-value" id="form" autocomplete="off">
+        <div class="seg" id="mode" role="group" aria-label="Entry type">
+          <button data-mode="value" type="button" aria-pressed="true">Value</button>
+          <button data-mode="add" type="button" aria-pressed="false">Add funds</button>
+          <button data-mode="withdraw" type="button" aria-pressed="false">Withdraw</button>
+        </div>
+        <div class="field">
+          <label for="val" id="val-label">Current portfolio value</label>
+          <div class="amount-wrap"><span class="cur" id="cur-sym">€</span>
+            <input id="val" type="number" inputmode="decimal" step="any" min="0" placeholder="0" required></div>
+        </div>
+        <div class="row2">
+          <div class="field f-note">
+            <label for="note">Note</label>
+            <input id="note" type="text" maxlength="60" placeholder="Inheritance, gift…">
+          </div>
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" type="date">
+          </div>
+        </div>
+        <div class="form-hint" id="hint"></div>
+        <button class="primary" id="save" type="submit">Save value</button>
+      </form>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>`);
+
+  const form = $('#form'), valIn = $('#val'), dateIn = $('#date'), hint = $('#hint'), saveBtn = $('#save');
+  const noteIn = $('#note'), valLabel = $('#val-label');
+  const curSel = $('#currency');
+  const sheet = $('#sheet'), backdrop = $('#backdrop');
+  dateIn.value = todayStr();
+  dateIn.max = todayStr();
+
+  function curSymbol() {
+    try {
+      const p = new Intl.NumberFormat(undefined, { style: 'currency', currency: settings.currency }).formatToParts(0).find(x => x.type === 'currency');
+      return p ? p.value : settings.currency;
+    } catch (_) { return settings.currency; }
+  }
+  function openSheet(m) {
+    setMode(m || 'value');
+    dateIn.value = todayStr();
+    $('#cur-sym').textContent = curSymbol();
+    backdrop.classList.add('open'); sheet.classList.add('open');
+    setTimeout(() => valIn.focus({ preventScroll: true }), 280);
+  }
+  function closeSheet() { backdrop.classList.remove('open'); sheet.classList.remove('open'); valIn.blur(); }
+  $('#fab').addEventListener('click', () => openSheet('value'));
+  $('#close').addEventListener('click', closeSheet);
+  backdrop.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+  document.addEventListener('click', e => { if (e.target.closest('[data-open]')) openSheet(e.target.closest('[data-open]').dataset.open); });
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  const MODES = {
+    value: { label: 'Current portfolio value', save: 'Save value', title: 'New entry',
+             hint: "Saving again on the same date replaces that day's value." },
+    add: { label: 'Amount added', save: 'Add funds', title: 'Add funds',
+           hint: 'Moves every growth line up from this date. Not counted as growth.' },
+    withdraw: { label: 'Amount withdrawn', save: 'Withdraw funds', title: 'Withdraw funds',
+                hint: 'Moves every growth line down from this date. Not counted as a loss.' }
+  };
+  let mode = 'value';
+  function setMode(m) {
+    mode = m;
+    form.classList.toggle('mode-value', m === 'value');
+    form.classList.toggle('mode-funds', m !== 'value');
+    document.querySelectorAll('#mode button').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.mode === m)));
+    valLabel.textContent = MODES[m].label;
+    saveBtn.textContent = MODES[m].save;
+    $('#sheet-title').textContent = MODES[m].title;
+    setHint(MODES[m].hint);
+  }
+  $('#mode').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setMode(b.dataset.mode); });
+  setMode('value');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const v = parseFloat(String(valIn.value).replace(',', '.'));
+    const d = dateIn.value || todayStr();
+    if (!isFinite(v) || v <= 0) { setHint('Enter an amount above zero.', 'err'); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { setHint('Pick a valid date.', 'err'); return; }
+    const amount = Math.round(v * 100) / 100;
+    saveBtn.disabled = true;
+    try {
+      if (mode === 'value') {
+        await db.doc('entries/' + d).set({ date: d, value: amount, savedAt: Date.now() });
+        valIn.value = '';
+        await refresh();
+        closeSheet();
+        toast(`Saved ${money(amount)}`);
+      } else {
+        const signed = mode === 'add' ? amount : -amount;
+        const key = d + '-' + Math.random().toString(36).slice(2, 8);
+        await db.doc('deposits/' + key).set({ key, date: d, amount: signed, note: noteIn.value.trim().slice(0, 60), savedAt: Date.now() });
+        noteIn.value = ''; valIn.value = '';
+        await refresh();
+        const early = entries.length && dateToT(d) <= entries[0].t;
+        // Stay open in value mode: the natural next step is logging the new total.
+        setMode('value');
+        setHint(early
+          ? `Recorded. It's on or before your first entry, so it's already part of your starting value.`
+          : `${signed > 0 ? 'Added' : 'Withdrew'} ${money(amount)}. Now log your new total portfolio value, or close.`, 'ok');
+        valIn.focus({ preventScroll: true });
+      }
+    } catch (err) {
+      setHint('Could not save: ' + (err && err.message || err), 'err');
+    } finally { saveBtn.disabled = false; }
+  });
+  function setHint(text, cls) { hint.textContent = text; hint.className = 'form-hint ' + (cls || ''); }
+
+  curSel.addEventListener('change', async () => { await saveSettings({ currency: curSel.value }); renderAll(); });
+  $('#chips').addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b) return;
+    await saveSettings({ horizon: b.dataset.h });
+    renderAll();
+  });
+
+  // ---------- hero ----------
+  const HERO_FAN = `<svg class="hero-fan" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">${
+    [0,1,2,3,4,5,6,7,8,9].map(i => `<path d="M0 118 Q170 ${114 - i * 4} 300 ${104 - i * 11}" fill="none" stroke="#fff" stroke-width="1.4"/>`).join('')}</svg>`;
+
+  function renderHero() {
+    const hero = $('#hero');
+    if (!entries.length) {
+      hero.innerHTML = `${HERO_FAN}<div><div class="hero-label">Portfolio value</div><div class="hero-value num" style="opacity:.5">—</div>
+        <div class="hero-sub">Log today's value to set your starting point. Every growth line begins there.</div></div>
+        <button class="hero-cta" type="button" data-open="value">Log your first value</button>`;
+      return;
+    }
+    const first = entries[0], last = entries[entries.length - 1];
+    const days = (last.t - first.t) / DAY;
+    const added = flowsBetween(first.t, last.t);          // funds in/out, not growth
+    const invested = first.value + added;
+    const diff = last.value - invested;                    // market gain only
+    const total = invested > 0 ? diff / invested : 0;
+    const cls = diff >= 0 ? 'delta-up' : 'delta-down';
+    let cagrTxt = '—', paceTxt = '<small>after 30 days</small>';
+    if (days >= 30) {
+      const cagr = impliedRate();
+      if (cagr !== null) {
+        cagrTxt = pct(cagr);
+        const r = cagr * 100;
+        if (r < 1) paceTxt = 'Below 1%';
+        else if (r >= 10) paceTxt = 'Above 10%';
+        else paceTxt = `${Math.floor(r)}–${Math.floor(r) + 1}% <small>band</small>`;
+      }
+    } else cagrTxt = '<small>after 30 days</small>';
+    const prev = entries.length > 1 ? entries[entries.length - 2] : null;
+    let lastChg = '<small>first entry</small>';
+    if (prev) {
+      const c = periodChange(prev, last);
+      lastChg = `<span class="${c >= 0 ? 'delta-up' : 'delta-down'}">${pct(c)}</span> <small>since ${fmtDate(prev.t, { day: 'numeric', month: 'short' })}</small>`;
+    }
+    const addedTxt = added ? `<div class="hero-sub small num">${added > 0 ? '+' : '−'}${esc(money(Math.abs(added)))} ${added > 0 ? 'added' : 'withdrawn'} funds, not counted as growth</div>` : '';
+    hero.innerHTML = `${HERO_FAN}
+      <div>
+        <div class="hero-label">Portfolio value · ${esc(fmtDate(last.t))}</div>
+        <div class="hero-value num">${esc(money(last.value))}</div>
+        <div class="hero-sub num">${entries.length > 1
+          ? `<span class="${cls}">${diff >= 0 ? '+' : '−'}${esc(money(Math.abs(diff)))} (${pct(total)})</span> growth since ${esc(fmtDate(first.t, { day: 'numeric', month: 'short', year: 'numeric' }))}`
+          : 'Your starting point. Every growth line begins here.'}</div>
+        ${entries.length > 1 ? addedTxt : ''}
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Per year</div><div class="v num">${cagrTxt}</div></div>
+        <div class="stat"><div class="k">Pace</div><div class="v">${paceTxt}</div></div>
+        <div class="stat"><div class="k">Last change</div><div class="v num">${lastChg}</div></div>
+      </div>`;
+  }
+
+  // ---------- history ----------
+  function renderHistory() {
+    const el = $('#history');
+    if (!entries.length && !deposits.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    el.style.display = '';
+    const items = entries.map((e, i) => ({ kind: 'value', t: e.t, e, prev: entries[i - 1], order: 0 }))
+      .concat(deposits.map(d => ({ kind: 'fund', t: d.t, d, order: 1 })))
+      .sort((a, b) => b.t - a.t || b.order - a.order);
+    const rows = showAll ? items : items.slice(0, 8);
+    const dateFmt = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+    const countTxt = `${entries.length} ${entries.length === 1 ? 'value' : 'values'}${deposits.length ? ` · ${deposits.length} fund ${deposits.length === 1 ? 'change' : 'changes'}` : ''}`;
+    el.innerHTML = `<h2>History <small>${countTxt}</small></h2><ul>${
+      rows.map(it => {
+        if (it.kind === 'value') {
+          const { e, prev } = it;
+          const c = prev ? periodChange(prev, e) : 0;
+          return `
+          <li tabindex="0">
+            <span class="ico v"></span>
+            <span class="h-main"><div class="h-val">${esc(money(e.value))}</div><div class="h-sub">${esc(fmtDate(e.t, dateFmt))}</div></span>
+            <span><span class="pill ${prev ? (c >= 0 ? 'up' : 'down') : ''}">${prev ? pct(c) : 'Start'}</span>
+            <button class="del" data-kind="value" data-date="${e.date}" type="button">Delete</button></span>
+          </li>`;
+        }
+        const d = it.d;
+        return `
+          <li tabindex="0">
+            <span class="ico ${d.amount > 0 ? 'f' : 'w'}"></span>
+            <span class="h-main"><div class="h-val">${d.amount > 0 ? '+' : '−'}${esc(money(Math.abs(d.amount)))}</div>
+              <div class="h-sub">${esc(fmtDate(d.t, { day: 'numeric', month: 'short', year: '2-digit' }))} · ${d.note ? esc(d.note) : (d.amount > 0 ? 'Added funds' : 'Withdrawn')}</div></span>
+            <span><span class="pill">Funds</span>
+            <button class="del" data-kind="fund" data-id="${esc(d.id)}" type="button">Delete</button></span>
+          </li>`;
+      }).join('')}</ul>${items.length > 8 ? `<button class="more" id="more" type="button">${showAll ? 'Show less' : `Show all ${items.length}`}</button>` : ''}`;
+  }
+  let showAll = false;
+  $('#history').addEventListener('click', async ev => {
+    if (ev.target.closest('#more')) { showAll = !showAll; renderHistory(); return; }
+    const b = ev.target.closest('.del');
+    if (b) {
+      b.disabled = true; b.textContent = 'Deleting…';
+      const path = b.dataset.kind === 'fund' ? 'deposits/' + b.dataset.id : 'entries/' + b.dataset.date;
+      try { await db.doc(path).delete(); await refresh(); toast('Deleted'); }
+      catch (err) { b.disabled = false; b.textContent = 'Delete'; toast('Could not delete'); }
+      return;
+    }
+    // Tap a row to reveal its delete button; tap again to hide it.
+    const li = ev.target.closest('li'); if (!li) return;
+    const wasOpen = li.classList.contains('open');
+    document.querySelectorAll('#history li.open').forEach(x => x.classList.remove('open'));
+    if (!wasOpen) li.classList.add('open');
+  });
+
+  // ---------- chart ----------
+  const plot = $('#plot');
+  let plotHide = () => {};
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('#plot')) plotHide(); });
+  let lastW = 0;
+
+  function currentHorizon() {
+    if (settings.horizon) return settings.horizon;
+    if (!entries.length) return '1';
+    const span = (entries[entries.length - 1].t - entries[0].t) / DAY;
+    return span < 365 ? '1' : 'fit';
+  }
+
+  function niceStep(range, target) {
+    const raw = range / target;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const n = raw / mag;
+    return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
+  }
+
+  function dateTicks(t0, t1, maxTicks) {
+    const spanDays = (t1 - t0) / DAY;
+    const ticks = [];
+    const d0 = new Date(t0);
+    if (spanDays <= 45) {
+      const step = Math.max(1, Math.ceil(spanDays / maxTicks / 7)) * 7 * DAY;
+      for (let t = t0; t <= t1; t += step) ticks.push({ t, label: fmtDate(t, { day: 'numeric', month: 'short' }) });
+      return ticks;
+    }
+    if (spanDays <= 900) {
+      const months = Math.ceil(spanDays / 30.44);
+      const step = [1, 2, 3, 6, 12].find(s => months / s <= maxTicks) || 12;
+      let y = d0.getUTCFullYear(), m = d0.getUTCMonth() + 1;
+      m = Math.ceil(m / step) * step;
+      for (;;) {
+        const t = Date.UTC(y + Math.floor(m / 12), m % 12, 1);
+        if (t > t1) break;
+        if (t >= t0) {
+          const dt = new Date(t);
+          ticks.push({ t, label: dt.getUTCMonth() === 0 ? String(dt.getUTCFullYear()) : fmtDate(t, { month: 'short' }) });
+        }
+        m += step;
+      }
+      return ticks;
+    }
+    const years = spanDays / 365.25;
+    const step = [1, 2, 5, 10].find(s => years / s <= maxTicks) || 10;
+    let y = Math.ceil(d0.getUTCFullYear() / step) * step;
+    if (Date.UTC(y, 0, 1) < t0) y += step;
+    for (; Date.UTC(y, 0, 1) <= t1; y += step) ticks.push({ t: Date.UTC(y, 0, 1), label: String(y) });
+    return ticks;
+  }
+
+  function renderChart() {
+    const W = plot.clientWidth || 600;
+    lastW = W;
+    const H = Math.round(Math.max(W < 480 ? 340 : 300, Math.min(460, W * 0.6)));
+    const R = ramp();
+
+    $('#legend').innerHTML = `
+      <span class="item"><span class="ramp" style="background:linear-gradient(90deg, ${R[0]}, ${R[9]})"></span>1% → 10% per year</span>
+      <span class="item"><span class="dot"></span>Your portfolio</span>
+      ${active.length ? '<span class="item"><span class="tri"></span>Funds in/out</span>' : ''}`;
+
+    const h = currentHorizon();
+    document.querySelectorAll('#chips button').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.h === h)));
+
+    if (!entries.length) {
+      plot.innerHTML = `<div class="empty"><b>No data yet</b>Tap <b style="display:inline">New entry</b> to log your portfolio value. Your first entry becomes the starting point for the 1–10% growth lines.</div>`;
+      return;
+    }
+
+    const first = entries[0], last = entries[entries.length - 1];
+    const V0 = first.value, t0 = first.t;
+    let tEnd = last.t;
+    if (h !== 'fit') tEnd = Math.max(tEnd, t0 + Number(h) * YEAR);
+    if (tEnd - t0 < 30 * DAY) tEnd = t0 + 30 * DAY;
+    const proj = (rate, t, inclusive) => model(rate, t, inclusive);
+    const funds = active.filter(d => d.t <= tEnd);
+    const fundTimes = new Set(funds.map(d => d.t));
+
+    // y-domain
+    const checkTs = [t0, tEnd, ...funds.map(d => d.t)];
+    let yMin = Math.min(V0, ...entries.map(e => e.value), ...checkTs.flatMap(t => [proj(1, t, false), proj(1, t, true)]));
+    let yMax = Math.max(...entries.map(e => e.value), ...checkTs.flatMap(t => [proj(10, t, false), proj(10, t, true)]));
+    const pad = (yMax - yMin) * 0.06 || V0 * 0.02;
+    yMin -= pad; yMax += pad;
+    const yStep = niceStep(yMax - yMin, 5);
+    yMin = Math.floor(yMin / yStep) * yStep;
+    yMax = Math.ceil(yMax / yStep) * yStep;
+    if (yMin < 0) yMin = 0;
+
+    const narrow = W < 480;
+    const m = { l: narrow ? 52 : 64, r: narrow ? 38 : 46, t: 14, b: 30 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const x = t => m.l + (t - t0) / (tEnd - t0) * iw;
+    const y = v => m.t + (1 - (v - yMin) / (yMax - yMin)) * ih;
+    const tFromX = px => t0 + (px - m.l) / iw * (tEnd - t0);
+
+    const N = 90;
+    const samples = [...new Set(Array.from({ length: N + 1 }, (_, i) => t0 + (tEnd - t0) * i / N).concat([...fundTimes]))].sort((a, b) => a - b);
+    // Each point is [t, value]; at a funds date the line steps vertically.
+    const curve = rate => {
+      const pts = [];
+      samples.forEach(t => {
+        if (fundTimes.has(t)) { pts.push([t, proj(rate, t, false)]); pts.push([t, proj(rate, t, true), true]); }
+        else pts.push([t, proj(rate, t, true)]);
+      });
+      return pts;
+    };
+    const toD = (pts, gaps) => pts.map((p, i) => `${!i || (gaps && p[2]) ? 'M' : 'L'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join('');
+    const linePath = rate => toD(curve(rate), true);
+    const bandPath = toD(curve(10)) + curve(1).reverse().map(p => `L${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join('') + 'Z';
+
+    let svg = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Portfolio value over time against 1 to 10 percent annual growth lines">
+      <defs>
+        <linearGradient id="band" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="${R[0]}" stop-opacity="0.04"/>
+          <stop offset="1" stop-color="${R[9]}" stop-opacity="0.16"/>
+        </linearGradient>
+      </defs>`;
+
+    // grid + y ticks
+    for (let v = yMin; v <= yMax + yStep / 2; v += yStep) {
+      const yy = y(v).toFixed(1);
+      svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
+      svg += `<text class="tick" x="${m.l - 8}" y="${yy}" text-anchor="end" dominant-baseline="middle">${esc(money(v, true))}</text>`;
+    }
+    // x ticks
+    const xt = dateTicks(t0, tEnd, narrow ? 4 : 7);
+    xt.forEach(tk => {
+      svg += `<text class="tick" x="${x(tk.t).toFixed(1)}" y="${H - 8}" text-anchor="middle">${esc(tk.label)}</text>`;
+    });
+    // today marker if within future range
+    const now = dateToT(todayStr());
+    if (now > t0 && now < tEnd && tEnd - now > 7 * DAY) {
+      svg += `<line x1="${x(now)}" x2="${x(now)}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-3)" stroke-width="1" stroke-dasharray="2 4" opacity=".7"/>`;
+      svg += `<text class="tick" x="${x(now) + 4}" y="${m.t + 10}">Today</text>`;
+    }
+
+    // band + rate lines
+    svg += `<path d="${bandPath}" fill="url(#band)"/>`;
+    RATES.forEach((r, i) => {
+      svg += `<path d="${linePath(r)}" fill="none" stroke="${R[i]}" stroke-width="${r === 1 || r === 5 || r === 10 ? 2 : 1.5}" stroke-linecap="round" opacity="${r === 1 || r === 5 || r === 10 ? 1 : 0.85}"/>`;
+    });
+    // selective direct labels: 10%, 5%, 1%
+    const labelYs = [];
+    [10, 5, 1].forEach(r => {
+      const ly = y(proj(r, tEnd));
+      if (labelYs.some(o => Math.abs(o - ly) < 13)) return;
+      labelYs.push(ly);
+      svg += `<text class="rate-label" x="${W - m.r + 6}" y="${ly.toFixed(1)}" dominant-baseline="middle">${r}%</text>`;
+    });
+
+    // funds in/out: faint guide + marker on the baseline
+    funds.forEach(d => {
+      const fx = x(d.t).toFixed(1), by = m.t + ih;
+      svg += `<line x1="${fx}" x2="${fx}" y1="${m.t}" y2="${by}" stroke="var(--fund)" stroke-width="1" stroke-dasharray="1 4" opacity=".7"/>`;
+      svg += d.amount > 0
+        ? `<path d="M${fx},${by - 13} l6.5,10 h-13 z" fill="var(--fund)" stroke="var(--surface)" stroke-width="2" stroke-linejoin="round"/>`
+        : `<path d="M${fx},${by - 3} l6.5,-10 h-13 z" fill="var(--fund)" stroke="var(--surface)" stroke-width="2" stroke-linejoin="round"/>`;
+    });
+
+    // actual values: faint connector + dots
+    if (entries.length > 1) {
+      svg += `<path d="${entries.map((e, i) => `${i ? 'L' : 'M'}${x(e.t).toFixed(1)},${y(e.value).toFixed(1)}`).join('')}" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity=".35" stroke-linejoin="round"/>`;
+    }
+    const dotR = entries.length > 120 ? 3.5 : 5;
+    entries.forEach((e, i) => {
+      const isLast = i === entries.length - 1;
+      svg += `<circle cx="${x(e.t).toFixed(1)}" cy="${y(e.value).toFixed(1)}" r="${isLast ? dotR + 1.5 : dotR}" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`;
+    });
+
+    // hover layer
+    svg += `<g id="hover" style="display:none">
+      <line id="hx" y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-3)" stroke-width="1"/>
+      <circle id="hdot" r="${dotR + 3}" fill="none" stroke="var(--accent)" stroke-width="2"/>
+    </g>
+    <rect id="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>
+    </svg>`;
+
+    plot.innerHTML = svg + `<div class="tooltip" id="tip"></div>`;
+
+    const svgEl = plot.querySelector('svg');
+    const hover = svgEl.querySelector('#hover'), hx = svgEl.querySelector('#hx'), hdot = svgEl.querySelector('#hdot');
+    const tip = plot.querySelector('#tip');
+
+    function showAt(clientX) {
+      const rect = svgEl.getBoundingClientRect();
+      const px = (clientX - rect.left) * (W / rect.width);
+      let t = Math.min(tEnd, Math.max(t0, tFromX(px)));
+      // snap to nearest entry if within 14px
+      let near = null, best = Infinity;
+      entries.forEach(e => { const d = Math.abs(x(e.t) - px); if (d < best) { best = d; near = e; } });
+      let fnear = null, fbest = Infinity;
+      funds.forEach(f => { const d = Math.abs(x(f.t) - px); if (d < fbest) { fbest = d; fnear = f; } });
+      const snapped = near && best < 14 ? near : null;
+      const fsnap = fnear && fbest < 14 && (!snapped || fbest <= best) ? fnear : null;
+      if (snapped && (!fsnap || snapped.t === fsnap.t)) t = snapped.t; else if (fsnap) t = fsnap.t;
+      const fundsHere = funds.filter(f => f.t === t);
+      const cx = x(t);
+      hover.style.display = '';
+      hx.setAttribute('x1', cx); hx.setAttribute('x2', cx);
+      if (snapped && snapped.t === t) { hdot.style.display = ''; hdot.setAttribute('cx', cx); hdot.setAttribute('cy', y(snapped.value)); }
+      else hdot.style.display = 'none';
+
+      const rows = [];
+      fundsHere.forEach(f => rows.push(`<div class="row"><span class="l"><span class="sw tri"></span>${f.amount > 0 ? 'Added' : 'Withdrawn'}${f.note ? ' · ' + esc(f.note) : ''}</span><span class="r">${f.amount > 0 ? '+' : '−'}${esc(money(Math.abs(f.amount)))}</span></div>`));
+      if (snapped && snapped.t === t) rows.push(`<div class="row"><span class="l"><span class="sw dot"></span>You</span><span class="r">${esc(money(snapped.value))}</span></div>`);
+      (narrow ? [10, 5, 1] : [10, 7, 5, 3, 1]).forEach(r => {
+        rows.push(`<div class="row"><span class="l"><span class="sw" style="background:${R[r - 1]}"></span>${r}% / yr</span><span class="r">${esc(money(proj(r, t)))}</span></div>`);
+      });
+      tip.innerHTML = `<div class="t-date">${esc(fmtDate(t))}</div>${rows.join('')}`;
+      tip.style.opacity = '1';
+      const scale = rect.width / W;
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      let left = cx * scale + 14;
+      if (left + tw > rect.width) left = cx * scale - tw - 14;
+      const top = Math.max(0, Math.min((m.t + 6) * scale, rect.height - th));
+      tip.style.left = Math.max(0, left) + 'px';
+      tip.style.top = top + 'px';
+    }
+    function hide() { hover.style.display = 'none'; tip.style.opacity = '0'; }
+    const hit = svgEl.querySelector('#hit');
+    hit.addEventListener('pointermove', ev => showAt(ev.clientX));
+    hit.addEventListener('pointerdown', ev => showAt(ev.clientX));
+    hit.addEventListener('pointerleave', ev => { if (ev.pointerType !== 'touch') hide(); });
+    plotHide = hide;
+  }
+
+  function renderAll() {
+    curSel.value = settings.currency;
+    renderHero();
+    renderChart();
+    renderHistory();
+  }
+
+  async function refresh() {
+    await loadEntries();
+    renderAll();
+  }
+
+  new ResizeObserver(() => { if (Math.abs((plot.clientWidth || 0) - lastW) > 2) renderChart(); }).observe(plot);
+  darkMQ.addEventListener && darkMQ.addEventListener('change', renderChart);
+
+  try {
+    await Promise.all([loadSettings(), loadEntries()]);
+    if (![...curSel.options].some(o => o.value === settings.currency)) settings.currency = 'EUR';
+    renderAll();
+  } catch (err) {
+    app.innerHTML = `<div class="card status">Could not load your data: ${esc(err && err.message || err)}</div>`;
+    return;
+  }
+
+  // Live updates from other devices, if supported
+  try {
+    const col = db.collection('entries');
+    if (typeof col.onSnapshot === 'function') col.onSnapshot(() => { loadEntries().then(renderAll).catch(() => {}); });
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

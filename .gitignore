@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+.DS_Store
+# Private terms for the local privacy scan. Never commit this file.
+.privacy-denylist

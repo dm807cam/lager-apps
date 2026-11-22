@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deutsch-Dino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#8fd96b;--ink:#1f2a1c;--card:#fff;--go:#2fbf5b;--coral:#ff7a45;--sky:#2f80ed;--soft:#fff4c2;--gold:#ffcc33;--kh:clamp(52px,8vh,74px)}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.4 "Baloo 2",ui-rounded,"Trebuchet MS",system-ui,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{height:100%;display:flex;flex-direction:column;max-width:1180px;margin:0 auto;padding:env(safe-area-inset-top,0) max(10px,env(safe-area-inset-right,0)) env(safe-area-inset-bottom,0) max(10px,env(safe-area-inset-left,0))}
+.top{display:flex;align-items:center;gap:8px;padding:8px 0}
+.lvl{flex:none;width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:var(--coral);color:#fff;font-weight:800;font-size:22px;box-shadow:0 3px 0 var(--ink);display:grid;place-items:center}
+.xpw{flex:1;display:flex;flex-direction:column;gap:2px}
+.ttl{font-weight:800;font-size:15px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xpb{height:12px;border:3px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden}
+.xpb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd166,#ff7a45);transition:width .5s}
+.pill{flex:none;display:flex;align-items:center;gap:4px;height:38px;padding:0 10px;border:3px solid var(--ink);border-radius:20px;background:#fff;font-weight:800;font-size:17px;white-space:nowrap}
+.pill.fire{background:#ffe1d6}
+.pill.fire.hot{background:#ff9a3c;color:#fff}
+.coin{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3a6,var(--gold) 55%,#d99a00);border:2px solid #8a5a00;flex:none}
+.ring{width:22px;height:22px;flex:none}
+.menu{flex:none;width:44px;height:44px;border-radius:14px;border:3px solid var(--ink);background:#fff;font-size:22px;font-weight:800;box-shadow:0 3px 0 var(--ink)}
+main{flex:1;min-height:0;display:grid;grid-template-rows:minmax(150px,1fr) auto auto;gap:10px;padding-bottom:10px}
+.arena{position:relative;border:4px solid var(--ink);border-radius:24px;overflow:hidden;box-shadow:0 5px 0 var(--ink);background:#9fe0ff}
+.arena>svg.scene{position:absolute;inset:0;width:100%;height:100%}
+.wtag{position:absolute;left:10px;top:10px;max-width:44%;background:rgba(255,255,255,.92);border:3px solid var(--ink);border-radius:14px;padding:2px 10px 3px;font-weight:800;font-size:15px;line-height:1.2}
+.wtag small{display:block;font-size:13px;font-weight:700;opacity:.8;white-space:nowrap}
+.mhud{position:absolute;right:10px;top:10px;width:min(50%,300px);background:rgba(255,255,255,.94);border:3px solid var(--ink);border-radius:14px;padding:3px 10px 6px}
+.mname{font-weight:800;font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp{height:20px;border:3px solid var(--ink);border-radius:9px;background:#f3ead8;overflow:hidden;position:relative}
+.hp i{display:block;height:100%;background:linear-gradient(#ffe7a8,#e8b64c);transition:width .35s}
+.hp b{position:absolute;inset:0;font-size:13px;line-height:14px;text-align:center}
+.buddy{position:absolute;left:3%;bottom:3%;height:66%;aspect-ratio:1;max-width:46%}
+.buddy svg{width:100%;height:100%;display:block;overflow:visible}
+.hat{position:absolute;transform:translate(-50%,-80%);font-size:clamp(22px,5vh,46px);line-height:1;pointer-events:none}
+.hat.eye{transform:translate(-50%,-50%);font-size:clamp(14px,3vh,26px)}
+.nest{position:absolute;right:4%;bottom:2%;height:64%;aspect-ratio:1;max-width:46%}
+.nest svg{width:100%;height:100%;display:block;overflow:visible}
+.bubble{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-weight:800;font-size:clamp(28px,5.5vh,48px);color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke;text-shadow:0 4px 0 var(--ink);white-space:nowrap;pointer-events:none;opacity:0;z-index:4}
+.bubble.show{animation:pop 1s ease-out forwards}
+.fly{position:absolute;font-size:30px;pointer-events:none;z-index:3}
+.card{background:var(--card);border:4px solid var(--ink);border-radius:24px;box-shadow:0 5px 0 var(--ink);padding:8px 12px 10px}
+.card.good{background:#ddffe6}
+.card.bad{animation:shake .4s}
+.crow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;font-weight:800;background:var(--soft);border:2px solid var(--ink);border-radius:10px;padding:0 8px;line-height:1.6}
+.chip.again{background:#ffd6f0}
+.stinfo{margin-left:auto;font-size:13px;font-weight:700;opacity:.75}
+.say{width:44px;height:36px;border-radius:12px;border:3px solid var(--ink);background:#fff;font-size:18px;display:grid;place-items:center;padding:0}
+.q{text-align:center;font-weight:800;font-size:clamp(20px,3.4vh,28px);line-height:1.3;padding:4px 0;overflow-wrap:anywhere}
+.q .pic{display:block;font-size:clamp(44px,8vh,72px);line-height:1.1}
+.q .big{display:block;font-size:clamp(30px,5.6vh,48px);line-height:1.2;margin-top:2px}
+.q mark{background:#ffe066;border-radius:6px;padding:0 4px;text-decoration:underline 3px;text-underline-offset:4px}
+.slot{display:inline-block;min-width:1.3em;padding:0 .2em;border:3px dashed var(--sky);border-radius:10px;color:var(--sky);line-height:1.15;text-align:center}
+.slot.ok{border-style:solid;border-color:var(--go);color:#14833f;background:#eafff1}
+.slot.no{border-style:solid;border-color:var(--coral);color:#c0392b;background:#fff0ee}
+.letters{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:6px}
+.letters span{width:clamp(30px,5vh,42px);height:clamp(38px,6vh,50px);border-bottom:4px solid var(--ink);font-size:clamp(24px,4.4vh,36px);font-weight:800;display:grid;place-items:center}
+.letters span.on{color:#14833f}
+.fb{min-height:1.4em;text-align:center;font-weight:700;font-size:16px}
+.fb.bad{color:#c0392b}
+.ctrl{display:grid;min-height:calc(var(--kh)*2 + 14px)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(var(--kh),auto);gap:10px;padding-bottom:4px}
+.choices.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.choices.long{grid-template-columns:minmax(0,1fr)}
+.key{min-height:var(--kh);border:3px solid var(--ink);border-radius:18px;background:#fff;box-shadow:0 4px 0 var(--ink);font-size:clamp(22px,3.8vh,32px);font-weight:800;line-height:1.15;padding:4px 8px}
+.long .key{font-size:clamp(17px,2.6vh,21px);text-align:left;padding:8px 14px;font-weight:700}
+.emo .key{font-size:clamp(38px,7vh,60px)}
+.key:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.key.wrong{background:#ffd0c4;opacity:.55}
+.key.right{background:var(--go);color:#fff}
+.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;align-content:start}
+.tile{width:clamp(48px,7.6vh,64px);height:clamp(52px,8vh,68px);border:3px solid var(--ink);border-radius:14px;background:#fff8dc;box-shadow:0 4px 0 var(--ink);font-size:clamp(26px,4.6vh,36px);font-weight:800}
+.tile.used{visibility:hidden}
+.tile.err{background:#ffd0c4;animation:shake .35s}
+.bigbtn{min-height:clamp(64px,10vh,90px);border:3px solid var(--ink);border-radius:20px;background:var(--sky);color:#fff;font-size:28px;font-weight:800;box-shadow:0 5px 0 var(--ink);width:100%}
+.bigbtn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.bigbtn.go{background:var(--go)}
+.bigbtn.coral{background:var(--coral)}
+#weiter{height:calc(100% - 5px);font-size:clamp(28px,5vh,44px)}
+[hidden]{display:none!important}
+@media (min-width:860px) and (min-aspect-ratio:1/1){
+main{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+.arena{grid-row:1/3;min-height:420px}
+.card{display:flex;flex-direction:column}
+.card .q{flex:1;display:flex;flex-direction:column;justify-content:center}
+.q{font-size:clamp(24px,3.6vh,32px)}
+.ctrl{align-self:start}
+}
+@media (max-width:420px){.ttl{font-size:13px}.pill{padding:0 7px;font-size:15px;height:34px;gap:3px}.lvl{width:40px;height:40px;font-size:19px}.menu{width:40px;height:40px}#dayP b{display:none}}
+.ov{position:fixed;inset:0;background:rgba(31,42,28,.62);display:flex;align-items:center;justify-content:center;padding:12px;z-index:20}
+.sheet{background:#fff;border:4px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);width:min(560px,100%);max-height:92%;overflow:auto;padding:16px 16px 18px;position:relative}
+.sheet h2{margin:0 0 6px;font-size:32px;line-height:1.05}
+.sheet p{margin:4px 0 10px}
+.x{position:absolute;right:10px;top:10px;width:44px;height:44px;border-radius:14px;border:3px solid var(--ink);background:#fff;font-size:22px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+.item{border:3px solid var(--ink);border-radius:18px;background:var(--soft);padding:6px 4px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.item .e{font-size:44px;line-height:1.1}
+.item .n{font-weight:800;font-size:14px;line-height:1.15}
+.item small{font-size:13px;line-height:1.2}
+.item button{margin-top:4px;min-height:36px;width:100%;border:3px solid var(--ink);border-radius:12px;background:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:4px}
+.item.sel{background:#ddffe6}
+.item.locked{opacity:.6}
+.item svg{width:80px;height:80px}
+.item.r1{border-color:#2f80ed}
+.item.r2{border-color:#8b5cf6;background:#f1eaff}
+.item.r3{border-color:#e07000;background:linear-gradient(#fff7cf,#ffd98a)}
+.item.sil{background:#f2f2f2;border-style:dashed}
+.item.sil svg{filter:brightness(0);opacity:.18}
+.rar{display:inline-block;font-size:12px;font-weight:800;border-radius:8px;padding:0 6px;margin-left:6px;color:#fff;line-height:1.5;vertical-align:2px}
+.rar.r0{background:#8a8f98}.rar.r1{background:#2f80ed}.rar.r2{background:#8b5cf6}.rar.r3{background:#ff7a00}.rar.new{background:#ff3d7f}
+.tabs{display:flex;gap:8px;margin:6px 0 12px}
+.tabs button{flex:1;min-height:44px;border:3px solid var(--ink);border-radius:14px;background:#fff;font-weight:800}
+.tabs button.on{background:var(--ink);color:#fff}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.mgrid button{min-height:84px;border:3px solid var(--ink);border-radius:18px;background:var(--soft);box-shadow:0 4px 0 var(--ink);font-weight:800;font-size:18px;line-height:1.2}
+.mgrid button span{display:block;font-size:30px}
+.badge{display:flex;align-items:center;gap:10px;padding:8px 10px;border:3px solid var(--ink);border-radius:16px;margin-bottom:8px;background:#fff}
+.badge .e{font-size:32px;flex:none;width:44px;text-align:center}
+.badge.off{opacity:.45;filter:grayscale(1)}
+.badge b{display:block;line-height:1.1}
+.badge small{font-size:14px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:16px 0 8px;font-size:20px;font-weight:800}
+.sec small{font-size:15px;font-weight:700}
+.prog{height:14px;border:3px solid var(--ink);border-radius:9px;background:#fff;overflow:hidden;margin:6px 0 4px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,#2fbf5b,#ff7a00)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 12px}
+.seg button{min-width:48px;min-height:44px;border:3px solid var(--ink);border-radius:12px;background:#fff;font-weight:800;font-size:18px}
+.seg button.on{background:var(--sky);color:#fff}
+label.l{font-weight:800;display:block;margin-top:8px}
+input.t{font:inherit;font-size:20px;font-weight:700;width:100%;padding:8px 12px;border:3px solid var(--ink);border-radius:14px;min-height:50px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{padding:4px 6px;border-bottom:2px solid #eee;text-align:left}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meter{height:10px;border-radius:6px;background:#eee;overflow:hidden;min-width:50px}
+.meter i{display:block;height:100%;background:var(--go)}
+.center{text-align:center}
+.reveal{width:min(190px,48vw);display:block;margin:0 auto}
+.start-dino{width:min(190px,46vw);display:block;margin:0 auto}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:800;padding:8px 16px;border-radius:18px;z-index:30;max-width:calc(100% - 24px);text-align:center;animation:drop .3s ease-out}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+.buddy .body{transform-origin:100px 190px;animation:breathe 2.6s ease-in-out infinite}
+.buddy.cheer .body{animation:hop .45s}
+.nest .egg{transform-origin:100px 175px}
+.nest.hit .egg{animation:wob .45s}
+.nest.laugh .egg{animation:wiggle .6s}
+.nest.gone .egg{animation:gone .6s forwards}
+.nest.enter .egg{animation:enter .5s ease-out}
+@keyframes breathe{50%{transform:scale(1.02,.98)}}
+@keyframes hop{40%{transform:translateY(-16px)}}
+@keyframes wob{25%{transform:rotate(-9deg)}60%{transform:rotate(7deg)}85%{transform:rotate(-3deg)}}
+@keyframes wiggle{20%{transform:translateY(-10px)}40%{transform:translateY(0)}60%{transform:translateY(-6px)}}
+@keyframes gone{to{transform:scale(1.3);opacity:0}}
+@keyframes enter{from{transform:translateY(-120%)}}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes drop{from{transform:translate(-50%,-20px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.buddy .body,.nest .egg{animation:none!important}.bubble.show{animation-duration:1.4s}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <button class="lvl" id="lvlBtn" aria-label="Level"><span id="lvlN">1</span></button>
+    <div class="xpw"><div class="ttl" id="lvlT">Ei-Entdecker</div><div class="xpb"><i id="xpF"></i></div></div>
+    <div class="pill" title="Münzen"><span class="coin"></span><b id="coinN">0</b></div>
+    <div class="pill fire" id="comboP" title="Richtig in Folge">🔥<b id="comboN">0</b></div>
+    <div class="pill" id="dayP" title="Tagesziel"><svg class="ring" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8" fill="none" stroke="#eee" stroke-width="5"/><circle id="dayRing" cx="11" cy="11" r="8" fill="none" stroke="#2fbf5b" stroke-width="5" stroke-dasharray="0 60" transform="rotate(-90 11 11)" stroke-linecap="round"/></svg><b id="dayN">0/25</b></div>
+    <button class="menu" id="menuBtn" aria-label="Menü">☰</button>
+  </header>
+  <main>
+    <section class="arena" id="arena">
+      <svg class="scene" id="scene" viewBox="0 0 800 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+      <div class="wtag" id="wtag">Farnwald</div>
+      <div class="mhud"><div class="mname" id="mname">Dino-Ei</div><div class="hp"><i id="hpF" style="width:100%"></i><b id="hpT"></b></div></div>
+      <div class="buddy" id="buddy"></div>
+      <div class="nest" id="nest"></div>
+      <div class="bubble" id="bubble"></div>
+    </section>
+    <section class="card" id="card">
+      <div class="crow"><span class="chip" id="topic">Anlaute</span><span class="chip again" id="again" hidden>Nochmal!</span><span class="stinfo" id="stinfo">Klasse 1 · Stufe 1</span><button class="say" id="say" aria-label="Aufgabe vorlesen">🔊</button></div>
+      <div class="q" id="q"></div>
+      <div class="fb" id="fb"></div>
+    </section>
+    <section class="ctrl">
+      <div class="choices" id="choices"></div>
+      <div class="tiles" id="tiles" hidden></div>
+      <button class="bigbtn go" id="weiter" hidden>Weiter ➜</button>
+    </section>
+  </main>
+</div>
+<div class="ov" id="ov" hidden><div class="sheet" id="sheet"></div></div>
+<canvas id="fx"></canvas>
+<script>
+{
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const P=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pickN=(arr,n)=>shuffle(arr.slice()).slice(0,n);
+const rng=seed=>{let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647)/2147483647};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=(o=0)=>{const d=new Date();d.setDate(d.getDate()+o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lc=s=>s.toLowerCase();
+
+/* ---------- word data ---------- */
+// [Wort, Artikel, Mehrzahl (null = keine Aufgabe), Bild, Silben]
+const N=[['Hund','der','Hunde','🐶',1],['Katze','die','Katzen','🐱',2],['Maus','die','Mäuse','🐭',1],['Haus','das','Häuser','🏠',1],['Baum','der','Bäume','🌳',1],['Apfel','der','Äpfel','🍎',2],['Banane','die','Bananen','🍌',3],['Ball','der','Bälle','⚽',1],['Auto','das','Autos','🚗',2],['Fisch','der','Fische','🐟',1],['Sonne','die','Sonnen','☀️',2],['Mond','der','Monde','🌙',1],['Stern','der','Sterne','⭐',1],['Blume','die','Blumen','🌸',2],['Vogel','der','Vögel','🐦',2],['Buch','das','Bücher','📖',1],['Schiff','das','Schiffe','🚢',1],['Hase','der','Hasen','🐰',2],['Igel','der','Igel','🦔',2],['Ente','die','Enten','🦆',2],['Eis','das',null,'🍦',1],['Tomate','die','Tomaten','🍅',3],['Kuchen','der','Kuchen','🍰',2],['Uhr','die','Uhren','⏰',1],['Schuh','der','Schuhe','👟',1],['Hut','der','Hüte','🎩',1],['Bär','der','Bären','🐻',1],['Löwe','der','Löwen','🦁',2],['Affe','der','Affen','🐒',2],['Elefant','der','Elefanten','🐘',3],['Schlange','die','Schlangen','🐍',2],['Pferd','das','Pferde','🐴',1],['Kuh','die','Kühe','🐮',1],['Schwein','das','Schweine','🐷',1],['Frosch','der','Frösche','🐸',1],['Rakete','die','Raketen','🚀',3],['Zug','der','Züge','🚂',1],['Fahrrad','das','Fahrräder','🚲',2],['Brot','das','Brote','🍞',1],['Käse','der',null,'🧀',2],['Ei','das','Eier','🥚',1],['Kerze','die','Kerzen','🕯️',2],['Gitarre','die','Gitarren','🎸',3],['Trommel','die','Trommeln','🥁',2],['Schere','die','Scheren','✂️',2],['Lampe','die','Lampen','💡',2],['Tasse','die','Tassen','☕',2],['Krone','die','Kronen','👑',2],['Schnecke','die','Schnecken','🐌',2],['Biene','die','Bienen','🐝',2],['Wolke','die','Wolken','☁️',2],['Regenschirm','der','Regenschirme','☂️',3],['Erdbeere','die','Erdbeeren','🍓',3],['Kirsche','die','Kirschen','🍒',2],['Zitrone','die','Zitronen','🍋',3],['Pinguin','der','Pinguine','🐧',3],['Eule','die','Eulen','🦉',2],['Schildkröte','die','Schildkröten','🐢',3],['Dinosaurier','der','Dinosaurier','🦕',5],['Telefon','das','Telefone','☎️',3],['Tiger','der','Tiger','🐯',2],['Wal','der','Wale','🐳',1],['Krokodil','das','Krokodile','🐊',3],['Kamel','das','Kamele','🐫',2],['Giraffe','die','Giraffen','🦒',3],['Zebra','das','Zebras','🦓',2],['Karotte','die','Karotten','🥕',3],['Pilz','der','Pilze','🍄',1],['Herz','das','Herzen','❤️',1],['Geschenk','das','Geschenke','🎁',2],['Ballon','der',null,'🎈',2],['Schlüssel','der','Schlüssel','🔑',2],['Bus','der',null,'🚌',1],['Flugzeug','das','Flugzeuge','✈️',2],['Teddy','der','Teddys','🧸',2],['Pizza','die',null,'🍕',2],['Nase','die','Nasen','👃',2],['Ohr','das','Ohren','👂',1],['Hand','die','Hände','✋',1],['Mund','der','Münder','👄',1],['Fuß','der','Füße','🦶',1]];
+const simpleStart=w=>!/^(Sch|Ei|Eu|Au|St|Sp|Pf|Ch|Qu|Ä|Ö|Ü)/.test(w);
+const VERBS=['laufen','springen','essen','trinken','schlafen','lesen','schreiben','malen','spielen','singen','tanzen','schwimmen','lachen','rennen','kochen','bauen','fliegen','rufen','werfen','fahren','klettern','hüpfen','weinen','träumen','putzen'];
+const ADJS=['groß','klein','schnell','langsam','laut','leise','warm','kalt','schön','lustig','traurig','bunt','hell','dunkel','nass','trocken','dick','dünn','alt','jung','süß','sauer','weich','hart','stark','müde','rot','grün','frech','leicht','schwer'];
+const PRON=['ich','du','er','sie','es','wir','ihr'];
+const PREP=['auf','unter','neben','hinter','in','mit','über','vor','zwischen'];
+const RHYME=[['Haus','Maus','Laus'],['Hand','Sand','Wand','Band'],['Baum','Traum','Schaum','Raum'],['Hose','Rose','Dose'],['Tasche','Flasche'],['Katze','Tatze','Glatze'],['Kanne','Tanne','Pfanne','Wanne'],['Hund','Mund'],['Nase','Hase','Vase'],['Fisch','Tisch'],['Kuh','Schuh'],['Ball','Stall','Knall'],['Bein','Stein','Schwein'],['Sonne','Tonne'],['Igel','Spiegel','Ziegel'],['Hut','Mut'],['Schnecke','Decke','Ecke'],['Brot','Boot'],['Kerze','Herz'],['Mond','Thron']].filter(g=>g[0]!=='Kerze'&&g[0]!=='Mond');
+const OPP=[['groß','klein'],['laut','leise'],['warm','kalt'],['schnell','langsam'],['hell','dunkel'],['nass','trocken'],['dick','dünn'],['alt','jung'],['oben','unten'],['voll','leer'],['lang','kurz'],['schwer','leicht'],['hart','weich'],['früh','spät'],['viel','wenig'],['Tag','Nacht'],['lachen','weinen'],['fröhlich','traurig'],['sauber','schmutzig'],['stark','schwach'],['süß','sauer'],['offen','zu'],['vorne','hinten'],['innen','außen']];
+const CONF={a:['o','e','d'],b:['d','p','h'],d:['b','q','p'],e:['a','c','o'],f:['t','l','k'],g:['q','y','p'],h:['n','b','k'],k:['h','x','l'],l:['i','t','f'],m:['n','w','u'],n:['m','u','h'],r:['n','v','t'],s:['z','c','x'],t:['f','l','i'],u:['n','v','w'],w:['m','v','u'],i:['l','j','t'],o:['a','c','e']};
+// [Grundform, ich (Präsens), ich (Präteritum), Hilfsverb, Partizip]
+const TENSE=[['gehen','gehe','ging','bin','gegangen'],['laufen','laufe','lief','bin','gelaufen'],['essen','esse','aß','habe','gegessen'],['trinken','trinke','trank','habe','getrunken'],['schreiben','schreibe','schrieb','habe','geschrieben'],['lesen','lese','las','habe','gelesen'],['singen','singe','sang','habe','gesungen'],['schwimmen','schwimme','schwamm','bin','geschwommen'],['fahren','fahre','fuhr','bin','gefahren'],['spielen','spiele','spielte','habe','gespielt'],['malen','male','malte','habe','gemalt'],['lachen','lache','lachte','habe','gelacht'],['springen','springe','sprang','bin','gesprungen'],['sehen','sehe','sah','habe','gesehen'],['kommen','komme','kam','bin','gekommen'],['finden','finde','fand','habe','gefunden'],['schlafen','schlafe','schlief','habe','geschlafen'],['rufen','rufe','rief','habe','gerufen'],['bauen','baue','baute','habe','gebaut'],['tanzen','tanze','tanzte','habe','getanzt'],['fliegen','fliege','flog','bin','geflogen'],['werfen','werfe','warf','habe','geworfen'],['kochen','koche','kochte','habe','gekocht'],['helfen','helfe','half','habe','geholfen'],['denken','denke','dachte','habe','gedacht'],['bringen','bringe','brachte','habe','gebracht']];
+const STEIG=[['groß','größer','am größten'],['klein','kleiner','am kleinsten'],['schnell','schneller','am schnellsten'],['alt','älter','am ältesten'],['jung','jünger','am jüngsten'],['lang','länger','am längsten'],['warm','wärmer','am wärmsten'],['kalt','kälter','am kältesten'],['gut','besser','am besten'],['viel','mehr','am meisten'],['hoch','höher','am höchsten'],['stark','stärker','am stärksten'],['laut','lauter','am lautesten'],['schön','schöner','am schönsten'],['gern','lieber','am liebsten']];
+// [Wort 1, Wort 2, zusammen, Artikel des 2. Worts]
+const COMP=[['Haus','Tür','Haustür','die'],['Apfel','Baum','Apfelbaum','der'],['Schnee','Mann','Schneemann','der'],['Fuß','Ball','Fußball','der'],['Hand','Schuh','Handschuh','der'],['Zahn','Bürste','Zahnbürste','die'],['Feuer','Wehr','Feuerwehr','die'],['Tisch','Bein','Tischbein','das'],['Baum','Haus','Baumhaus','das'],['Eis','Bär','Eisbär','der'],['Sand','Burg','Sandburg','die'],['Kinder','Zimmer','Kinderzimmer','das'],['Blumen','Topf','Blumentopf','der'],['Wasser','Flasche','Wasserflasche','die'],['Spiel','Platz','Spielplatz','der'],['Regen','Bogen','Regenbogen','der'],['Fenster','Bank','Fensterbank','die'],['Schul','Buch','Schulbuch','das']];
+const GAP={
+ieei:['B[ie|ei]ne','Br[ie|ei]f','Sp[ie|ei]gel','Z[ie|ei]ge','W[ie|ei]se','R[ie|ei]se','Fl[ie|ei]ge','T[ie|ei]r','Pap[ie|ei]r','Klav[ie|ei]r','St[ei|ie]n','B[ei|ie]n','S[ei|ie]l','Kl[ei|ie]d','Schw[ei|ie]n','[Ei|Ie]mer','Pf[ei|ie]fe','L[ei|ie]ter','Z[ei|ie]tung','Kn[ie|ei]'],
+doppel:['So[nn|n]e','Ba[ll|l]','Te[ll|l]er','Mu[tt|t]er','Pu[pp|p]e','Su[pp|p]e','Bu[tt|t]er','Hi[mm|m]el','Ko[ff|f]er','Schi[ff|f]','Ka[mm|m]','Wa[ss|s]er','Ta[nn|n]e','Ka[nn|n]e','Be[tt|t]','Ha[mm|m]er','Bri[ll|l]e','Ho[s|ss]e','Na[s|ss]e','Ro[s|ss]e','Ha[s|ss]e','Toma[t|tt]e','Rake[t|tt]e','I[g|gg]el','Na[m|mm]e','Blu[m|mm]e','Schu[l|ll]e','Do[s|ss]e'],
+aeueu:['B[äu|eu]me','H[äu|eu]ser','M[äu|eu]se','F[eu|äu]er','L[eu|äu]te','Fr[eu|äu]nd','[Eu|Äu]le','Kr[äu|eu]ter','Tr[äu|eu]me','h[eu|äu]te','R[äu|eu]ber','B[eu|äu]tel','N[eu|äu]n'],
+ae:['[Ä|E]pfel','H[ä|e]nde','B[ä|e]lle','Gl[ä|e]ser','K[ä|e]lte','N[ä|e]chte','W[ä|e]lder','B[e|ä]tt','N[e|ä]st','F[e|ä]nster','H[e|ä]ft','B[e|ä]rg','Z[e|ä]lt','St[ä|e]dte'],
+sz:['Fu[ß|ss]','Stra[ß|ss]e','Gru[ß|ss]','So[ß|ss]e','Spa[ß|ss]','grü[ß|ss]en','Ku[ss|ß]','Flu[ss|ß]','Schlo[ss|ß]','Wa[ss|ß]er','Ta[ss|ß]e','Nu[ss|ß]','Kla[ss|ß]e','Ki[ss|ß]en','Fa[ss|ß]','Schlü[ss|ß]el','gro[ß|ss]','sü[ß|ss]','hei[ß|ss]','wei[ß|ss]'],
+cktz:['Ja[ck|k]e','De[ck|k]e','So[ck|k]e','Zu[ck|k]er','Schne[ck|k]e','Bä[ck|k]er','Glo[ck|k]e','Ha[k|ck]en','Ban[k|ck]','Pa[k|ck]et','Ka[tz|z]e','Mü[tz|z]e','Pla[tz|z]','Bli[tz|z]','Sa[tz|z]','Pil[z|tz]','Her[z|tz]','Sal[z|tz]','Ker[z|tz]e','Hol[z|tz]','Schmer[z|tz]'],
+dass:['Ich hoffe, [dass|das] du kommst.','[Das|Dass] Auto ist rot.','Das Buch, [das|dass] ich lese, ist spannend.','Ich weiß, [dass|das] du lachst.','[Das|Dass] ist mein Hund.','Mama sagt, [dass|das] es Pizza gibt.','Das Pferd, [das|dass] dort steht, ist braun.','Es ist schön, [dass|das] du da bist.','Siehst du [das|dass] Haus?','Ich glaube, [dass|das] es regnet.','Das Kind, [das|dass] singt, heißt Mia.','Weißt du, [dass|das] Wale Säugetiere sind?'],
+punkt:['Wie heißt du[?|.|!]','Ich spiele Fußball[.|?|!]','Pass auf[!|?|.]','Wo wohnst du[?|.|!]','Der Hund bellt[.|?|!]','Hilfe[!|?|.]','Kommst du mit[?|.|!]','Heute scheint die Sonne[.|?|!]','Was machst du[?|.|!]','Komm schnell her[!|?|.]','Wir gehen in den Park[.|?|!]','Wann ist die Pause[?|.|!]','Ich mag Eis[.|?|!]','Hast du Hunger[?|.|!]'],
+pron:['Lena malt. [Sie|Er|Es] malt ein Bild.','Paul rennt. [Er|Sie|Es] rennt schnell.','Das Baby schläft. [Es|Er|Sie] schläft tief.','Mia und Tom spielen. [Sie|Wir|Er] spielen Ball.','Der Hund bellt. [Er|Sie|Es] bellt laut.','Die Katze miaut. [Sie|Er|Es] miaut leise.','Das Pferd läuft. [Es|Er|Sie] läuft weg.','Ben und ich bauen. [Wir|Sie|Ihr] bauen eine Burg.','Du und Lea lest. [Ihr|Wir|Sie] lest ein Buch.']};
+const GAPH={ieei:'Hörst du ein langes i? Dann schreibst du meistens ie.',doppel:'Nach einem kurzen, klatschenden Vokal kommt oft ein doppelter Mitlaut.',aeueu:'äu schreibst du, wenn es ein verwandtes Wort mit au gibt (Baum → Bäume).',ae:'ä schreibst du, wenn es ein verwandtes Wort mit a gibt (Apfel → Äpfel).',sz:'Nach langem Vokal oder ei/au: ß. Nach kurzem Vokal: ss.',cktz:'Nach kurzem Vokal: ck und tz. Nach l, n, r niemals ck oder tz.',dass:'Kannst du „dieses“ oder „welches“ einsetzen? Dann: das. Sonst: dass.',punkt:'Frage: ?   Ausruf oder Aufforderung: !   Aussage: .',pron:'Für ein Mädchen: sie. Für einen Jungen: er. Für ein Baby oder Ding mit „das“: es.'};
+const GAPT={ieei:'ie oder ei',doppel:'Doppelte Mitlaute',aeueu:'äu oder eu',ae:'ä oder e',sz:'ss oder ß',cktz:'ck, k, tz oder z',dass:'das oder dass',punkt:'Satzzeichen',pron:'Pronomen'};
+const SPLIT=['Ba-na-ne','To-ma-te','Ka-rot-te','Gi-raf-fe','Ra-ke-te','Schmet-ter-ling','Fens-ter','Ta-sche','Lö-we','Te-le-fon','Erd-bee-re','Kat-ze','Schu-le','Pup-pe','Blu-me','Son-ne','Mon-tag','Fe-ri-en','Schnee-mann','Dra-chen','Ge-burts-tag','Kro-ko-dil','Ap-fel','Kin-der','Was-ser','Zu-cker','Kis-sen','Wol-ke','Gar-ten','Hun-de','Win-ter','Ki-no'];
+const FAM=[['fahren',['Fahrrad','Fahrer','Abfahrt'],['Farbe','fallen','Faden']],['spielen',['Spielzeug','Spieler','Spielplatz'],['Spiegel','spitz','Spinne']],['lesen',['Leser','Lesebuch','vorlesen'],['Löwe','leise','Lehrer']],['malen',['Maler','Malbuch','bemalen'],['Mantel','Mandel','Mais']],['backen',['Bäcker','Backofen','gebacken'],['Bach','Bank','Ball']],['schreiben',['Schreibtisch','Schrift','aufschreiben'],['Schrank','schreien','Schraube']],['fliegen',['Flugzeug','Fliege','Flug'],['Fleck','fließen','Flasche']],['Kind',['kindlich','Kindergarten','Kindheit'],['Kino','Kinn','Kiste']]];
+const FIELD=[['gehen',['schlendern','rennen','schleichen','spazieren','hüpfen','laufen']],['sagen',['flüstern','rufen','schreien','antworten','erzählen','fragen']],['sehen',['schauen','gucken','beobachten','betrachten','starren']],['essen',['futtern','naschen','knabbern','schmausen']]];
+const CASES=[['{Der Hund} bellt laut.','Nominativ'],['{Die Katze} schläft auf dem Sofa.','Nominativ'],['{Das Kind} lacht.','Nominativ'],['{Mein Bruder} spielt Fußball.','Nominativ'],['Ich sehe {den Hund}.','Akkusativ'],['Lena streichelt {die Katze}.','Akkusativ'],['Wir kaufen {einen Ball}.','Akkusativ'],['Paul liest {das Buch}.','Akkusativ'],['Ich helfe {dem Mann}.','Dativ'],['Mia gibt {der Lehrerin} ein Bild.','Dativ'],['Wir spielen mit {dem Hund}.','Dativ'],['Das Geschenk gefällt {dem Kind}.','Dativ'],['Das ist das Auto {des Vaters}.','Genitiv'],['Die Farbe {des Balles} ist rot.','Genitiv'],['Das Fell {der Katze} ist weich.','Genitiv'],['Der Name {des Hundes} ist Bello.','Genitiv']];
+const CASEQ={Nominativ:'Wer oder was?',Genitiv:'Wessen?',Dativ:'Wem?',Akkusativ:'Wen oder was?'};
+const SG=[['Der Hund','frisst','einen Knochen'],['Meine Schwester','liest','ein Buch'],['Die Kinder','spielen','im Garten'],['Opa','backt','einen Kuchen'],['Der Lehrer','erklärt','die Aufgabe'],['Die Sonne','scheint','hell'],['Lena und Tom','bauen','eine Sandburg'],['Das Baby','schläft','im Bett'],['Der Vogel','singt','ein Lied'],['Unsere Katze','jagt','eine Maus']];
+const RIGHT=[['„Komm her!“, ruft Mama.','„Komm her“! ruft Mama.','Komm her!, ruft Mama.'],['Tom sagt: „Ich habe Hunger.“','Tom sagt „Ich habe Hunger.“','Tom sagt: Ich habe Hunger.'],['„Wo ist mein Ball?“, fragt Lena.','„Wo ist mein Ball“? fragt Lena.','„Wo ist mein Ball.“ fragt Lena?'],['Oma fragt: „Möchtest du Kuchen?“','Oma fragt „Möchtest du Kuchen?“','Oma fragt: „Möchtest du Kuchen.“'],['„Ich bin müde“, sagt Paul.','„Ich bin müde.“, sagt Paul.','„Ich bin müde“ sagt Paul.']];
+const KOMMA=[['Ich kaufe Äpfel, Birnen und Bananen.','Ich kaufe Äpfel Birnen, und Bananen.','Ich kaufe, Äpfel, Birnen und Bananen.'],['Mia, Ben und Lea spielen.','Mia Ben, und Lea spielen.','Mia, Ben, und Lea spielen.'],['Ich bleibe zu Hause, weil es regnet.','Ich bleibe zu Hause weil, es regnet.','Ich bleibe, zu Hause weil es regnet.'],['Wir spielen draußen, wenn die Sonne scheint.','Wir spielen draußen wenn, die Sonne scheint.','Wir, spielen draußen wenn die Sonne scheint.'],['Der Hund ist groß, braun und frech.','Der Hund ist groß braun, und frech.','Der Hund, ist groß braun und frech.']];
+
+/* ---------- task generators ---------- */
+const T=(q,a,ch,topic,x={})=>Object.assign({q,a,ch:shuffle([...new Set(ch)]),topic},x);
+const umlaut=w=>{const m=w.match(/^(.*)(au|a|o|u)([^aeiouäöü]*)$/i);if(!m)return w;const map={au:'äu',a:'ä',o:'ö',u:'ü',Au:'Äu',A:'Ä',O:'Ö',U:'Ü'};return m[1]+(map[m[2]]||m[2])+m[3]};
+const nouns=f=>N.filter(f||(()=>true));
+const anlaut=()=>{const n=P(nouns(x=>simpleStart(x[0])&&x[0].length<=7)),L=n[0][0];return T(`Welcher Buchstabe fehlt?<span class="pic">${n[3]}</span><span class="big">□${esc(n[0].slice(1))}</span>`,L,[L,...pickN('ABDEFGHIKLMNOPRTWZ'.split('').filter(c=>c!==L),2)],'Anlaute',{say:`${n[0]}. Mit welchem Buchstaben beginnt ${n[0]}?`,h:`${n[0]} beginnt mit ${L}.`,raw:1})};
+const bildAnlaut=()=>{const n=P(nouns(x=>simpleStart(x[0]))),L=n[0][0],others=pickN(nouns(x=>x[0][0]!==L),2);return T(`Welches Bild beginnt mit <span class="big">${L}</span>`,n[3],[n[3],...others.map(o=>o[3])],'Anlaute',{emo:1,raw:1,say:`Welches Bild beginnt mit ${L}?`,h:`${n[0]} beginnt mit ${L}.`})};
+const kleinBuchst=()=>{const k=P(Object.keys(CONF)),L=k.toUpperCase();return T(`Welcher kleine Buchstabe gehört zu<span class="big">${L}</span>`,k,[k,...CONF[k]],'Buchstaben',{raw:1,say:`Welcher kleine Buchstabe gehört zum großen ${L}?`,h:`Groß ${L}, klein ${k}.`})};
+const wortBild=(maxL=6)=>{const n=P(nouns(x=>x[0].length<=maxL)),o=pickN(nouns(x=>x[0]!==n[0]&&(x[0][0]===n[0][0]||Math.abs(x[0].length-n[0].length)<=1)),3);return T(`Welches Wort passt zum Bild?<span class="pic">${n[3]}</span>`,n[0],[n[0],...o.slice(0,2).map(x=>x[0])],'Wörter lesen',{raw:1,h:`Das ist ${n[1]} ${n[0]}.`})};
+const silben=()=>{const n=P(nouns()),s=n[4];const ch=s>=4?['3','4','5']:['1','2','3','4'];return T(`Wie viele Silben hat das Wort? Klatsche mit!<span class="pic">${n[3]}</span><span class="big">${esc(n[0])}</span>`,String(s),ch,'Silben',{raw:1,say:`Wie viele Silben hat ${n[0]}? Klatsche mit!`,h:`${n[0]} hat ${s} Silbe${s>1?'n':''}.`})};
+const reim=()=>{const g=P(RHYME),[b,c]=pickN(g,2),o=pickN(RHYME.filter(x=>x!==g),2).map(x=>P(x));return T(`Was reimt sich auf<span class="big">${b}</span>`,c,[c,...o],'Reime',{raw:1,say:`Was reimt sich auf ${b}?`,h:`${b} und ${c} reimen sich.`})};
+const artikel=()=>{const n=P(nouns());return T(`der, die oder das?<span class="pic">${n[3]}</span><span class="big">□ ${esc(n[0])}</span>`,n[1],['der','die','das'],'Artikel',{raw:1,say:`Der, die oder das: ${n[0]}?`,h:`Es heißt: ${n[1]} ${n[0]}.`})};
+const vokal=()=>{const c=nouns(x=>x[0].length>=3&&x[0].length<=6);for(let t=0;t<30;t++){const n=P(c),w=n[0],idx=[];for(let i=1;i<w.length;i++){if('aeiou'.includes(w[i])&&!'aeiouäöü'.includes(w[i-1]||'')&&!'aeiouäöü'.includes(w[i+1]||''))idx.push(i)}if(!idx.length)continue;const i=P(idx),v=w[i];return T(`Welcher Buchstabe fehlt?<span class="pic">${n[3]}</span><span class="big">${esc(w.slice(0,i))}□${esc(w.slice(i+1))}</span>`,v,[v,...pickN('aeiou'.split('').filter(x=>x!==v),2)],'Vokale',{raw:1,say:w,h:`Es heißt ${w}.`})}return anlaut()};
+const abcNext=()=>{const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ',i=R(1,23),L=A[i];return T(`Welcher Buchstabe kommt im ABC nach<span class="big">${L}</span>`,A[i+1],[A[i+1],A[i-1],A[i+2]],'ABC',{raw:1,say:`Welcher Buchstabe kommt im ABC nach ${L}?`,h:`… ${A[i-1]}, ${L}, ${A[i+1]}, ${A[i+2]} …`})};
+const abcFirst=(same)=>{let ws;if(same){const groups={};N.forEach(n=>{(groups[n[0][0]]=groups[n[0][0]]||[]).push(n[0])});const g=P(Object.values(groups).filter(x=>new Set(x.map(w=>w[1])).size>=3));ws=[];shuffle(g.slice()).forEach(w=>{if(ws.length<3&&!ws.some(v=>v[1]===w[1]))ws.push(w)})}else{ws=[];shuffle(N.slice()).forEach(n=>{if(ws.length<3&&!ws.some(v=>v[0]===n[0][0]))ws.push(n[0])})}
+ const a=ws.slice().sort((x,y)=>x.localeCompare(y,'de'))[0];return T('Welches Wort steht im ABC zuerst?',a,ws,'ABC',{h:same?`Schau auf den zweiten Buchstaben: ${a}.`:`${a[0]} kommt im ABC zuerst.`})};
+const plural=()=>{const n=P(nouns(x=>x[2])),w=n[0],p=n[2];const ds=[w+'e',w+'en',w+'s',w+'er',umlaut(w)+'e',umlaut(w)+'er',w+'n'].filter(x=>x!==p&&x!==w);return T(`Ein ${n[3]} – viele …?<span class="big">${n[1]} ${esc(w)} → die □</span>`,p,[p,...pickN(ds,2)],'Mehrzahl',{raw:1,say:`${n[1]} ${w}. Und viele?`,h:`${n[1]} ${w}, die ${p}.`})};
+const singular=()=>{const n=P(nouns(x=>x[2]&&x[2]!==x[0])),w=n[0],p=n[2];const ds=[p.replace(/(e|en|er|n|s)$/,''),umlaut(w),w+'e'].filter(x=>x!==w&&x!==p);return T(`Wie heißt die Einzahl?<span class="big">die ${esc(p)} → ${n[1]} □</span>`,w,[w,...pickN([...new Set(ds)],2),p].slice(0,3),'Einzahl',{raw:1,h:`die ${p}, ${n[1]} ${w}.`})};
+const gross=()=>{const n=P(nouns()),v=P(VERBS),a=P(ADJS);return T('Welches Wort schreibt man groß?',lc(n[0]),[lc(n[0]),v,a],'Großschreibung',{h:`${n[0]} ist ein Nomen. Nomen schreibt man groß.`,showA:n[0]})};
+const wortart=(k)=>{const t=P(['Nomen','Verb','Adjektiv']);const nm={Nomen:'Nomen (Namenwort)',Verb:'Verb (Tunwort)',Adjektiv:'Adjektiv (Wiewort)'};const n=P(nouns())[0],v=P(VERBS),a=P(ADJS);const c={Nomen:n,Verb:v,Adjektiv:a}[t];return T(`Welches Wort ist ein ${nm[t]}?`,c,[n,v,a],'Wortarten',{h:`${c} ist ein ${nm[t]}.`})};
+const wortartWelche=(four)=>{const types=four?['Nomen','Verb','Adjektiv','Pronomen','Präposition']:['Nomen','Verb','Adjektiv'];const t=P(types);const w={Nomen:P(N)[0],Verb:P(VERBS),Adjektiv:P(ADJS),Pronomen:P(PRON),Präposition:P(PREP)}[t];const ch=four?[t,...pickN(types.filter(x=>x!==t),3)]:types;return T(`Zu welcher Wortart gehört<span class="big">${esc(w)}</span>`,t,ch,'Wortarten',{raw:1,h:`${w} ist ein${t==='Präposition'?'e':''} ${t}.`})};
+const gegenteil=()=>{const p=P(OPP),i=R(0,1),w=p[i],a=p[1-i],o=pickN(OPP.filter(x=>x!==p),2).map(x=>P(x));return T(`Was ist das Gegenteil von<span class="big">${w}</span>`,a,[a,...o],'Gegenteile',{raw:1,h:`${w} – ${a}`})};
+const gap=(key)=>{const it=P(GAP[key]),m=it.match(/\[([^\]]+)\]/),parts=m[1].split('|'),a=parts[0],full=it.replace(m[0],a),q=esc(it.replace(m[0],'□'));const sentence=key==='dass'||key==='punkt'||key==='pron';return T(`${sentence?'Was gehört in die Lücke?':'Was fehlt?'}<span class="big">${q}</span>`,a,parts,GAPT[key],{raw:1,say:key==='punkt'?it.replace(m[0],''):full,h:`${full} – ${GAPH[key]}`,ws:1})};
+const prat=()=>{const v=P(TENSE),stem=v[0].slice(0,-2);const ds=[stem+'te',v[4],v[1]+'te',stem+'t'].filter(x=>x!==v[2]);return T(`Heute: ich ${v[1]}.<br>Gestern: ich …?`,v[2],[v[2],...pickN([...new Set(ds)],2)],'Zeitformen',{raw:1,h:`ich ${v[1]} → ich ${v[2]}`})};
+const zeitform=(four)=>{const v=P(TENSE),forms=[['Präsens',`Ich ${v[1]}.`],['Präteritum',`Ich ${v[2]}.`],['Perfekt',`Ich ${v[3]} ${v[4]}.`]];if(four)forms.push(['Futur',`Ich werde ${v[0]}.`]);const f=P(forms);return T(`Welche Zeitform ist das?<span class="big">${f[1]}</span>`,f[0],forms.map(x=>x[0]),'Zeitformen',{raw:1,h:`„${f[1]}“ steht im ${f[0]}.`})};
+const hilfsverb=()=>{const v=P(TENSE);return T(`Ich □ ${v[4]}.`,v[3],['bin','habe'],'Zeitformen',{h:`Ich ${v[3]} ${v[4]}. Bei Bewegung (gehen, fahren, fliegen …) nimmt man meist „sein“.`})};
+const futur=()=>{const v=P(TENSE);return T(`Morgen □ ich ${v[0]}.`,'werde',['werde','wurde','bin','habe'],'Zeitformen',{h:`Futur: werden + Grundform – Morgen werde ich ${v[0]}.`})};
+const steig=(irr)=>{const s=irr?P(STEIG.filter(x=>['gut','viel','gern','hoch'].includes(x[0]))):P(STEIG);if(Math.random()<.5){const ds=['am '+s[0]+'sten','am '+s[1]+'en',s[1]+'ste'];return T(`${s[0]} – ${s[1]} – …?`,s[2],[s[2],...pickN(ds,2)],'Steigerung',{h:`${s[0]}, ${s[1]}, ${s[2]}`})}const ds=[s[0]+'er',umlaut(s[0])+'er','mehr '+s[0]].filter(x=>x!==s[1]);return T(`Steigere:<span class="big">${s[0]} → …?</span>`,s[1],[s[1],...pickN([...new Set(ds)],2)],'Steigerung',{raw:1,h:`${s[0]}, ${s[1]}, ${s[2]}`})};
+const comp=()=>{const c=P(COMP);if(Math.random()<.5)return T(`${c[0]} + ${c[1]} = ?`,c[2],[c[2],c[1]+lc(c[0]),c[0]+' '+c[1]],'Zusammengesetzte Nomen',{h:`${c[0]} + ${c[1]} = ${c[2]}`});return T(`Welcher Artikel passt?<span class="big">□ ${c[2]}</span>`,c[3],['der','die','das'],'Zusammengesetzte Nomen',{raw:1,h:`Das letzte Wort bestimmt den Artikel: ${c[3]} ${c[1]} → ${c[3]} ${c[2]}.`})};
+const trenn=()=>{const s=P(SPLIT),w=s.replace(/-/g,'');const pos=[];let i=0;for(const ch of s){if(ch==='-')pos.push(i);else i++}const mk=ps=>{let o='';for(let k=0;k<w.length;k++){if(ps.includes(k))o+='-';o+=w[k]}return o};const ds=new Set();for(let t=0;t<30&&ds.size<2;t++){const ps=pos.map(p=>Math.random()<.5?p:Math.min(w.length-1,Math.max(1,p+(Math.random()<.5?-1:1))));const v=mk([...new Set(ps)].sort((a,b)=>a-b));if(v!==s)ds.add(v)}return T(`Wie trennt man das Wort richtig?<span class="big">${w}</span>`,s,[s,...ds],'Silbentrennung',{raw:1,h:`Richtig: ${s}. Sprich langsam und klatsche die Silben.`})};
+const familie=()=>{const f=P(FAM),c=P(f[1]);return T(`Welches Wort gehört zur Wortfamilie<span class="big">${f[0]}</span>`,c,[c,...pickN(f[2],2)],'Wortfamilie',{raw:1,h:`${c} gehört zur Familie von „${f[0]}“.`})};
+const wortfeld=()=>{const f=P(FIELD),c=P(f[1]),o=pickN(FIELD.filter(x=>x!==f),2).map(x=>P(x[1]));return T(`Welches Wort gehört zum Wortfeld<span class="big">${f[0]}</span>`,c,[c,...o],'Wortfeld',{raw:1,h:`${c} ist eine Art zu ${f[0]}.`})};
+const fall=()=>{const c=P(CASES),q=esc(c[0]).replace(/\{(.+?)\}/,'<mark>$1</mark>');return T(`In welchem Fall steht das markierte Wort?<span class="big" style="font-size:clamp(22px,3.6vh,30px)">${q}</span>`,c[1],['Nominativ','Genitiv','Dativ','Akkusativ'],'Fälle',{raw:1,keep:1,say:c[0].replace(/[{}]/g,''),h:`Frage: ${CASEQ[c[1]]} → ${c[1]}`})};
+const fallFrage=()=>{const f=P(Object.keys(CASEQ));return T(`Mit welcher Frage findest du den ${f}?`,CASEQ[f],Object.values(CASEQ),'Fälle',{h:`${f}: ${CASEQ[f]}`})};
+const satzglied=()=>{const s=P(SG),sub=Math.random()<.5;return T(`${sub?'Was ist das Subjekt?':'Was ist das Prädikat?'}<span class="big" style="font-size:clamp(22px,3.6vh,30px)">${s[0]} ${s[1]} ${s[2]}.</span>`,sub?s[0]:s[1],[s[0],s[1],s[2]],'Satzglieder',{raw:1,h:sub?`Wer oder was ${s[1]}? → ${s[0]}`:`Das Prädikat ist das Verb: ${s[1]}`})};
+const richtig=(arr,topic,h)=>{const r=P(arr);return T('Welcher Satz ist richtig geschrieben?',r[0],r,topic,{long:1,h})};
+const build=(minL,maxL)=>{const pool=[...nouns(x=>x[0].length>=minL&&x[0].length<=maxL)];const n=P(pool);return{kind:'build',w:n[0],pic:n[3],q:'Baue das Wort!',topic:'Wörter bauen',say:n[0],h:`Es heißt ${n[1]} ${n[0]}.`}};
+const G={
+1:[[1,anlaut],[1,bildAnlaut],[1,kleinBuchst],[1,()=>wortBild(5)],[2,silben],[2,reim],[2,artikel],[3,vokal],[3,()=>build(2,4)],[3,()=>wortBild(7)],[4,abcNext],[4,()=>gap('punkt')],[4,()=>build(3,5)],[5,()=>build(4,6)],[5,reim],[5,plural]],
+2:[[1,artikel],[1,plural],[1,gross],[1,()=>build(3,6)],[2,()=>abcFirst(false)],[2,gegenteil],[2,()=>wortart(2)],[2,()=>gap('ieei')],[3,()=>gap('doppel')],[3,()=>gap('punkt')],[3,()=>build(4,7)],[4,silben],[4,singular],[4,comp],[5,()=>abcFirst(true)],[5,()=>build(5,9)],[5,()=>gap('pron')]],
+3:[[1,()=>wortartWelche(false)],[1,plural],[1,prat],[1,()=>build(4,8)],[2,()=>steig(false)],[2,comp],[2,()=>gap('aeueu')],[2,()=>gap('sz')],[3,()=>gap('cktz')],[3,trenn],[3,familie],[3,()=>gap('pron')],[4,()=>zeitform(false)],[4,()=>richtig(RIGHT,'Wörtliche Rede','Begleitsatz und Rede werden mit „ … “ und Komma oder Doppelpunkt getrennt.')],[4,()=>build(6,12)],[5,()=>gap('ae')],[5,hilfsverb],[5,()=>abcFirst(true)]],
+4:[[1,()=>zeitform(true)],[1,fall],[1,()=>gap('dass')],[1,()=>build(5,12)],[2,satzglied],[2,fallFrage],[2,()=>richtig(KOMMA,'Komma','Aufzählungen trennt man mit Komma, vor „und“ steht keins. Vor weil, wenn, dass steht ein Komma.')],[3,futur],[3,hilfsverb],[3,wortfeld],[3,()=>gap('sz')],[4,()=>build(7,12)],[4,()=>steig(true)],[4,()=>wortartWelche(true)],[5,()=>richtig(RIGHT,'Wörtliche Rede','Begleitsatz und Rede werden mit „ … “ und Komma oder Doppelpunkt getrennt.')],[5,trenn],[5,fall],[5,()=>gap('cktz')]]};
+
+/* ---------- dinos ---------- */
+const WORLDS=[
+ {n:'Farnwald',sky:['#7fd6ff','#e2f8ff'],h:['#9ad46a','#6bbf4a','#4a9e3a'],g:'#3d7f2c',deco:'ferns',sun:'#ffe066'},
+ {n:'Vulkaninsel',sky:['#ff9a62','#ffe0b0'],h:['#8a5a44','#6b3f30','#4a2a20'],g:'#3a2018',deco:'volcano',sun:'#fff2c2'},
+ {n:'Sumpfland',sky:['#9ec9a8','#e0f0dc'],h:['#6f9e5c','#557f48','#3d6236'],g:'#4a6b3a',deco:'swamp',sun:'#fff6cc'},
+ {n:'Wüstencanyon',sky:['#ffb36b','#ffe9c4'],h:['#e8a060','#d07f45','#b8642f'],g:'#c97a3a',deco:'canyon',sun:'#fff6d0'},
+ {n:'Eiszeit',sky:['#9fd8ff','#f0faff'],h:['#eaf7ff','#cbe8f8','#a9d4ec'],g:'#94c6e4',deco:'ice',sun:'#ffffff'},
+ {n:'Urmeer',sky:['#5fc4f0','#d6f4ff'],h:['#2a9fc4','#1d86ab','#156a8a'],g:'#f0d898',deco:'beach',sun:'#fff3b0'},
+ {n:'Himmelsfelsen',sky:['#5b6bd6','#ffb8d0'],h:['#8a7fd0','#6f63b8','#554a9a'],g:'#463d82',deco:'sky',sun:'#ffd27a'}];
+const RAR=['gewöhnlich','selten','episch','legendär'];
+// [Name, Welt (-1 = überall), Seltenheit, Form, Farbton, Muster, Extra, Helligkeit?, Sättigung?]
+const DINO=[
+['Farni-Rex',0,0,'rex',110,'spots',''],['Blätterhals',0,0,'long',95,'none',''],['Dreihorn-Toni',0,0,'tri',30,'none',''],['Moosstachel',0,1,'steg',80,'stripes',''],['Blüten-Raptor',0,2,'raptor',320,'spots','flower'],
+['Glutzahn',1,0,'rex',8,'stripes',''],['Ascheflügel',1,0,'ptero',20,'none','',50,25],['Lavapanzer',1,0,'anky',18,'spots',''],['Feuersegel',1,1,'spino',25,'stripes',''],['Magma-Max',1,2,'tri',0,'dots','stars',42],
+['Schlammi',2,0,'para',75,'spots','',48],['Sumpfhals',2,0,'long',160,'stripes','',48],['Froschzahn',2,0,'raptor',120,'dots',''],['Nebelzack',2,1,'steg',175,'none','',62],['Seerosen-Spino',2,2,'spino',300,'spots','flower'],
+['Sandflitzer',3,0,'raptor',40,'stripes','',62],['Kaktusrücken',3,0,'steg',100,'spots','',50],['Staubhorn',3,0,'tri',35,'none','',60],['Canyonsegler',3,1,'ptero',12,'stripes',''],['Sonnenkamm',3,2,'para',45,'dots','glasses',58],
+['Frostfuß',4,0,'rex',200,'spots','',72],['Schneehals',4,0,'long',210,'none','',86,30],['Eispanzer',4,0,'anky',195,'dots','',70],['Gletscherflügel',4,1,'ptero',185,'none','',70],['Polarlicht-Raptor',4,2,'raptor',170,'stripes','stars',62],
+['Wellenhals',5,0,'plesio',195,'spots',''],['Korallen-Rex',5,0,'rex',350,'dots','',66],['Perlenpanzer',5,0,'anky',330,'spots','',70],['Tiefsee-Spino',5,1,'spino',230,'stripes','',48],['Meeresglanz',5,2,'plesio',280,'dots','stars'],
+['Wolkenflügel',6,0,'ptero',220,'none','',82,40],['Sternenkamm',6,0,'para',260,'dots',''],['Regenbogenhals',6,0,'long',290,'stripes',''],['Donnerhorn',6,1,'tri',50,'stripes',''],['Himmelskönig',6,2,'rex',270,'spots','crown'],
+['Goldener Ur-Rex',-1,3,'rex',45,'none','crown stars',58,95],['Kristall-Brachio',-1,3,'long',190,'dots','halo stars',72],['Phönix-Ptero',-1,3,'ptero',18,'stripes','halo stars',58,95],
+['Farnfiederling',0,0,'archaeo',100,'none',''],['Kuppelkopf',0,0,'pachy',60,'spots',''],['Moos-Baby',0,1,'rex',130,'dots','shell',62],['Segelechse',0,1,'dimetro',90,'stripes',''],['Herzchen-Brachio',0,2,'long',340,'dots','hearts',70],
+['Funkenfeder',1,0,'archaeo',15,'stripes',''],['Rußkuppel',1,0,'pachy',10,'none','',40,30],['Lava-Baby',1,1,'tri',20,'dots','shell'],['Glutsegel',1,1,'dimetro',5,'spots',''],['Flammen-Ptero',1,2,'ptero',30,'stripes','stars'],
+['Sumpfkuppel',2,0,'pachy',95,'spots','',48],['Schilfsegel',2,0,'dimetro',140,'none',''],['Moorfeder',2,1,'archaeo',80,'dots',''],['Matsch-Baby',2,1,'anky',70,'spots','shell',50],['Libellen-Ptero',2,2,'ptero',170,'dots','leaf'],
+['Dünenkuppel',3,0,'pachy',35,'stripes','',62],['Sandfeder',3,0,'archaeo',45,'spots','',62],['Kaktus-Baby',3,1,'steg',110,'dots','shell',52],['Felsensegel',3,1,'dimetro',20,'stripes',''],['Wüstenkönig-Tri',3,2,'tri',40,'dots','crown',58],
+['Schneefeder',4,0,'archaeo',205,'none','',80,35],['Eiskuppel',4,0,'pachy',200,'dots','',74],['Pinguin-Baby',4,1,'raptor',220,'none','shell',40,40],['Frostsegel',4,1,'dimetro',190,'stripes','',70],['Schneeflocken-Steg',4,2,'steg',180,'dots','stars',76],
+['Wellenmosa',5,0,'mosa',200,'stripes',''],['Muschel-Baby',5,0,'plesio',20,'dots','shell',66],['Tintenmosa',5,1,'mosa',260,'spots','',45],['Korallenfeder',5,1,'archaeo',350,'dots','',66],['Riesen-Mosa',5,2,'mosa',180,'dots','crown',50],
+['Sternenfeder',6,0,'archaeo',250,'dots',''],['Wolkenkuppel',6,0,'pachy',230,'none','',82,35],['Mond-Baby',6,1,'para',60,'dots','shell',72],['Nordlichtsegel',6,1,'dimetro',280,'stripes',''],['Regenbogen-Ptero',6,2,'ptero',300,'stripes','stars hearts'],
+['Diamant-Stego',-1,3,'steg',190,'dots','halo stars',78],['Sonnen-Archaeo',-1,3,'archaeo',45,'stripes','crown stars',58,95]];
+const dexCount=s=>Object.keys(s.dex||{}).filter(k=>s.dex[k]>0).length;
+let uid=0;
+function dinoSVG(sp,shiny){const s=DINO[sp]||DINO[0];let h=s[4],sat=s[8]!=null?s[8]:75,L=s[7]!=null?s[7]:58;if(shiny){h=(h+150)%360;sat=Math.max(sat,75);L=Math.min(Math.max(L,50),72)}
+ const b=`hsl(${h} ${sat}% ${L}%)`,d=`hsl(${h} ${sat}% ${Math.max(14,L-18)}%)`,l=`hsl(${h} 85% ${Math.min(92,L+24)}%)`,ln=`hsl(${h} 55% 18%)`,ac=`hsl(${(h+40)%360} 85% 62%)`,S=`stroke="${ln}" stroke-width="3" stroke-linejoin="round"`,bone='#fff6e0';
+ const eye=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="${ln}" stroke-width="2.5"/><circle cx="${x+r*.2}" cy="${y}" r="${r*.55}" fill="#1b1530"/><circle cx="${x+r*.38}" cy="${y-r*.25}" r="${r*.2}" fill="#fff"/>`;
+ const sm=(dd)=>`<path d="${dd}" fill="none" stroke="${ln}" stroke-width="3" stroke-linecap="round"/>`;
+ const rexBase={tail:`<path d="M70,112 Q24,104 6,76 Q22,122 74,146Z" fill="${b}" ${S}/>`,far:`<rect x="62" y="142" width="20" height="40" rx="9" fill="${d}" ${S}/>`,neck:`<ellipse cx="122" cy="98" rx="22" ry="28" fill="${b}" ${S}/>`,body:`<ellipse cx="92" cy="124" rx="46" ry="38" fill="${b}" ${S}/>`,belly:`<ellipse cx="104" cy="138" rx="26" ry="21" fill="${l}"/>`,leg:`<ellipse cx="86" cy="150" rx="20" ry="24" fill="${b}" ${S}/><rect x="76" y="166" width="30" height="16" rx="8" fill="${b}" ${S}/>`,arm:`<path d="M124,124 q14,2 16,12" stroke="${ln}" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M124,124 q14,2 16,12" stroke="${b}" stroke-width="5" stroke-linecap="round" fill="none"/>`};
+ const quadLegs=(xs,y,hgt,w)=>({far:xs.map(x=>`<rect x="${x-12}" y="${y-4}" width="${w}" height="${hgt}" rx="8" fill="${d}" ${S}/>`).join(''),near:xs.map(x=>`<rect x="${x}" y="${y}" width="${w+1}" height="${hgt-2}" rx="8" fill="${b}" ${S}/>`).join('')});
+ let t;
+ switch(s[3]){
+ case 'rex':t={pre:rexBase.tail+rexBase.far+rexBase.neck+rexBase.body,post:rexBase.belly+rexBase.leg+rexBase.arm+`<ellipse cx="142" cy="76" rx="40" ry="28" fill="${b}" ${S}/>`+sm('M118,88 Q146,104 178,84')+`<path d="M150,95 l4,8 l4,-9Z M164,91 l4,7 l4,-8Z" fill="#fff" stroke="${ln}" stroke-width="1.5"/><circle cx="174" cy="68" r="2.5" fill="${ln}"/>`+eye(148,64,9),be:[92,124,46,38],hx:140,hy:50,ex:148,ey:64};break;
+ case 'raptor':t={pre:`<path d="M70,112 Q30,108 4,96 Q30,124 72,136Z" fill="${b}" ${S}/><rect x="70" y="136" width="12" height="44" rx="6" fill="${d}" ${S}/><ellipse cx="118" cy="100" rx="14" ry="22" fill="${b}" ${S}/><ellipse cx="92" cy="120" rx="38" ry="28" fill="${b}" ${S}/>`,post:`<ellipse cx="100" cy="130" rx="20" ry="14" fill="${l}"/><ellipse cx="88" cy="140" rx="14" ry="18" fill="${b}" ${S}/><rect x="82" y="148" width="10" height="32" rx="5" fill="${b}" ${S}/><rect x="80" y="176" width="24" height="8" rx="4" fill="${b}" ${S}/>`+rexBase.arm.replace(/M124,124/g,'M118,118')+[[124,66],[132,62],[140,64]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="5" ry="11" transform="rotate(-25 ${x} ${y})" fill="${ac}" ${S}/>`).join('')+`<ellipse cx="138" cy="84" rx="30" ry="18" fill="${b}" ${S}/>`+sm('M114,90 Q138,100 166,88')+`<circle cx="162" cy="80" r="2" fill="${ln}"/>`+eye(140,78,7),be:[92,120,38,28],hx:134,hy:60,ex:140,ey:78};break;
+ case 'para':t={pre:rexBase.tail+rexBase.far+`<path d="M128,62 Q102,30 84,46" fill="none" stroke="${ln}" stroke-width="16" stroke-linecap="round"/><path d="M128,62 Q102,30 84,46" fill="none" stroke="${ac}" stroke-width="10" stroke-linecap="round"/>`+rexBase.neck+rexBase.body,post:rexBase.belly+rexBase.leg+rexBase.arm+`<ellipse cx="138" cy="78" rx="32" ry="24" fill="${b}" ${S}/><ellipse cx="166" cy="88" rx="18" ry="10" fill="${l}" ${S}/>`+sm('M150,92 Q162,98 176,92')+eye(140,70,8),be:[92,124,46,38],hx:142,hy:56,ex:140,ey:70};break;
+ case 'spino':{let ribs='';for(let k=0;k<5;k++)ribs+=`<line x1="${62+k*14}" y1="108" x2="${66+k*13}" y2="${54-Math.sin(k/4*3.14)*10}" stroke="${ln}" stroke-width="2" opacity=".45"/>`;t={pre:rexBase.tail+rexBase.far+`<path d="M52,112 Q56,44 86,40 Q118,38 128,104Z" fill="${ac}" ${S}/>`+ribs+rexBase.neck+rexBase.body,post:rexBase.belly+rexBase.leg+rexBase.arm+`<ellipse cx="146" cy="84" rx="40" ry="18" fill="${b}" ${S}/>`+sm('M112,92 Q148,104 184,86')+`<path d="M158,97 l3,7 l3,-8Z M170,94 l3,6 l3,-7Z" fill="#fff" stroke="${ln}" stroke-width="1.5"/><circle cx="180" cy="80" r="2" fill="${ln}"/>`+eye(140,76,7),be:[92,124,46,38],hx:142,hy:66,ex:140,ey:76};break}
+ case 'long':{const q=quadLegs([66,114],154,32,16);t={pre:`<path d="M44,132 Q12,136 4,166 Q26,146 50,150Z" fill="${b}" ${S}/>`+q.far+`<path d="M108,124 Q140,92 152,44" fill="none" stroke="${ln}" stroke-width="30" stroke-linecap="round"/><path d="M108,124 Q140,92 152,44" fill="none" stroke="${b}" stroke-width="24" stroke-linecap="round"/><ellipse cx="84" cy="134" rx="48" ry="32" fill="${b}" ${S}/>`,post:`<ellipse cx="88" cy="148" rx="30" ry="13" fill="${l}"/>`+q.near+`<ellipse cx="160" cy="40" rx="20" ry="13" fill="${b}" ${S}/>`+sm('M164,46 Q172,48 178,44')+`<circle cx="176" cy="37" r="2" fill="${ln}"/>`+eye(162,34,5),be:[84,134,48,32],hx:158,hy:27,ex:162,ey:34};break}
+ case 'tri':{const q=quadLegs([70,120],154,28,18);let sc='';for(let a=-170;a<=-10;a+=32){const r=a*Math.PI/180;sc+=`<circle cx="${134+Math.cos(r)*32}" cy="${104+Math.sin(r)*32}" r="5" fill="${ac}" ${S}/>`}t={pre:`<path d="M44,128 Q14,132 8,152 Q28,140 48,146Z" fill="${b}" ${S}/>`+q.far+`<ellipse cx="88" cy="130" rx="50" ry="34" fill="${b}" ${S}/>`,post:`<ellipse cx="92" cy="146" rx="30" ry="13" fill="${l}"/>`+q.near+sc+`<circle cx="134" cy="104" r="32" fill="${d}" ${S}/><ellipse cx="152" cy="128" rx="28" ry="22" fill="${b}" ${S}/><path d="M174,124 L192,134 L174,142Z" fill="${d}" ${S}/><path d="M146,110 Q162,86 188,82 Q168,96 156,116Z" fill="${bone}" ${S}/><path d="M136,112 Q148,90 170,84 Q154,100 144,118Z" fill="${bone}" ${S}/><path d="M172,118 L178,104 L182,120Z" fill="${bone}" ${S}/>`+sm('M160,138 Q170,142 178,138')+eye(152,122,7),be:[88,130,50,34],hx:134,hy:74,ex:152,ey:122};break}
+ case 'steg':{const q=quadLegs([72,122],152,30,18);let pl='';[[52,22],[70,30],[88,34],[106,30],[124,22]].forEach(([x,hh])=>{const by=128-34*Math.sqrt(Math.max(0,1-((x-92)/52)**2))+8;pl+=`<polygon points="${x-11},${by} ${x},${by-hh} ${x+11},${by}" fill="${ac}" ${S}/>`});t={pre:`<path d="M48,128 Q16,124 6,108 Q20,140 50,148Z" fill="${b}" ${S}/><path d="M14,112 L4,96 L20,108Z M26,118 L20,100 L32,114Z" fill="${bone}" ${S}/>`+pl+q.far+`<ellipse cx="92" cy="128" rx="52" ry="34" fill="${b}" ${S}/>`,post:`<ellipse cx="96" cy="146" rx="32" ry="12" fill="${l}"/>`+q.near+`<ellipse cx="146" cy="134" rx="16" ry="12" fill="${b}" ${S}/><ellipse cx="160" cy="140" rx="18" ry="13" fill="${b}" ${S}/>`+sm('M166,146 Q172,148 178,144')+eye(164,135,5),be:[92,128,52,34],hx:160,hy:127,ex:164,ey:135};break}
+ case 'anky':{const q=quadLegs([74,124],156,22,18);let ar='';for(let x=46;x<=138;x+=15){const by=140-26*Math.sqrt(Math.max(0,1-((x-92)/56)**2))+5;ar+=`<polygon points="${x-7},${by} ${x},${by-12} ${x+7},${by}" fill="${bone}" ${S}/>`}t={pre:`<path d="M44,140 Q22,136 16,130" fill="none" stroke="${ln}" stroke-width="12" stroke-linecap="round"/><path d="M44,140 Q22,136 16,130" fill="none" stroke="${b}" stroke-width="7" stroke-linecap="round"/><circle cx="14" cy="128" r="13" fill="${d}" ${S}/>`+q.far+`<ellipse cx="92" cy="140" rx="56" ry="26" fill="${b}" ${S}/>`,post:ar+q.near+`<path d="M146,136 L140,124 L152,132Z" fill="${bone}" ${S}/><ellipse cx="158" cy="146" rx="20" ry="15" fill="${b}" ${S}/>`+sm('M164,152 Q172,155 180,150')+eye(162,140,5.5),be:[92,140,56,26],hx:158,hy:132,ex:162,ey:140};break}
+ case 'ptero':t={pre:`<path d="M98,104 L14,64 Q28,96 26,112 L92,120Z" fill="${l}" ${S}/><path d="M112,104 L190,62 Q176,96 178,112 L118,120Z" fill="${l}" ${S}/><path d="M98,104 L14,64 M112,104 L190,62" stroke="${d}" stroke-width="4" stroke-linecap="round"/><ellipse cx="105" cy="112" rx="16" ry="24" fill="${b}" ${S}/>`,post:`<path d="M100,134 l-4,12 M110,134 l4,12" stroke="${ln}" stroke-width="3" stroke-linecap="round"/><path d="M110,74 L80,56 L114,82Z" fill="${d}" ${S}/><ellipse cx="118" cy="80" rx="15" ry="13" fill="${b}" ${S}/><path d="M128,76 L176,86 L128,90Z" fill="#ffb84d" ${S}/>`+eye(120,76,5.5),be:[105,112,16,24],hx:118,hy:67,ex:120,ey:76};break;
+ case 'pachy':t={pre:rexBase.tail+rexBase.far+rexBase.neck+rexBase.body,post:rexBase.belly+rexBase.leg+rexBase.arm+`<ellipse cx="142" cy="82" rx="32" ry="22" fill="${b}" ${S}/><path d="M114,76 Q116,40 142,40 Q168,40 170,74Z" fill="${bone}" ${S}/>`+[118,128,156,166].map(x=>`<circle cx="${x}" cy="${x<140?72-(x-118):72-(166-x)}" r="3.5" fill="${d}"/>`).join('')+sm('M150,94 Q162,100 172,92')+eye(150,80,7),be:[92,124,46,38],hx:142,hy:42,ex:150,ey:80};break;
+ case 'dimetro':{const q=quadLegs([72,122],150,24,16);let ribs='';for(let k=0;k<6;k++)ribs+=`<line x1="${62+k*14}" y1="132" x2="${64+k*13}" y2="${70-Math.sin(k/5*3.14)*12}" stroke="${ln}" stroke-width="2" opacity=".45"/>`;t={pre:`<path d="M44,140 Q20,146 4,160 Q24,150 46,152Z" fill="${b}" ${S}/>`+q.far+`<path d="M50,134 Q56,62 96,58 Q132,58 142,132Z" fill="${ac}" ${S}/>`+ribs+`<ellipse cx="96" cy="140" rx="54" ry="22" fill="${b}" ${S}/>`,post:`<ellipse cx="100" cy="150" rx="32" ry="9" fill="${l}"/>`+q.near+`<ellipse cx="160" cy="138" rx="24" ry="14" fill="${b}" ${S}/>`+sm('M140,144 Q162,152 184,140')+`<path d="M160,148 l3,6 l3,-7Z M172,146 l3,6 l3,-7Z" fill="#fff" stroke="${ln}" stroke-width="1.5"/>`+eye(162,132,5.5),be:[96,140,54,22],hx:160,hy:124,ex:162,ey:132};break}
+ case 'archaeo':t={pre:[[64,104,-40],[58,116,-15],[60,128,10]].map(([x,y,a])=>`<ellipse cx="${x}" cy="${y}" rx="24" ry="8" transform="rotate(${a} ${x} ${y})" fill="${ac}" ${S}/>`).join('')+`<rect x="92" y="138" width="8" height="40" rx="4" fill="${d}" ${S}/><ellipse cx="122" cy="102" rx="12" ry="18" fill="${b}" ${S}/><ellipse cx="100" cy="122" rx="32" ry="26" fill="${b}" ${S}/>`,post:`<ellipse cx="108" cy="132" rx="18" ry="12" fill="${l}"/><rect x="104" y="140" width="8" height="38" rx="4" fill="${b}" ${S}/><path d="M100,178 l16,0 M110,178 l4,-4" stroke="${ln}" stroke-width="3" stroke-linecap="round"/><ellipse cx="96" cy="118" rx="28" ry="14" transform="rotate(-18 96 118)" fill="${d}" ${S}/><path d="M76,118 l30,-6 M78,126 l30,-8" stroke="${l}" stroke-width="2" opacity=".7"/>`+[[124,70],[132,66]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="4" ry="10" transform="rotate(-30 ${x} ${y})" fill="${ac}" ${S}/>`).join('')+`<ellipse cx="134" cy="86" rx="18" ry="16" fill="${b}" ${S}/><path d="M148,82 L172,90 L148,98Z" fill="${b}" ${S}/><path d="M154,95 l2,4 l2,-4Z M162,93 l2,4 l2,-4Z" fill="#fff"/>`+eye(138,82,6),be:[100,122,32,26],hx:132,hy:70,ex:138,ey:82};break;
+ case 'mosa':t={pre:`<path d="M42,140 L6,116 L16,140 L6,164Z" fill="${d}" ${S}/><ellipse cx="72" cy="158" rx="18" ry="7" transform="rotate(25 72 158)" fill="${d}" ${S}/><ellipse cx="96" cy="140" rx="60" ry="20" fill="${b}" ${S}/>`,post:`<ellipse cx="100" cy="150" rx="40" ry="8" fill="${l}"/><ellipse cx="120" cy="162" rx="20" ry="8" transform="rotate(-25 120 162)" fill="${b}" ${S}/><path d="M80,122 l8,-10 l8,10 Z" fill="${d}" ${S}/><ellipse cx="160" cy="132" rx="32" ry="14" fill="${b}" ${S}/>`+sm('M134,138 Q162,148 192,132')+`<path d="M150,142 l3,6 l3,-7Z M162,142 l3,6 l3,-7Z M174,139 l3,6 l3,-7Z" fill="#fff" stroke="${ln}" stroke-width="1.5"/>`+eye(160,126,5.5)+`<path d="M0,178 Q25,170 50,178 T100,178 T150,178 T200,178 V200 H0Z" fill="#5ec8e8" opacity=".6"/>`,be:[96,140,60,20],hx:160,hy:118,ex:160,ey:126};break;
+ case 'plesio':t={pre:`<ellipse cx="64" cy="156" rx="22" ry="9" transform="rotate(25 64 156)" fill="${d}" ${S}/><ellipse cx="114" cy="158" rx="22" ry="9" transform="rotate(-25 114 158)" fill="${d}" ${S}/><path d="M108,138 Q150,124 152,62" fill="none" stroke="${ln}" stroke-width="26" stroke-linecap="round"/><path d="M108,138 Q150,124 152,62" fill="none" stroke="${b}" stroke-width="20" stroke-linecap="round"/><path d="M46,140 Q20,142 8,150 Q26,152 48,150Z" fill="${b}" ${S}/><ellipse cx="86" cy="144" rx="44" ry="24" fill="${b}" ${S}/>`,post:`<ellipse cx="90" cy="154" rx="28" ry="10" fill="${l}"/><ellipse cx="72" cy="162" rx="22" ry="9" transform="rotate(20 72 162)" fill="${b}" ${S}/><ellipse cx="118" cy="164" rx="22" ry="9" transform="rotate(-20 118 164)" fill="${b}" ${S}/><ellipse cx="160" cy="58" rx="18" ry="12" fill="${b}" ${S}/>`+sm('M166,64 Q172,66 178,61')+eye(162,53,5)+`<path d="M0,178 Q25,170 50,178 T100,178 T150,178 T200,178 V200 H0Z" fill="#5ec8e8" opacity=".6"/>`,be:[86,144,44,24],hx:160,hy:46,ex:162,ey:53};break;
+ }
+ const id='d'+(++uid),r=rng(sp*97+11),[cx,cy,rx,ry]=t.be;let pat='';
+ if(s[5]==='spots')for(let i=0;i<7;i++)pat+=`<circle cx="${cx+(r()*2-1)*rx*.8}" cy="${cy+(r()*1.6-1)*ry*.7}" r="${4+r()*6}" fill="${d}" opacity=".45"/>`;
+ if(s[5]==='stripes')for(let x=cx-rx;x<cx+rx;x+=16)pat+=`<path d="M${x},${cy-ry} l8,0 l-10,${ry*2} l-8,0Z" fill="${d}" opacity=".38"/>`;
+ if(s[5]==='dots')for(let i=0;i<12;i++)pat+=`<circle cx="${cx+(r()*2-1)*rx*.85}" cy="${cy+(r()*1.6-1)*ry*.7}" r="${1.8+r()*2.4}" fill="#fff" opacity=".85"/>`;
+ const ex=(s[6]||'').split(' ').filter(Boolean);if(shiny&&!ex.includes('stars'))ex.push('stars');let xtra='';
+ ex.forEach(e=>{const{hx,hy}=t;
+  if(e==='crown')xtra+=`<polygon points="${hx-16},${hy} ${hx-17},${hy-20} ${hx-8},${hy-10} ${hx},${hy-24} ${hx+8},${hy-10} ${hx+17},${hy-20} ${hx+16},${hy}" fill="#ffcc33" stroke="#7a4f00" stroke-width="3" stroke-linejoin="round"/><circle cx="${hx}" cy="${hy-8}" r="3.5" fill="#e63946"/>`;
+  if(e==='flower'){const fx=hx+8,fy=hy-4;for(let k=0;k<5;k++){const a=k*1.2566;xtra+=`<circle cx="${fx+Math.cos(a)*6}" cy="${fy+Math.sin(a)*6}" r="5" fill="#fff" stroke="${ln}" stroke-width="1.5"/>`}xtra+=`<circle cx="${fx}" cy="${fy}" r="4" fill="#ffd23f"/>`}
+  if(e==='shell')xtra+=`<path d="M${hx-18},${hy+6} L${hx-16},${hy-8} L${hx-9},${hy-2} L${hx-3},${hy-13} L${hx+4},${hy-4} L${hx+10},${hy-12} L${hx+18},${hy+6} Q${hx},${hy+12} ${hx-18},${hy+6}Z" fill="#fff8e8" stroke="${ln}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="${hx-6}" cy="${hy+2}" r="2.5" fill="#e8c98a"/><circle cx="${hx+8}" cy="${hy}" r="2" fill="#e8c98a"/>`;
+  if(e==='hearts')[[30,50,7],[176,40,6],[184,120,5]].forEach(([x,y,q])=>xtra+=`<path d="M${x},${y+q} C${x-q*1.6},${y-q*.2} ${x-q*.6},${y-q*1.4} ${x},${y-q*.4} C${x+q*.6},${y-q*1.4} ${x+q*1.6},${y-q*.2} ${x},${y+q}Z" fill="#ff6fa8" stroke="#b0306a" stroke-width="1.5"/>`);
+  if(e==='leaf')xtra+=`<path d="M${hx},${hy+4} q14,-22 30,-14 q-12,18 -30,14Z" fill="#5cc96b" stroke="${ln}" stroke-width="2"/>`;
+  if(e==='halo')xtra+=`<ellipse cx="${hx}" cy="${hy-12}" rx="18" ry="5" fill="none" stroke="#ffd23f" stroke-width="4"/>`;
+  if(e==='glasses')xtra+=`<rect x="${t.ex-10}" y="${t.ey-6}" width="22" height="12" rx="5" fill="#15132b"/><line x1="${t.ex-10}" y1="${t.ey-2}" x2="${t.ex-22}" y2="${t.ey-4}" stroke="#15132b" stroke-width="3"/>`;
+  if(e==='stars')[[24,40,8],[180,26,7],[188,150,6],[18,150,6]].forEach(([x,y,q])=>xtra+=`<path d="M${x},${y-q} Q${x},${y} ${x+q},${y} Q${x},${y} ${x},${y+q} Q${x},${y} ${x-q},${y} Q${x},${y} ${x},${y-q}Z" fill="#fff59d" stroke="#e0a800" stroke-width="1.5"/>`)});
+ return `<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><g class="body"><ellipse cx="100" cy="188" rx="64" ry="7" fill="#000" opacity=".18"/>${t.pre}<clipPath id="${id}"><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/></clipPath><g clip-path="url(#${id})">${pat}</g>${t.post}${xtra}</g></svg>`}
+const DHEAD=sp=>{const m={pachy:[142,42,150,80],dimetro:[160,124,162,132],archaeo:[132,70,138,82],mosa:[160,118,160,126],rex:[140,50,148,64],raptor:[134,60,140,78],para:[142,56,140,70],spino:[142,66,140,76],long:[158,27,162,34],tri:[134,74,152,122],steg:[160,127,164,135],anky:[158,132,162,140],ptero:[118,67,120,76],plesio:[160,46,162,53]};return m[DINO[sp][3]]};
+const EGGC=[['#f3e7cf','#c9a66b'],['#cfe9ff','#2f80ed'],['#e7dcff','#8b5cf6'],['#ffe08a','#e0a800']];
+const CRACKS=['M100,44 L94,62 L104,74 L96,90','M70,90 L84,98 L78,112 L90,120','M130,92 L118,104 L126,116 L114,128','M62,130 L78,134 L72,148','M138,134 L124,140 L132,154 L120,162','M96,150 L104,138 L112,152 L106,168'];
+function eggSVG(rar,giant,frac){const[c1,c2]=EGGC[rar],nc=Math.min(6,Math.round(frac*6.4));const sc=giant?1.12:1;
+ return `<svg viewBox="0 0 200 200" aria-hidden="true"><ellipse cx="100" cy="176" rx="74" ry="18" fill="#7a4a22" stroke="#3b2410" stroke-width="3"/>${[0,1,2,3,4,5].map(i=>`<path d="M${34+i*24},${170+(i%2)*6} l${18},${-6+(i%3)*4}" stroke="#a8743f" stroke-width="4" stroke-linecap="round"/>`).join('')}
+<g class="egg"><g transform="translate(100 176) scale(${sc}) translate(-100 -176)"><path d="M100,40 C140,40 152,110 152,128 C152,160 128,178 100,178 C72,178 48,160 48,128 C48,110 60,40 100,40Z" fill="${c1}" stroke="#3b2a1a" stroke-width="4"/><circle cx="80" cy="84" r="9" fill="${c2}" opacity=".7"/><circle cx="120" cy="112" r="12" fill="${c2}" opacity=".7"/><circle cx="84" cy="146" r="8" fill="${c2}" opacity=".7"/><circle cx="126" cy="70" r="6" fill="${c2}" opacity=".7"/><path d="M76,62 Q86,48 100,46" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>${CRACKS.slice(0,nc).map(p=>`<path d="${p}" stroke="#3b2a1a" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}${rar===3?`<path d="M160,60 l3,9 l9,3 l-9,3 l-3,9 l-3,-9 l-9,-3 l9,-3Z" fill="#fff59d" stroke="#e0a800"/><path d="M40,90 l2,6 l6,2 l-6,2 l-2,6 l-2,-6 l-6,-2 l6,-2Z" fill="#fff59d" stroke="#e0a800"/>`:''}</g></g>
+<path d="M28,170 Q100,198 172,170 Q100,188 28,170Z" fill="#5e3818"/></svg>`}
+
+/* ---------- game data ---------- */
+const HATS=[['x0','🎀','Schleife',30],['x1','🧢','Kappe',40],['x2','🌸','Blüte',60],['x3','🎩','Zylinder',80],['x4','⛑️','Helm',100],['x5','🕶️','Sonnenbrille',120],['x6','🎓','Doktorhut',150],['x7','👒','Sonnenhut',200],['x8','👑','Krone',400]];
+const TITLES=['Ei-Entdecker','Buchstaben-Baby','Silben-Saurier','Reim-Raptor','Wort-Rex','Lese-Brachio','Schreib-Stego','Satz-Spino','Komma-Kamarasaurus','Grammatik-Gigant','Sprach-Saurus','Deutsch-Legende'];
+const title=l=>l<=TITLES.length?TITLES[l-1]:'Deutsch-Legende '+'⭐'.repeat(Math.min(5,l-TITLES.length));
+const need=l=>80+l*40;
+const PRAISE=['Super!','Klasse!','Toll!','Spitze!','Genau!','Prima!','Stark!','Juhu!','Bravo!','Richtig!','Wow!'];
+const COMBO={3:'3er-Kombo!',5:'Doppel-Knack!',8:'Dino-Power!',12:'Dreifach-Knack!',15:'Unaufhaltsam!',20:'Wörter-Sturm!',30:'Legendär!'};
+const ACH=[
+ ['first','🥚','Erster Dino','Brüte dein erstes Ei aus',s=>s.hatched>=1],
+ ['ep','💜','Episch!','Brüte einen epischen Dino aus',s=>DINO.some((x,i)=>x[2]===2&&s.dex[i])],
+ ['leg','🌟','Legenden-Finder','Brüte einen legendären Dino aus',s=>DINO.some((x,i)=>x[2]===3&&s.dex[i])],
+ ['shiny','✨','Glitzer-Dino','Brüte einen Glitzer-Dino aus',s=>Object.keys(s.shiny||{}).length>0],
+ ['d10','🦕','Dino-Forscher','Entdecke 10 Dino-Arten',s=>dexCount(s)>=10],
+ ['d25','🏞️','Dino-Park','Entdecke 25 Dino-Arten',s=>dexCount(s)>=25],
+ ['d50','🦖','Dino-Experte','Entdecke 50 Dino-Arten',s=>dexCount(s)>=50],
+ ['baby','🐣','Baby-Sitter','Finde ein Dino-Baby',s=>DINO.some((x,i)=>/shell/.test(x[6])&&s.dex[i])],
+ ['dall','🏅','Alle entdeckt','Entdecke alle 75 Dino-Arten',s=>dexCount(s)>=DINO.length],
+ ['k10','🔥','Feuer-Kombo','10 richtig hintereinander',s=>s.best>=10],
+ ['k25','☄️','Unaufhaltsam','25 richtig hintereinander',s=>s.best>=25],
+ ['r100','💯','Hunderter-Held','100 Aufgaben richtig',s=>s.right>=100],
+ ['r500','🏆','Wörter-Profi','500 Aufgaben richtig',s=>s.right>=500],
+ ['r1000','📚','Tausend Wörter','1000 Aufgaben richtig',s=>s.right>=1000],
+ ['w3','🧭','Weltenbummler','Erreiche Welt 3',s=>s.world>=2],
+ ['w7','🌈','Himmelsfelsen','Erreiche die letzte Welt',s=>s.world>=6],
+ ['wfull','🌍','Welt komplett','Finde alle Dinos einer Welt',s=>Object.keys(s.wdone||{}).length>=1],
+ ['t3','📅','Dranbleiben','3 Tage hintereinander Tagesziel',s=>s.dstreak>=3],
+ ['t7','🗓️','Wochen-Star','7 Tage hintereinander Tagesziel',s=>s.dstreak>=7],
+ ['l5','🎖️','Level 5','Erreiche Level 5',s=>s.lvl>=5],
+ ['l10','🥇','Level 10','Erreiche Level 10',s=>s.lvl>=10],
+ ['b10','⚡','Blitzschnell','10 Blitz-Antworten',s=>s.blitz>=10],
+ ['shop','🛍️','Schick gemacht','Kaufe etwas im Laden',s=>s.hats.length>0]];
+
+/* ---------- state & saving (Lager db, private per user) ---------- */
+const fresh=()=>({v:1,name:'',k:1,st:{1:1,2:1,3:1,4:1},lvl:1,xp:0,xpAll:0,coins:0,right:0,ans:0,blitz:0,best:0,combo:0,world:0,mi:0,egg:null,dex:{0:1},shiny:{},wdone:{},hatched:0,park:[],buddy:0,hats:[],hat:null,special:false,ach:{},day:{d:'',n:0,done:false},goal:25,dstreak:0,lastGoal:'',topics:{},sound:true,voice:true,auto:null,savedAt:0});
+let S=fresh();
+const merge=d=>{d=d?JSON.parse(JSON.stringify(d)):null;const o=Object.assign(fresh(),d||{});o.st=Object.assign(fresh().st,o.st||{});o.day=Object.assign(fresh().day,o.day||{});return o};
+let store=null,busy=false,again=false,timer=0,saveWarned=false;
+function save(){S.savedAt=Date.now();if(!store||timer)return;timer=setTimeout(()=>{timer=0;push()},800)}
+async function push(){if(!store)return;if(busy){again=true;return}busy=true;
+ try{await store.set({s:JSON.parse(JSON.stringify(S))})}catch(e){if(e&&(e.code==='not_granted'||e.code==='invalid_argument')){store=null;if(!saveWarned){saveWarned=true;toast('Spielstand kann hier nicht gespeichert werden.')}}else if(e&&e.code==='quota_exceeded'&&!saveWarned){saveWarned=true;toast('Speicher ist voll – Spielstand nicht gespeichert.')}else if(store){setTimeout(save,5000)}}
+ busy=false;if(again){again=false;push()}}
+addEventListener('pagehide',()=>{if(store&&timer){clearTimeout(timer);timer=0;push()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&store&&timer){clearTimeout(timer);timer=0;push()}});
+const FAIL={fail:1};
+async function loadStore(over){if(!window.lager)return null;try{const db=await window.lager.use('db'),user=await window.lager.use('user');if(!db||!user)return null;const id=await user.id();if(!id)return null;
+ const ref=db.doc('data/users/'+id+'/spielstand');const snap=await ref.get();if(over())return FAIL;store=ref;return snap.exists?(snap.data()||{}).s||null:null}catch(e){return FAIL}}
+function tryLoad(){return new Promise(res=>{let over=false;const t=setTimeout(()=>{over=true;res(FAIL)},12000);loadStore(()=>over).then(v=>{if(over)return;clearTimeout(t);res(v)},()=>{if(over)return;clearTimeout(t);res(FAIL)})})}
+const LOADING='<div class="center"><h2>Deutsch-Dino</h2><p>Lade deinen Spielstand …</p></div>';
+async function loadLoop(){for(;;){const d=await tryLoad();if(d!==FAIL)return d;store=null;
+ const again=await new Promise(res=>{sheet('<div class="center"><h2>Hoppla!</h2><p>Dein Spielstand konnte gerade nicht geladen werden. Ist das Internet an?</p><button class="bigbtn go" id="retryB">Nochmal versuchen</button><p></p><button class="bigbtn" id="offB" style="background:#8a8f98">Ohne Speichern spielen</button></div>',false);$('#retryB').addEventListener('click',()=>res(true));$('#offB').addEventListener('click',()=>res(false))});
+ if(!again)return null;sheet(LOADING,false)}}
+
+/* ---------- sound & speech ---------- */
+let AC=null;
+const tone=(f,d=.12,type='sine',t=0,v=.18,f2)=>{if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended'&&AC.resume)AC.resume();const o=AC.createOscillator(),g=AC.createGain();const st=AC.currentTime+t;o.type=type;o.frequency.setValueAtTime(f,st);if(f2)o.frequency.exponentialRampToValueAtTime(f2,st+d);g.gain.setValueAtTime(v,st);g.gain.exponentialRampToValueAtTime(.001,st+d);o.connect(g);g.connect(AC.destination);o.start(st);o.stop(st+d+.02)}catch(e){}};
+const SFX={ok:()=>{tone(660,.1,'triangle');tone(990,.16,'triangle',.08)},bad:()=>{tone(260,.18,'triangle',0,.14,180)},hit:()=>{tone(240,.1,'square',0,.07,120)},coin:()=>{tone(988,.08,'square',0,.07);tone(1319,.14,'square',.07,.07)},win:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',i*.1))},lvl:()=>{[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,.16,'triangle',i*.08))},key:()=>tone(520,.04,'sine',0,.06)};
+const plain=h=>String(h).replace(/<br>/g,' ').replace(/<span class="pic">.*?<\/span>/g,' ').replace(/<[^>]+>/g,' ').replace(/□/g,' Lücke ').replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+const sayText=t=>t.say||plain(t.q);
+let voiceUnlocked=false;
+function speak(text){try{if(window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='de-DE';u.rate=.88;speechSynthesis.speak(u)}}catch(e){}}
+const autoRead=()=>S.voice&&(S.auto==null?S.k===1:S.auto);
+
+/* ---------- world scene ---------- */
+function sceneSVG(wi){const w=WORLDS[wi%7],r=rng(wi*977+29),o=[];
+ o.push(`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${w.sky[0]}"/><stop offset="1" stop-color="${w.sky[1]}"/></linearGradient><radialGradient id="sg"><stop offset="0" stop-color="${w.sun}" stop-opacity=".7"/><stop offset="1" stop-color="${w.sun}" stop-opacity="0"/></radialGradient></defs><rect width="800" height="400" fill="url(#sk)"/><circle cx="420" cy="80" r="90" fill="url(#sg)"/><circle cx="420" cy="80" r="36" fill="${w.sun}"/>`);
+ if(w.deco==='sky'){for(let i=0;i<40;i++)o.push(`<circle cx="${r()*800}" cy="${r()*200}" r="${r()*1.6+.4}" fill="#fff" opacity=".8"/>`);[[150,150],[620,120]].forEach(([x,y])=>o.push(`<path d="M${x-70},${y} Q${x},${y+70} ${x+70},${y}Z" fill="#6f63b8"/><ellipse cx="${x}" cy="${y}" rx="72" ry="14" fill="#9be07a"/>`))}
+ if(['ferns','swamp','ice','beach','canyon'].includes(w.deco))for(let i=0;i<3;i++){const x=60+i*260+r()*80,y=40+r()*60,s=.7+r()*.5;o.push(`<g opacity=".9" fill="#fff" transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="10" rx="46" ry="16"/><ellipse cx="-18" cy="0" rx="22" ry="18"/><ellipse cx="14" cy="-4" rx="26" ry="22"/></g>`)}
+ if(w.deco==='volcano')o.push(`<polygon points="330,280 460,110 520,110 660,280" fill="#5a3326"/><polygon points="490,110 520,110 660,280 570,280" fill="#3d2118"/><path d="M470,114 Q488,170 462,215 Q488,240 470,280" stroke="#ff6a2b" stroke-width="10" fill="none"/><ellipse cx="490" cy="110" rx="32" ry="8" fill="#ffb347"/>${[0,1,2].map(i=>`<circle cx="${484+i*18}" cy="${80-i*26}" r="${16+i*7}" fill="#7a6060" opacity=".5"/>`).join('')}`);
+ if(w.deco==='ice')o.push(`<polygon points="40,260 170,80 300,260" fill="#fff"/><polygon points="170,80 300,260 200,260" fill="#d4ecf9"/><polygon points="500,260 640,60 780,260" fill="#fff"/><polygon points="640,60 780,260 670,260" fill="#d4ecf9"/>`);
+ if(w.deco==='canyon')[[60,170,120],[300,140,90],[600,120,150]].forEach(([x,y,wd])=>o.push(`<path d="M${x},300 L${x+10},${y} L${x+wd-10},${y} L${x+wd},300Z" fill="#c4683a"/><rect x="${x+10}" y="${y}" width="${wd-20}" height="10" fill="#e08a50"/>`));
+ w.h.forEach((c,i)=>{const base=250+i*40,A=16-i*3,per=90+r()*60,ph=r()*6;let p=`M-20,400 L-20,${base}`;for(let x=-20;x<=840;x+=40)p+=` L${x},${(base-A*Math.sin(x/per+ph)-r()*6).toFixed(1)}`;o.push(`<path d="${p} L840,400 Z" fill="${c}"/>`);
+  if(i===1&&w.deco==='ferns')for(let k=0;k<12;k++){const x=k*70+r()*30,y=base+4;let f='';for(let j=-3;j<=3;j++)f+=`<path d="M${x},${y} Q${x+j*14},${y-40-r()*20} ${x+j*26},${y-30}" stroke="#2f7d32" stroke-width="5" fill="none" stroke-linecap="round"/>`;o.push(f)}
+  if(i===1&&w.deco==='swamp')for(let k=0;k<14;k++){const x=r()*800;o.push(`<path d="M${x},${base+6} l-4,-46 M${x+6},${base+6} l4,-38" stroke="#4a6b2a" stroke-width="4" stroke-linecap="round"/><ellipse cx="${x-4}" cy="${base-40}" rx="4" ry="11" fill="#7a4a22"/>`)}
+  if(i===1&&w.deco==='beach')for(let k=0;k<3;k++){const x=120+k*260+r()*60,y=base;o.push(`<path d="M${x},${y} Q${x+10},${y-60} ${x+4},${y-110}" stroke="#8a5a2b" stroke-width="9" fill="none"/>${[-60,-25,15,50].map(a=>`<path d="M${x+4},${y-110} q${a*.8},-26 ${a*1.4},6" stroke="#2f9e44" stroke-width="9" fill="none" stroke-linecap="round"/>`).join('')}`)}});
+ o.push(`<rect x="0" y="352" width="800" height="48" fill="${w.g}"/><rect x="0" y="352" width="800" height="5" fill="#fff" opacity=".18"/>`);
+ if(w.deco==='swamp')o.push(`<ellipse cx="400" cy="372" rx="300" ry="16" fill="#5e8a6e" opacity=".8"/>`);
+ if(w.deco==='beach')o.push(`<path d="M0,300 Q100,290 200,300 T400,300 T600,300 T800,300 V330 H0Z" fill="#7fd3f0" opacity=".6"/>`);
+ if(w.deco==='ice')for(let i=0;i<40;i++)o.push(`<circle cx="${r()*800}" cy="${r()*340}" r="${1.5+r()*2}" fill="#fff"/>`);
+ if(w.deco==='volcano')for(let i=0;i<20;i++)o.push(`<circle cx="${r()*800}" cy="${r()*330}" r="${1.5+r()*2.5}" fill="#ffb347" opacity=".8"/>`);
+ return o.join('')}
+
+/* ---------- fx ---------- */
+const fx=$('#fx'),fxc=fx.getContext('2d');let parts=[],fxOn=false;
+function confetti(n=120){if(reduced)return;fx.width=innerWidth;fx.height=innerHeight;const cols=['#ff7a45','#2fbf5b','#2f80ed','#ffcc33','#ff8fd0','#fff'];for(let i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*innerWidth*.6,y:innerHeight*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*12-4,s:6+Math.random()*7,c:P(cols),a:Math.random()*6,l:90+Math.random()*50});if(!fxOn){fxOn=true;requestAnimationFrame(tick)}}
+function tick(){fxc.clearRect(0,0,fx.width,fx.height);parts=parts.filter(p=>p.l-->0);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=.2;fxc.save();fxc.translate(p.x,p.y);fxc.rotate(p.a);fxc.fillStyle=p.c;fxc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.66);fxc.restore()});if(parts.length)requestAnimationFrame(tick);else{fxOn=false;fxc.clearRect(0,0,fx.width,fx.height)}}
+let toastQ=[],toastOn=false;
+function toast(msg){toastQ.push(msg);if(!toastOn)nextToast()}
+function nextToast(){const m=toastQ.shift();if(!m){toastOn=false;return}toastOn=true;const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>{d.remove();nextToast()},2300)}
+function bubble(txt){const b=$('#bubble');b.textContent=txt;b.classList.remove('show');void b.offsetWidth;b.classList.add('show')}
+const rarTag=q=>q===0?'':`<span class="rar r${q}">${RAR[q]}</span>`;
+
+/* ---------- rendering ---------- */
+let sceneW=-1;
+function renderHUD(){$('#lvlN').textContent=S.lvl;$('#lvlT').textContent=(S.name?S.name+' · ':'')+title(S.lvl);$('#xpF').style.width=Math.min(100,S.xp/need(S.lvl)*100)+'%';$('#coinN').textContent=S.coins;
+ $('#comboN').textContent=S.combo;$('#comboP').classList.toggle('hot',S.combo>=5);
+ rollDay();const f=Math.min(1,S.day.n/S.goal);$('#dayRing').setAttribute('stroke-dasharray',(f*50.3).toFixed(1)+' 60');$('#dayN').textContent=S.day.done?'✓':S.day.n+'/'+S.goal;$('#dayP').title='Tagesziel: '+S.day.n+' von '+S.goal+' richtig';
+ $('#stinfo').textContent='Klasse '+S.k+' · Stufe '+S.st[S.k]}
+function renderWorld(){const wi=S.world%7;if(sceneW!==S.world){$('#scene').innerHTML=sceneSVG(wi);sceneW=S.world}const round=Math.floor(S.world/7);
+ $('#wtag').innerHTML=`${WORLDS[wi].n}${round?' '+'★'.repeat(Math.min(round,3)):''}<small>Welt ${S.world+1} · Ei ${S.mi+1}/5</small>`}
+function renderBuddy(){const sp=S.buddy in S.dex?S.buddy:0;const hd=DHEAD(sp);const hat=HATS.find(x=>x[0]===S.hat);
+ $('#buddy').innerHTML=dinoSVG(sp,!!S.shiny[sp]&&S.buddyShiny)+(hat?`<span class="hat ${hat[0]==='x5'?'eye':''}" style="left:${(hat[0]==='x5'?hd[2]:hd[0])/2}%;top:${(hat[0]==='x5'?hd[3]:hd[1])/2}%">${hat[1]}</span>`:'')}
+function renderEgg(enter){const e=S.egg;$('#nest').innerHTML=eggSVG(e.rar,e.giant,1-e.hp/e.max);$('#mname').innerHTML=(e.giant?'Riesen-Ei':'Dino-Ei')+rarTag(e.rar);renderHP();const el=$('#nest');el.className='nest';if(enter){void el.offsetWidth;el.classList.add('enter');if(e.rar===3){toast('🌟 Ein GOLDENES Ei! Darin steckt ein legendärer Dino!');confetti(80)}else if(e.rar===2)toast('💜 Ein episches Ei!')}}
+function renderHP(){const e=S.egg;$('#hpF').style.width=Math.max(0,e.hp/e.max*100)+'%';$('#hpT').textContent='Schale '+Math.max(0,e.hp)+' / '+e.max}
+function renderAll(){if(!Array.isArray(S.park))S.park=[];if(S.park.length>300)S.park.length=300;if(!Array.isArray(S.hats))S.hats=[];if(!S.dex||typeof S.dex!=='object')S.dex={0:1};if(!DINO[S.buddy])S.buddy=0;if(S.egg&&(!(S.egg.hp>0)||S.egg.dead||!DINO[S.egg.sp]||!EGGC[S.egg.rar]))S.egg=null;renderHUD();renderWorld();renderBuddy();if(!S.egg)newEgg();renderEgg(false)}
+function wpick(arr,wf){let tot=0;const ws=arr.map(i=>{const w=wf(i);tot+=w;return w});let x=Math.random()*tot;for(let j=0;j<arr.length;j++){x-=ws[j];if(x<=0)return arr[j]}return arr[arr.length-1]}
+function newEgg(){const wi=S.world%7,round=Math.floor(S.world/7),giant=S.mi===4;let rar;
+ if(S.special){rar=Math.random()<.12?3:2;S.special=false}else if(S.world>=1&&Math.random()<.015)rar=3;else if(giant)rar=Math.random()<.5?1:2;else{const x=Math.random();rar=x<.62?0:x<.9?1:2}
+ const all=DINO.map((x,i)=>i);let pool=rar===3?all.filter(i=>DINO[i][2]===3):all.filter(i=>DINO[i][1]===wi&&DINO[i][2]===rar);if(!pool.length)pool=all.filter(i=>DINO[i][1]===wi);
+ const sp=wpick(pool,i=>S.dex[i]?1:1.8);let hp=4+Math.min(wi,6)+round*2+[0,1,3,6][rar];if(giant)hp=Math.round(hp*1.6);S.egg={sp,rar,giant,hp,max:hp,sh:Math.random()<.04}}
+
+/* ---------- tasks ---------- */
+let cur=null,queue=[],served=0,lastQ='',recent=[],sinceChange=0;
+function genTask(){const k=S.k,st=S.st[k];const pool=G[k].filter(e=>e[0]<=st);let tot=0;const ws=pool.map(e=>{const w=e[0]===st?3:e[0]===st-1?2:1;tot+=w;return w});let t,tries=0;
+ do{let x=Math.random()*tot,i=0;while(x>ws[i]){x-=ws[i];i++}t=pool[Math.min(i,pool.length-1)][1]();t.key=t.kind==='build'?t.w:t.q+t.a}while(t.key===lastQ&&++tries<6);return t}
+function newTask(){served++;const qi=queue.findIndex(x=>x.due<=served);let t,again=false;if(qi>=0){t=queue.splice(qi,1)[0].t;again=true}else t=genTask();lastQ=t.key;
+ if(t.kind==='build')t.tiles=shuffle(t.w.split('').map((c,i)=>({c,i})));
+ cur={t,tries:0,miss:0,pos:0,start:performance.now(),lock:false,done:false,again,picked:[],sel:null};renderTask();if(autoRead()&&voiceUnlocked)setTimeout(()=>speak(sayText(t)),250)}
+function qHTML(t,state){if(t.kind==='build'){const shown=t.w.split('').map((c,i)=>`<span class="${i<cur.pos||state?'on':''}">${i<cur.pos||state?esc(c):''}</span>`).join('');return `Baue das Wort!<span class="pic">${t.pic}</span><div class="letters">${shown}</div>`}
+ const slot=state==='ok'?`<span class="slot ok">${esc(t.a)}</span>`:state==='no'?`<span class="slot no">${esc(t.a)}</span>`:`<span class="slot">?</span>`;
+ const body=t.raw?t.q:esc(t.q);return body.includes('□')?body.replace('□',t.emo?slot:slot):body}
+function renderTask(state){const t=cur.t;$('#topic').textContent=t.topic;$('#again').hidden=!cur.again;$('#card').classList.remove('good');$('#q').innerHTML=qHTML(t,state);
+ const isB=t.kind==='build';$('#choices').hidden=isB||cur.done;$('#tiles').hidden=!isB||cur.done;$('#weiter').hidden=!cur.done;
+ if(!isB&&!cur.done){const c=$('#choices');const long=t.long||t.ch.some(x=>String(x).length>14);c.className='choices'+(t.emo?' emo':'')+(long?' long':(t.ch.length===3?' c3':''));
+  c.innerHTML=t.ch.map((v,i)=>`<button class="key ${cur.picked.includes(i)?'wrong':''} ${cur.sel===i?'right':''}" data-i="${i}" ${cur.picked.includes(i)?'disabled':''}>${esc(v)}</button>`).join('')}
+ if(isB&&!cur.done)$('#tiles').innerHTML=t.tiles.map((x,j)=>`<button class="tile ${x.used?'used':''}" data-j="${j}">${esc(x.c)}</button>`).join('');
+ if(!cur.done&&!state){$('#fb').textContent='';$('#fb').className='fb'}}
+function pickChoice(i){if(!cur||cur.lock||cur.done)return;voiceUnlocked=true;const t=cur.t;if(t.ch[i]===t.a){cur.sel=i;correct()}else{cur.picked.push(i);wrong()}}
+function pickTile(j){if(!cur||cur.lock||cur.done)return;voiceUnlocked=true;const t=cur.t,x=t.tiles[j];if(x.used)return;
+ if(x.c===t.w[cur.pos]){x.used=true;cur.pos++;SFX.key();if(cur.pos>=t.w.length){if(cur.miss)cur.tries=1;correct()}else renderTask()}
+ else{cur.miss++;SFX.bad();const el=$(`#tiles [data-j="${j}"]`);if(el){el.classList.remove('err');void el.offsetWidth;el.classList.add('err')}
+  if(cur.miss>=3){cur.tries=2;finalWrong()}else{$('#fb').textContent=cur.miss===1?'Hoppla! Welcher Buchstabe kommt als Nächstes?':'Noch ein Versuch! Hör genau hin.';$('#fb').className='fb bad';S.combo=0;renderHUD()}}}
+function limit(t){return t.kind==='build'?6+t.w.length*1.6:t.long?16:t.ws||t.raw?9:7}
+function stat(t,first){const s=S.topics[t.topic]||[0,0];s[1]++;if(first)s[0]++;S.topics[t.topic]=s;S.ans++}
+function adapt(first){recent.push(first);if(recent.length>8)recent.shift();sinceChange++;const k=S.k,st=S.st[k];const last6=recent.slice(-6);
+ if(first&&st<5&&sinceChange>=6&&last6.length===6&&last6.every(Boolean)){S.st[k]=st+1;sinceChange=0;recent=[];toast(`⭐ Stufe ${st+1}! Die Aufgaben werden kniffliger.`)}
+ else if(!first&&st>1&&sinceChange>=4&&last6.filter(x=>!x).length>=3){S.st[k]=st-1;sinceChange=0;recent=[]}}
+function correct(){const t=cur.t,first=cur.tries===0;cur.lock=true;cur.lockAt=performance.now();
+ const dt=(performance.now()-cur.start)/1000,blitz=first&&dt<limit(t);
+ if(first){S.combo++;S.best=Math.max(S.best,S.combo);S.right++;if(blitz)S.blitz++}
+ stat(t,first);adapt(first);
+ const dmg=first?(S.combo>=12?3:S.combo>=5?2:1):1,coins=first?1+(blitz?1:0):0,xp=first?10+Math.min(S.combo,10)+(blitz?5:0):4;
+ renderTask('ok');$('#card').classList.add('good');if(t.kind!=='build'){$('#choices').hidden=false;const b=$(`#choices [data-i="${cur.sel}"]`);if(b)b.classList.add('right')}
+ SFX.ok();bubble(first?(COMBO[S.combo]||(blitz?'⚡ Blitzschnell!':P(PRAISE))):'Geschafft!');
+ $('#fb').textContent=first?`+${coins} Münze${coins>1?'n':''}  ·  +${xp} XP`:'Geschafft! +'+xp+' XP';
+ const bd=$('#buddy');bd.classList.remove('cheer');void bd.offsetWidth;bd.classList.add('cheer');
+ attack(dmg,()=>{S.coins+=coins;addXP(xp);dayCount();checkAch();save();renderHUD();
+  if(S.egg.hp<=0)setTimeout(hatch,450);else setTimeout(newTask,first?650:900)})}
+function wrong(){const t=cur.t;cur.tries++;S.combo=0;SFX.bad();const c=$('#card');c.classList.remove('bad');void c.offsetWidth;c.classList.add('bad');
+ const n=$('#nest');n.classList.remove('laugh','hit','enter');void n.offsetWidth;n.classList.add('laugh');
+ if(cur.tries===1&&t.ch.length>2){renderTask();$('#fb').textContent='Fast! Probier es nochmal.';$('#fb').className='fb bad';renderHUD();return}
+ finalWrong()}
+function finalWrong(){const t=cur.t;stat(t,false);adapt(false);queue.push({t:Object.assign({},t,{tiles:null}),due:served+R(3,5)});
+ cur.done=true;renderTask('no');const ans=t.kind==='build'?t.w:(t.showA||t.a);
+ $('#fb').innerHTML=`Richtig ist <b>${esc(ans)}</b>. ${t.h?esc(t.h):''} Die Aufgabe kommt gleich nochmal.`;$('#fb').className='fb';
+ S.combo=0;renderHUD();save();if(S.voice&&voiceUnlocked&&t.kind==='build')speak(t.w)}
+function attack(dmg,done){const ar=$('#arena').getBoundingClientRect(),h=$('#buddy').getBoundingClientRect(),m=$('#nest').getBoundingClientRect();
+ const s=document.createElement('span');s.className='fly';s.textContent=dmg>=3?'💥':dmg===2?'🌟':'⭐';$('#arena').appendChild(s);
+ const x0=h.left-ar.left+h.width*.7,y0=h.top-ar.top+h.height*.35,x1=m.left-ar.left+m.width*.4,y1=m.top-ar.top+m.height*.5;s.style.left=x0+'px';s.style.top=y0+'px';
+ let fired=false;const fin=()=>{if(fired)return;fired=true;s.remove();S.egg.hp-=dmg;$('#nest').innerHTML=eggSVG(S.egg.rar,S.egg.giant,1-Math.max(0,S.egg.hp)/S.egg.max);renderHP();SFX.hit();const el=$('#nest');el.className='nest';void el.offsetWidth;el.classList.add('hit');done()};
+ if(reduced||!s.animate){fin();return}
+ const a=s.animate([{transform:'translate(0,0) scale(.7)'},{transform:`translate(${(x1-x0)/2}px,${(y1-y0)/2-50}px) rotate(180deg) scale(1.2)`},{transform:`translate(${x1-x0}px,${y1-y0}px) rotate(360deg) scale(1)`}],{duration:360,easing:'ease-in'});a.onfinish=fin;setTimeout(fin,1200)}
+function addXP(x){S.xp+=x;S.xpAll+=x;while(S.xp>=need(S.lvl)){S.xp-=need(S.lvl);S.lvl++;S.coins+=10;setTimeout(()=>{SFX.lvl();confetti(140)},200);toast(`🎉 Level ${S.lvl}! Du bist jetzt ${title(S.lvl)}. +10 Münzen`)}}
+function rollDay(){const d=today();if(S.day.d!==d)S.day={d,n:0,done:false}}
+function streakNow(){return S.lastGoal===today()||S.lastGoal===today(-1)?S.dstreak:0}
+function dayCount(){rollDay();S.day.n++;if(!S.day.done&&S.day.n>=S.goal){S.day.done=true;S.dstreak=S.lastGoal===today(-1)?S.dstreak+1:S.lastGoal===today()?S.dstreak:1;S.lastGoal=today();S.coins+=20;confetti(160);SFX.lvl();toast(`🔥 Tagesziel geschafft! ${S.dstreak} ${S.dstreak===1?'Tag':'Tage'} in Folge. +20 Münzen`)}}
+function checkAch(){ACH.forEach(a=>{if(!S.ach[a[0]]&&a[4](S)){S.ach[a[0]]=today();S.coins+=10;toast(`${a[1]} Abzeichen: ${a[2]}! +10 Münzen`)}})}
+function hatch(){try{hatch0()}catch(err){rescue(err)}}
+function hatch0(){const e=S.egg;if(!e||e.dead)return;e.dead=1;SFX.win();const el=$('#nest');el.className='nest';void el.offsetWidth;el.classList.add('gone');
+ const isNew=!S.dex[e.sp];S.dex[e.sp]=(S.dex[e.sp]||0)+1;if(e.sh)S.shiny[e.sp]=(S.shiny[e.sp]||0)+1;S.hatched++;S.park.unshift({sp:e.sp,sh:e.sh?1:0});if(S.park.length>300)S.park.length=300;
+ for(let w=0;w<7;w++)if(!S.wdone[w]&&DINO.every((x,i)=>x[1]!==w||S.dex[i])){S.wdone[w]=1;S.coins+=50;toast(`🌍 ${WORLDS[w].n} komplett! Alle Dinos gefunden. +50 Münzen`)}
+ S.mi++;let newWorld=false;if(S.mi>=5){S.mi=0;S.world++;newWorld=true}
+ const gain=R(5,12)+[0,5,12,40][e.rar]+(e.giant?10:0)+(e.sh?20:0);S.coins+=gain;if(e.rar>=2||e.sh)confetti(160);checkAch();save();
+ setTimeout(()=>{try{sheet(`<div class="center"><h2>${isNew?'Ein neuer Dino!':'Geschlüpft!'}</h2><div class="reveal">${dinoSVG(e.sp,e.sh)}</div><p>${e.sh?'✨ ':''}<b>${esc(DINO[e.sp][0])}</b>${rarTag(e.rar)||'<span class="rar r0">gewöhnlich</span>'}${isNew?'<span class="rar new">NEU im Dino-Park!</span>':` – du hast ihn jetzt ${S.dex[e.sp]}×.`}</p><div style="font-size:26px;font-weight:800"><span class="coin" style="width:24px;height:24px;vertical-align:-3px"></span> +${gain} Münzen</div>${newWorld?`<p><b>Auf zur nächsten Welt: ${WORLDS[S.world%7].n}!</b></p>`:''}<div class="row" style="justify-content:center"><button class="bigbtn" data-act="mkbuddy" data-sp="${e.sp}" data-sh="${e.sh?1:0}" style="width:auto;padding:0 18px;font-size:20px;min-height:52px">Als Begleiter wählen</button></div><button class="bigbtn go" id="cont">Weiter ➜</button></div>`,false);
+  $('#cont').addEventListener('click',()=>{try{closeOv();S.egg=null;newEgg();renderWorld();renderEgg(true);save();newTask()}catch(err){rescue(err)}})}catch(err){rescue(err)}},550)}
+
+/* ---------- overlays ---------- */
+function sheet(html,closable=true){$('#sheet').innerHTML=(closable?'<button class="x" data-act="close" aria-label="Schließen">✕</button>':'')+html;$('#ov').hidden=false;$('#sheet').scrollTop=0}
+function closeOv(){$('#ov').hidden=true;$('#sheet').innerHTML=''}
+function showMenu(){sheet(`<h2>Menü</h2><p>${esc(S.name||'')} · Level ${S.lvl} · ${S.right} Aufgaben richtig</p><div class="mgrid"><button data-act="park"><span>🦕</span>Dino-Park</button><button data-act="shop"><span>🛍️</span>Laden</button><button data-act="badges"><span>🏅</span>Abzeichen</button><button data-act="parents"><span>🔒</span>Für Eltern</button></div><p style="margin-top:14px">🔥 Tage in Folge: <b>${streakNow()}</b> · Tagesziel heute: <b>${Math.min(S.day.n,S.goal)}/${S.goal}</b><br>🦕 Dino-Park: <b>${dexCount(S)}/${DINO.length}</b> Arten · 🥚 Ausgebrütet: <b>${S.hatched}</b> · Beste Kombo: <b>${S.best}</b></p>`)}
+function showPark(){const got=dexCount(S),tot=DINO.length;let h=`<h2>Dino-Park</h2><p>Entdeckt: <b>${got} von ${tot}</b> Dino-Arten. Tippe auf einen Dino, um ihn als Begleiter mitzunehmen.</p><div class="prog"><i style="width:${got/tot*100}%"></i></div>`;
+ [0,1,2,3,4,5,6,-1].forEach(w=>{const ids=DINO.map((x,i)=>i).filter(i=>DINO[i][1]===w),c=ids.filter(i=>S.dex[i]).length;
+  h+=`<div class="sec">${w<0?'🌟 Legendär':WORLDS[w].n}<small>${S.wdone[w]?'✅ ':''}${c}/${ids.length}</small></div><div class="grid">${ids.map(i=>{const q=DINO[i][2],has=S.dex[i],sel=S.buddy===i;return `<div class="item r${q} ${has?'':'sil'} ${sel?'sel':''}">${dinoSVG(i,false)}<div class="n">${has?esc(DINO[i][0]):'???'}</div><small>${RAR[q]}${has?` · ${S.dex[i]}×`:''}${S.shiny[i]?' · ✨':''}</small>${has?`<button data-act="mkbuddy" data-sp="${i}" data-sh="0">${sel?'Dabei ✓':'Begleiter'}</button>`:''}${has&&S.shiny[i]?`<button data-act="mkbuddy" data-sp="${i}" data-sh="1">✨ Glitzer</button>`:''}</div>`}).join('')}</div>`});
+ h+=`<p style="margin-top:14px"><small>Die Farbe des Eis verrät die Seltenheit: beige gewöhnlich, blau selten, lila episch, gold legendär. Glitzer-Dinos sind ganz selten und funkeln. Dino-Babys tragen noch ihre Eierschale.</small></p>`;sheet(h)}
+let shopTab='h';
+function showShop(){const tabs=`<div class="tabs"><button data-act="tabh" class="${shopTab==='h'?'on':''}">Hüte</button><button data-act="tabe" class="${shopTab==='e'?'on':''}">Eier</button></div>`,top=`<h2>Laden</h2><p>Du hast <span class="coin" style="vertical-align:-3px"></span> <b>${S.coins}</b> Münzen.</p>${tabs}`;
+ if(shopTab==='e'){sheet(top+`<div class="grid"><div class="item r2"><div class="e">🥚</div><div class="n">Spezial-Ei</div><small>Das nächste Ei wird episch – vielleicht sogar legendär!</small><button data-act="buyegg" ${S.special?'disabled':''}>${S.special?'Gekauft ✓':'<span class="coin"></span>150'}</button></div></div>`);return}
+ sheet(top+`<div class="grid">${HATS.map(it=>{const o=S.hats.includes(it[0]),s=S.hat===it[0];return `<div class="item ${s?'sel':''} ${!o&&S.coins<it[3]?'locked':''}"><div class="e">${it[1]}</div><div class="n">${it[2]}</div><button data-buy="${it[0]}">${s?'Ablegen':o?'Aufsetzen':`<span class="coin"></span>${it[3]}`}</button></div>`}).join('')}</div><p>Dein Begleiter-Dino trägt den Hut im Spiel.</p>`)}
+function buy(id){const it=HATS.find(x=>x[0]===id);if(!it)return;
+ if(S.hats.includes(id))S.hat=S.hat===id?null:id;
+ else if(S.coins>=it[3]){S.coins-=it[3];S.hats.push(id);S.hat=id;SFX.coin();confetti(60);checkAch()}
+ else{toast(`Dir fehlen noch ${it[3]-S.coins} Münzen. Weiter üben!`);return}
+ renderBuddy();renderHUD();save();showShop()}
+function showBadges(){const n=ACH.filter(a=>S.ach[a[0]]).length;sheet(`<h2>Abzeichen</h2><p><b>${n}</b> von ${ACH.length} gesammelt. Jedes Abzeichen bringt 10 Münzen.</p>${ACH.map(a=>`<div class="badge ${S.ach[a[0]]?'':'off'}"><span class="e">${a[1]}</span><div><b>${a[2]}</b><small>${a[3]}</small></div></div>`).join('')}`)}
+let gate=null,parentsOK=false,confirmReset=false;
+function showParents(){if(!parentsOK){gate=[R(12,19),R(3,9)];sheet(`<h2>Für Eltern</h2><p>Bitte löse diese Aufgabe, um die Einstellungen zu öffnen:</p><p style="font-size:30px;font-weight:800">${gate[0]} · ${gate[1]} = ?</p><form id="gateF"><input class="t" id="gateI" inputmode="numeric" autocomplete="off" aria-label="Ergebnis"><div style="height:10px"></div><button class="bigbtn" type="submit">Öffnen</button></form><p class="fb bad" id="gateM"></p>`);
+ $('#gateF').addEventListener('submit',e=>{e.preventDefault();if(+$('#gateI').value===gate[0]*gate[1]){parentsOK=true;showParents()}else $('#gateM').textContent='Leider falsch.'});return}
+ const tp=Object.entries(S.topics).sort((a,b)=>b[1][1]-a[1][1]),auto=autoRead();
+ sheet(`<h2>Für Eltern</h2>
+ <label class="l" for="nameI">Name</label><input class="t" id="nameI" value="${esc(S.name)}" maxlength="16" autocomplete="off">
+ <label class="l">Klasse</label><div class="row seg">${[1,2,3,4].map(k=>`<button data-k2="${k}" class="${S.k===k?'on':''}">${k}</button>`).join('')}</div>
+ <label class="l">Stufe in Klasse ${S.k} <small>(passt sich automatisch an)</small></label><div class="row seg">${[1,2,3,4,5].map(s=>`<button data-st="${s}" class="${S.st[S.k]===s?'on':''}">${s}</button>`).join('')}</div>
+ <label class="l">Tagesziel (richtige Aufgaben)</label><div class="row seg">${[15,25,40,60].map(g=>`<button data-goal="${g}" class="${S.goal===g?'on':''}">${g}</button>`).join('')}</div>
+ <label class="l">Töne</label><div class="row seg"><button data-snd="1" class="${S.sound?'on':''}">An</button><button data-snd="0" class="${S.sound?'':'on'}">Aus</button></div>
+ <label class="l">Vorlese-Knopf</label><div class="row seg"><button data-voice="1" class="${S.voice?'on':''}">An</button><button data-voice="0" class="${S.voice?'':'on'}">Aus</button></div>
+ <label class="l">Aufgaben automatisch vorlesen <small>(gut für Leseanfänger)</small></label><div class="row seg"><button data-auto="1" class="${auto?'on':''}">An</button><button data-auto="0" class="${auto?'':'on'}">Aus</button></div>
+ <label class="l">Statistik nach Thema (beim ersten Versuch richtig)</label>
+ ${tp.length?`<table><thead><tr><th>Thema</th><th class="n">Aufgaben</th><th class="n">Richtig</th><th></th></tr></thead><tbody>${tp.map(([n,[r,t]])=>`<tr><td>${esc(n)}</td><td class="n">${t}</td><td class="n">${Math.round(r/t*100)} %</td><td style="width:30%"><div class="meter"><i style="width:${r/t*100}%"></i></div></td></tr>`).join('')}</tbody></table>`:'<p>Noch keine Aufgaben gelöst.</p>'}
+ <p>Insgesamt: ${S.ans} Aufgaben, ${S.right} beim ersten Versuch richtig${S.ans?` (${Math.round(S.right/S.ans*100)} %)`:''}.</p>
+ <p><small>Themen nach Klasse – 1: Anlaute, Buchstaben, Silben, Reime, Artikel, Wörter lesen und bauen. 2: Mehrzahl, Großschreibung, ABC, Gegenteile, Wortarten, ie/ei, doppelte Mitlaute, Satzzeichen. 3: Zeitformen, Steigerung, zusammengesetzte Nomen, äu/eu, ä/e, ss/ß, ck/tz, Silbentrennung, Wortfamilien, Pronomen, wörtliche Rede. 4: vier Fälle, Satzglieder, das/dass, Komma, Perfekt und Futur, Wortfelder. Falsch gelöste Aufgaben kommen nach ein paar Runden noch einmal.</small></p>
+ <button class="bigbtn coral" data-act="reset">${confirmReset?'Wirklich alles löschen? Nochmal tippen':'Spielstand zurücksetzen'}</button>`);
+ $('#nameI').addEventListener('change',e=>{S.name=e.target.value.trim().slice(0,16);renderHUD();save()})}
+function showStart(){sheet(`<div class="center"><h2 style="font-size:44px">Deutsch-Dino</h2><div class="start-dino">${dinoSVG(0,false)}</div><p>Löse Deutsch-Aufgaben, knacke Dino-Eier und entdecke alle ${DINO.length} Dinos für deinen Dino-Park!</p></div>
+ <form id="startF"><label class="l" for="startN">Wie heißt du?</label><input class="t" id="startN" maxlength="16" autocomplete="off" value="${esc(S.name)}" placeholder="Dein Name">
+ <label class="l">In welche Klasse gehst du?</label><div class="row seg" id="startK">${[1,2,3,4].map(k=>`<button type="button" data-sk="${k}" class="${S.k===k?'on':''}" style="flex:1">${k}. Klasse</button>`).join('')}</div>
+ <button class="bigbtn go" type="submit">Los geht's! ➜</button></form>`,false);
+ $('#startK').addEventListener('click',e=>{const b=e.target.closest('[data-sk]');if(!b)return;S.k=+b.dataset.sk;[...$('#startK').children].forEach(x=>x.classList.toggle('on',x===b))});
+ $('#startF').addEventListener('submit',e=>{e.preventDefault();voiceUnlocked=true;S.name=($('#startN').value.trim()||'Dino-Fan').slice(0,16);SFX.ok();closeOv();renderAll();save();newTask()})}
+
+/* ---------- events ---------- */
+$('#choices').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)pickChoice(+b.dataset.i)});
+$('#tiles').addEventListener('click',e=>{const b=e.target.closest('[data-j]');if(b)pickTile(+b.dataset.j)});
+$('#weiter').addEventListener('click',()=>{if(cur&&cur.done)newTask()});
+$('#say').addEventListener('click',()=>{voiceUnlocked=true;if(cur)speak(sayText(cur.t))});
+$('#menuBtn').addEventListener('click',showMenu);$('#lvlBtn').addEventListener('click',showBadges);
+$('#ov').addEventListener('click',e=>{if(e.target.id==='ov'&&$('#sheet .x'))closeOv()});
+$('#sheet').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.act;
+ if(a==='close')closeOv();else if(a==='park')showPark();else if(a==='shop')showShop();else if(a==='badges')showBadges();else if(a==='parents')showParents();
+ else if(a==='tabh'){shopTab='h';showShop()}else if(a==='tabe'){shopTab='e';showShop()}
+ else if(a==='mkbuddy'){S.buddy=+b.dataset.sp;S.buddyShiny=b.dataset.sh==='1';renderBuddy();save();toast(`${DINO[S.buddy][0]} ist jetzt dein Begleiter!`);if($('#sheet .x'))showPark();else b.textContent='Dabei ✓'}
+ else if(a==='buyegg'){if(S.special)return;if(S.coins<150){toast(`Dir fehlen noch ${150-S.coins} Münzen. Weiter üben!`);return}S.coins-=150;S.special=true;SFX.coin();confetti(60);renderHUD();save();showShop()}
+ else if(b.dataset.buy)buy(b.dataset.buy);
+ else if(b.dataset.k2){S.k=+b.dataset.k2;queue=[];recent=[];save();renderHUD();newTask();showParents()}
+ else if(b.dataset.st){S.st[S.k]=+b.dataset.st;recent=[];save();renderHUD();newTask();showParents()}
+ else if(b.dataset.goal){S.goal=+b.dataset.goal;save();renderHUD();showParents()}
+ else if(b.dataset.snd){S.sound=b.dataset.snd==='1';save();showParents()}
+ else if(b.dataset.voice){S.voice=b.dataset.voice==='1';$('#say').hidden=!S.voice||!window.speechSynthesis;save();showParents()}
+ else if(b.dataset.auto){S.auto=b.dataset.auto==='1';save();showParents()}
+ else if(a==='reset'){if(!confirmReset){confirmReset=true;showParents();return}confirmReset=false;parentsOK=false;S=fresh();sceneW=-1;queue=[];save();renderAll();showStart()}});
+document.addEventListener('keydown',e=>{if(!$('#ov').hidden){if(e.key==='Escape'&&$('#sheet .x'))closeOv();return}if(!cur)return;
+ if(cur.done&&(e.key==='Enter'||e.key===' ')){e.preventDefault();newTask();return}
+ if(cur.t.kind==='build'){const j=cur.t.tiles.findIndex(x=>!x.used&&lc(x.c)===lc(e.key));if(j>=0)pickTile(j);return}
+ if(/^[1-4]$/.test(e.key)&&cur.t.ch[+e.key-1]!=null&&!cur.picked.includes(+e.key-1))pickChoice(+e.key-1)});
+
+/* ---------- boot ---------- */
+async function start(){if(!window.speechSynthesis)$('#say').hidden=true;
+ sheet(LOADING,false);
+ const d=await loadLoop();S=merge(d);S.combo=0;closeOv();
+ $('#say').hidden=!S.voice||!window.speechSynthesis;renderAll();
+ if(S.name)newTask();else showStart();
+ if(!store)toast('Hinweis: Ohne Anmeldung wird der Spielstand nicht gespeichert.')}
+/* ---------- safety net: never leave the child stuck ---------- */
+function rescue(e){try{console.error(e)}catch(_){}try{closeOv()}catch(_){}
+ try{if(!S.egg||S.egg.dead||!(S.egg.hp>0)){S.egg=null;newEgg()}renderWorld();renderEgg(true);renderHUD()}catch(_){}
+ try{save()}catch(_){}try{newTask()}catch(_){}}
+setInterval(()=>{try{if(!cur||!$('#ov').hidden||!cur.lock||cur.done)return;if(performance.now()-(cur.lockAt||0)<7000)return;cur.lockAt=performance.now();
+ if(S.egg&&!(S.egg.hp>0)&&!S.egg.dead)hatch();else{if(!S.egg||S.egg.dead){S.egg=null;newEgg();renderWorld();renderEgg(true)}newTask()}}catch(e){try{rescue(e)}catch(_){}}},1500);
+start();
+}
+</script>
+</body>
+</html>
+

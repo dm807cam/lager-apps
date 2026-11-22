@@ -1,0 +1,1397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Byline &middot; Blog analytics</title>
+<meta name="color-scheme" content="light dark">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f4f3ef; --surface: #fcfcfb; --raised: #ffffff;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,.10);
+  --accent: #2a78d6; --accent-wash: rgba(42,120,214,.12); --accent-ink: #1c5cab;
+  --good: #006300; --bad: #b42323;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
+  --q1:#cde2fb; --q2:#9ec5f4; --q3:#6da7ec; --q4:#3987e5; --q5:#256abf; --q6:#184f95; --q7:#0d366b;
+  --prev: #b5b3aa;
+  --radius: 14px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --raised: #222220;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+    --accent: #3987e5; --accent-wash: rgba(57,135,229,.18); --accent-ink: #86b6ef;
+    --good: #0ca30c; --bad: #e66767;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#0ca30c; --s7:#9085e9; --s8:#e66767;
+    --q1:#184f95; --q2:#1c5cab; --q3:#256abf; --q4:#2a78d6; --q5:#5598e7; --q6:#86b6ef; --q7:#cde2fb;
+    --prev: #5c5b56;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.45 var(--font); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--accent-ink); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; }
+.hidden { display: none !important; }
+.muted { color: var(--muted); } .ink2 { color: var(--ink-2); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Header */
+header.top { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--page) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+header.top .wrap { display: flex; align-items: center; gap: 12px; padding-top: 10px; padding-bottom: 10px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: -.01em; font-size: 17px; }
+.brand svg { width: 26px; height: 26px; border-radius: 7px; flex: none; }
+.grow { flex: 1; }
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 7px 12px; cursor: pointer; white-space: nowrap; min-height: 36px; }
+.btn:hover { background: var(--raised); border-color: var(--axis); }
+.btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.danger { color: var(--bad); }
+.btn.icon { padding: 7px; width: 36px; justify-content: center; }
+.btn svg { width: 18px; height: 18px; }
+.btn[disabled] { opacity: .5; cursor: default; }
+select.sel { appearance: none; border: 1px solid var(--border); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23898781' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center; border-radius: 10px; padding: 7px 30px 7px 12px; min-height: 36px; cursor: pointer; max-width: 100%; }
+.sync { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+.dot.live { background: #0ca30c; box-shadow: 0 0 0 0 rgba(12,163,12,.5); animation: pulse 2s infinite; }
+.dot.err { background: #d03b3b; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(12,163,12,.45); } 70% { box-shadow: 0 0 0 7px rgba(12,163,12,0); } 100% { box-shadow: 0 0 0 0 rgba(12,163,12,0); } }
+.spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toolbar */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 12px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-wash); color: var(--ink); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 13px; max-width: 100%; }
+.chip b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip button { border: 0; background: transparent; cursor: pointer; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); }
+.chip button:hover { background: var(--border); }
+.live-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.live-pill strong { color: var(--ink); }
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.card-h { display: flex; align-items: center; gap: 8px; padding: 14px 16px 6px; }
+.card-h h2 { font-size: 15px; margin: 0; font-weight: 650; }
+.card-b { padding: 6px 16px 14px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+@media (max-width: 820px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* KPIs */
+.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-bottom: 1px solid var(--border); }
+.kpi { text-align: left; border: 0; background: transparent; padding: 14px 16px 12px; cursor: pointer; position: relative; border-right: 1px solid var(--border); min-width: 0; }
+.kpi:last-child { border-right: 0; }
+.kpi:hover { background: var(--accent-wash); }
+.kpi[aria-pressed="true"]::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent); }
+.kpi .lab { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; gap: 4px; align-items: center; }
+.kpi .val { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin-top: 2px; white-space: nowrap; }
+.kpi .delta { font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.delta.up { color: var(--good); } .delta.down { color: var(--bad); } .delta.flat { color: var(--muted); }
+@media (max-width: 980px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kpi:nth-child(3) { border-right: 0; } .kpi:nth-child(-n+3) { border-bottom: 1px solid var(--border); } }
+@media (max-width: 520px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi { border-right: 1px solid var(--border) !important; border-bottom: 1px solid var(--border); } .kpi:nth-child(2n) { border-right: 0 !important; } .kpi:nth-last-child(-n+2) { border-bottom: 0; } .kpi .val { font-size: 22px; } }
+.chart-box { padding: 12px 8px 8px 4px; position: relative; }
+.chart-legend { display: flex; gap: 16px; padding: 0 16px 0; font-size: 12.5px; color: var(--ink-2); align-items: center; flex-wrap: wrap; }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.key i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.key i.line { height: 2px; width: 14px; border-radius: 2px; }
+svg.chart { display: block; width: 100%; overflow: visible; }
+svg.chart text { fill: var(--muted); font-size: 11px; font-family: var(--font); font-variant-numeric: tabular-nums; }
+.hit { fill: transparent; cursor: crosshair; }
+.hit:hover + .hl, .hl.on { opacity: 1; }
+
+/* Tabs */
+.tabs { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+.tab { border: 0; background: transparent; padding: 5px 9px; border-radius: 8px; font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.tab:hover { background: var(--border); }
+.tab[aria-selected="true"] { color: var(--ink); background: var(--accent-wash); font-weight: 600; }
+
+/* Bar list */
+.blist { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.blist th { font-size: 11.5px; font-weight: 600; color: var(--muted); text-align: right; padding: 4px 0 6px 10px; text-transform: uppercase; letter-spacing: .03em; }
+.blist th:first-child { text-align: left; padding-left: 0; }
+.blist td { padding: 0; height: 36px; text-align: right; font-size: 13.5px; font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 10px; color: var(--ink-2); }
+.blist td:first-child { text-align: left; padding-left: 0; color: var(--ink); }
+.blist td.v1 { color: var(--ink); font-weight: 600; }
+.brow { cursor: pointer; }
+.bcell { position: relative; height: 32px; display: flex; align-items: center; padding: 0 8px; gap: 8px; overflow: hidden; }
+.bcell .bar { position: absolute; left: 0; top: 2px; bottom: 2px; background: var(--accent-wash); border-radius: 6px; z-index: 0; transition: width .3s; }
+.bcell > span { position: relative; z-index: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.bcell .sub { color: var(--muted); font-size: 12px; }
+.brow:hover .bar { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.bcell .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; position: relative; z-index: 1; }
+.bcell .flag { font-size: 16px; line-height: 1; position: relative; z-index: 1; }
+.bcell a.ext { position: relative; z-index: 1; color: var(--muted); display: inline-flex; flex: none; }
+.bcell a.ext svg { width: 13px; height: 13px; }
+.badge { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 6px; background: var(--accent-wash); color: var(--accent-ink); position: relative; z-index: 1; flex: none; }
+.more { margin-top: 8px; }
+.empty { color: var(--muted); padding: 28px 0; text-align: center; font-size: 14px; }
+@media (max-width: 520px) { .blist .opt { display: none; } }
+
+/* Segmented bar */
+.seg { display: flex; gap: 2px; height: 28px; margin: 4px 0 12px; }
+.seg div { border-radius: 4px; min-width: 2px; color: #fff; font-size: 11.5px; font-weight: 600; display: flex; align-items: center; padding-left: 6px; overflow: hidden; white-space: nowrap; }
+.seg div.dark { color: #0b0b0b; }
+
+/* Heatmap */
+.heat { display: grid; grid-template-columns: 34px repeat(24, minmax(0, 1fr)); gap: 2px; font-size: 10.5px; color: var(--muted); }
+.heat .c { aspect-ratio: 1 / 1; border-radius: 3px; background: var(--grid); min-height: 8px; }
+.heat .rl { display: flex; align-items: center; }
+.heat .hl { text-align: center; }
+.heat-legend { display: flex; align-items: center; gap: 4px; justify-content: flex-end; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+.heat-legend i { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+.best { font-size: 13.5px; color: var(--ink-2); margin: 2px 0 10px; }
+.best strong { color: var(--ink); }
+
+/* Tooltip */
+#tip { position: fixed; z-index: 100; pointer-events: none; background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 6px 24px rgba(0,0,0,.14); min-width: 140px; }
+#tip .t { font-weight: 600; margin-bottom: 4px; }
+#tip .r { display: flex; justify-content: space-between; gap: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+#tip .r b { color: var(--ink); }
+
+/* Modal / drawer */
+dialog { border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--ink); padding: 0; width: min(720px, calc(100vw - 24px)); max-height: calc(100vh - 40px); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+.dlg-h { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 2; }
+.dlg-h h3 { margin: 0; font-size: 17px; }
+.dlg-b { padding: 16px 18px 22px; }
+.section { margin-bottom: 26px; }
+.section h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+.field { display: grid; gap: 4px; margin-bottom: 12px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field .hint { font-size: 12.5px; color: var(--muted); }
+.inp { border: 1px solid var(--border); background: var(--page); border-radius: 10px; padding: 9px 12px; width: 100%; }
+.inp:focus, .btn:focus-visible, select.sel:focus, .tab:focus-visible, .kpi:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+pre.code { background: var(--page); border: 1px solid var(--border); border-radius: 10px; padding: 12px; overflow-x: auto; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-all; margin: 0 0 8px; }
+.site-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.site-row:last-child { border-bottom: 0; }
+.note { background: var(--accent-wash); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; margin-bottom: 12px; }
+.note.err { background: color-mix(in srgb, #d03b3b 14%, transparent); }
+.meter { height: 8px; border-radius: 8px; background: var(--q1); overflow: hidden; margin: 6px 0; }
+.meter div { height: 100%; background: var(--accent); border-radius: 8px; }
+.seg-ctl { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.seg-ctl button { border: 0; background: transparent; padding: 7px 12px; cursor: pointer; font-size: 13.5px; }
+.seg-ctl button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
+/* Onboarding */
+.hero { max-width: 640px; margin: 40px auto; }
+.hero h1 { font-size: 30px; letter-spacing: -.02em; margin: 0 0 8px; line-height: 1.15; }
+.hero p.lead { font-size: 16px; color: var(--ink-2); margin: 0 0 22px; }
+.steps { counter-reset: s; display: grid; gap: 14px; }
+.step { padding: 18px; }
+.step h3 { margin: 0 0 8px; font-size: 16px; display: flex; gap: 10px; align-items: center; }
+.step h3::before { counter-increment: s; content: counter(s); width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; display: grid; place-items: center; flex: none; }
+.feat { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px 18px; font-size: 14px; color: var(--ink-2); margin: 0 0 24px; padding: 0; list-style: none; }
+.feat li::before { content: "\2713  "; color: var(--accent); font-weight: 700; }
+@media (max-width: 520px) { .feat { grid-template-columns: 1fr; } .hero h1 { font-size: 25px; } }
+
+/* Insights */
+.insights { font-size: 14.5px; }
+.insights ul { margin: 4px 0; padding-left: 18px; }
+.insights li { margin: 6px 0; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--page); padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 200; box-shadow: 0 8px 30px rgba(0,0,0,.25); max-width: calc(100vw - 32px); }
+table.dt { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+table.dt th, table.dt td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+table.dt th:first-child, table.dt td:first-child { text-align: left; }
+footer.foot { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 28px; }
+@media (max-width: 520px) { .hide-sm { display: none !important; } .wrap { padding: 0 10px 40px; } .card-h { padding: 12px 12px 4px; flex-wrap: wrap; } .card-b { padding: 4px 12px 12px; } .tabs { margin-left: 0; justify-content: flex-start; width: 100%; } }
+
+</style>
+</head>
+<body>
+<div id="app"><div class="empty" style="padding:80px 0">Loading&hellip;</div></div>
+<script>
+(async () => {
+"use strict";
+// ---------- helpers ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const LOCALE = navigator.language || "en";
+const nf = new Intl.NumberFormat(LOCALE);
+const cf = new Intl.NumberFormat(LOCALE, { notation: "compact", maximumFractionDigits: 1 });
+const fmtN = (n) => (Math.abs(n) >= 10000 ? cf.format(n) : nf.format(Math.round(n)));
+const fmtPct = (x) => (isFinite(x) ? Math.round(x * 100) + "%" : "–");
+const fmtDur = (ms) => { if (!isFinite(ms) || ms <= 0) return "0s"; const s = Math.round(ms / 1000); if (s < 60) return s + "s"; const m = Math.floor(s / 60); if (m < 60) return m + "m " + String(s % 60).padStart(2, "0") + "s"; return Math.floor(m / 60) + "h " + (m % 60) + "m"; };
+const DAY = 864e5;
+const utcDay = (ts) => new Date(ts).toISOString().slice(0, 10);
+const TAB_ID = Math.random().toString(36).slice(2);
+const regionNames = (() => { try { return new Intl.DisplayNames([LOCALE], { type: "region" }); } catch (e) { return null; } })();
+const langNames = (() => { try { return new Intl.DisplayNames([LOCALE], { type: "language" }); } catch (e) { return null; } })();
+const flag = (cc) => (cc && cc.length === 2 ? String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 127397 + c.charCodeAt(0))) : "🌐");
+const TZMAP = (() => { const m = Object.create(null); [
+  "AD:Europe/Andorra",
+  "AE:Asia/Dubai",
+  "AF:Asia/Kabul",
+  "AG:America/Antigua",
+  "AI:America/Anguilla",
+  "AL:Europe/Tirane",
+  "AM:Asia/Yerevan",
+  "AO:Africa/Luanda",
+  "AQ:Antarctica/Casey,Antarctica/Davis,Antarctica/DumontDUrville,Antarctica/Mawson,Antarctica/McMurdo,Antarctica/Palmer,Antarctica/Rothera,Antarctica/Syowa,Antarctica/Troll,Antarctica/Vostok",
+  "AR:America/Argentina/Buenos_Aires,America/Argentina/Catamarca,America/Argentina/Cordoba,America/Argentina/Jujuy,America/Argentina/La_Rioja,America/Argentina/Mendoza,America/Argentina/Rio_Gallegos,America/Argentina/Salta,America/Argentina/San_Juan,America/Argentina/San_Luis,America/Argentina/Tucuman,America/Argentina/Ushuaia,America/Buenos_Aires",
+  "AS:Pacific/Pago_Pago",
+  "AT:Europe/Vienna",
+  "AU:Antarctica/Macquarie,Australia/ACT,Australia/Adelaide,Australia/Brisbane,Australia/Broken_Hill,Australia/Darwin,Australia/Eucla,Australia/Hobart,Australia/Lindeman,Australia/Lord_Howe,Australia/Melbourne,Australia/Perth,Australia/Sydney",
+  "AW:America/Aruba",
+  "AX:Europe/Mariehamn",
+  "AZ:Asia/Baku",
+  "BA:Europe/Sarajevo",
+  "BB:America/Barbados",
+  "BD:Asia/Dacca,Asia/Dhaka",
+  "BE:Europe/Brussels",
+  "BF:Africa/Ouagadougou",
+  "BG:Europe/Sofia",
+  "BH:Asia/Bahrain",
+  "BI:Africa/Bujumbura",
+  "BJ:Africa/Porto-Novo",
+  "BL:America/St_Barthelemy",
+  "BM:Atlantic/Bermuda",
+  "BN:Asia/Brunei",
+  "BO:America/La_Paz",
+  "BQ:America/Kralendijk",
+  "BR:America/Araguaina,America/Bahia,America/Belem,America/Boa_Vista,America/Campo_Grande,America/Cuiaba,America/Eirunepe,America/Fortaleza,America/Maceio,America/Manaus,America/Noronha,America/Porto_Velho,America/Recife,America/Rio_Branco,America/Santarem,America/Sao_Paulo",
+  "BS:America/Nassau",
+  "BT:Asia/Thimbu,Asia/Thimphu",
+  "BW:Africa/Gaborone",
+  "BY:Europe/Minsk",
+  "BZ:America/Belize",
+  "CA:America/Atikokan,America/Blanc-Sablon,America/Cambridge_Bay,America/Creston,America/Dawson,America/Dawson_Creek,America/Edmonton,America/Fort_Nelson,America/Glace_Bay,America/Goose_Bay,America/Halifax,America/Inuvik,America/Iqaluit,America/Moncton,America/Rankin_Inlet,America/Regina,America/Resolute,America/St_Johns,America/Swift_Current,America/Toronto,America/Vancouver,America/Whitehorse,America/Winnipeg",
+  "CC:Indian/Cocos",
+  "CD:Africa/Kinshasa,Africa/Lubumbashi",
+  "CF:Africa/Bangui",
+  "CG:Africa/Brazzaville",
+  "CH:Europe/Zurich",
+  "CI:Africa/Abidjan",
+  "CK:Pacific/Rarotonga",
+  "CL:America/Coyhaique,America/Punta_Arenas,America/Santiago,Pacific/Easter",
+  "CM:Africa/Douala",
+  "CN:Asia/Shanghai,Asia/Urumqi",
+  "CO:America/Bogota",
+  "CR:America/Costa_Rica",
+  "CU:America/Havana",
+  "CV:Atlantic/Cape_Verde",
+  "CW:America/Curacao",
+  "CX:Indian/Christmas",
+  "CY:Asia/Famagusta,Asia/Nicosia",
+  "CZ:Europe/Prague",
+  "DE:Europe/Berlin,Europe/Busingen",
+  "DJ:Africa/Djibouti",
+  "DK:Europe/Copenhagen",
+  "DM:America/Dominica",
+  "DO:America/Santo_Domingo",
+  "DZ:Africa/Algiers",
+  "EC:America/Guayaquil,Pacific/Galapagos",
+  "EE:Europe/Tallinn",
+  "EG:Africa/Cairo",
+  "EH:Africa/El_Aaiun",
+  "ER:Africa/Asmara",
+  "ES:Africa/Ceuta,Atlantic/Canary,Europe/Madrid",
+  "ET:Africa/Addis_Ababa",
+  "FI:Europe/Helsinki",
+  "FJ:Pacific/Fiji",
+  "FK:Atlantic/Stanley",
+  "FM:Pacific/Chuuk,Pacific/Kosrae,Pacific/Pohnpei,Pacific/Truk",
+  "FO:Atlantic/Faeroe,Atlantic/Faroe",
+  "FR:Europe/Paris",
+  "GA:Africa/Libreville",
+  "GB:Europe/London",
+  "GD:America/Grenada",
+  "GE:Asia/Tbilisi",
+  "GF:America/Cayenne",
+  "GG:Europe/Guernsey",
+  "GH:Africa/Accra",
+  "GI:Europe/Gibraltar",
+  "GL:America/Danmarkshavn,America/Godthab,America/Nuuk,America/Scoresbysund,America/Thule",
+  "GM:Africa/Banjul",
+  "GN:Africa/Conakry",
+  "GP:America/Guadeloupe",
+  "GQ:Africa/Malabo",
+  "GR:Europe/Athens",
+  "GS:Atlantic/South_Georgia",
+  "GT:America/Guatemala",
+  "GU:Pacific/Guam",
+  "GW:Africa/Bissau",
+  "GY:America/Guyana",
+  "HK:Asia/Hong_Kong",
+  "HN:America/Tegucigalpa",
+  "HR:Europe/Zagreb",
+  "HT:America/Port-au-Prince",
+  "HU:Europe/Budapest",
+  "ID:Asia/Jakarta,Asia/Jayapura,Asia/Makassar,Asia/Pontianak",
+  "IE:Europe/Dublin",
+  "IL:Asia/Jerusalem",
+  "IM:Europe/Isle_of_Man",
+  "IN:Asia/Calcutta,Asia/Kolkata",
+  "IO:Indian/Chagos",
+  "IQ:Asia/Baghdad",
+  "IR:Asia/Tehran",
+  "IS:Atlantic/Reykjavik",
+  "IT:Europe/Rome",
+  "JE:Europe/Jersey",
+  "JM:America/Jamaica",
+  "JO:Asia/Amman",
+  "JP:Asia/Tokyo",
+  "KE:Africa/Nairobi",
+  "KG:Asia/Bishkek",
+  "KH:Asia/Phnom_Penh",
+  "KI:Pacific/Kanton,Pacific/Kiritimati,Pacific/Tarawa",
+  "KM:Indian/Comoro",
+  "KN:America/St_Kitts",
+  "KP:Asia/Pyongyang",
+  "KR:Asia/Seoul",
+  "KW:Asia/Kuwait",
+  "KY:America/Cayman",
+  "KZ:Asia/Almaty,Asia/Aqtau,Asia/Aqtobe,Asia/Atyrau,Asia/Oral,Asia/Qostanay,Asia/Qyzylorda",
+  "LA:Asia/Vientiane",
+  "LB:Asia/Beirut",
+  "LC:America/St_Lucia",
+  "LI:Europe/Vaduz",
+  "LK:Asia/Colombo",
+  "LR:Africa/Monrovia",
+  "LS:Africa/Maseru",
+  "LT:Europe/Vilnius",
+  "LU:Europe/Luxembourg",
+  "LV:Europe/Riga",
+  "LY:Africa/Tripoli",
+  "MA:Africa/Casablanca",
+  "MC:Europe/Monaco",
+  "MD:Europe/Chisinau",
+  "ME:Europe/Podgorica",
+  "MF:America/Marigot",
+  "MG:Indian/Antananarivo",
+  "MH:Pacific/Kwajalein,Pacific/Majuro",
+  "MK:Europe/Skopje",
+  "ML:Africa/Bamako",
+  "MM:Asia/Rangoon,Asia/Yangon",
+  "MN:Asia/Hovd,Asia/Ulaanbaatar,Asia/Ulan_Bator",
+  "MO:Asia/Macau",
+  "MP:Pacific/Saipan",
+  "MQ:America/Martinique",
+  "MR:Africa/Nouakchott",
+  "MS:America/Montserrat",
+  "MT:Europe/Malta",
+  "MU:Indian/Mauritius",
+  "MV:Indian/Maldives",
+  "MW:Africa/Blantyre",
+  "MX:America/Bahia_Banderas,America/Cancun,America/Chihuahua,America/Ciudad_Juarez,America/Hermosillo,America/Matamoros,America/Mazatlan,America/Merida,America/Mexico_City,America/Monterrey,America/Ojinaga,America/Tijuana",
+  "MY:Asia/Kuala_Lumpur,Asia/Kuching",
+  "MZ:Africa/Maputo",
+  "NA:Africa/Windhoek",
+  "NC:Pacific/Noumea",
+  "NE:Africa/Niamey",
+  "NF:Pacific/Norfolk",
+  "NG:Africa/Lagos",
+  "NI:America/Managua",
+  "NL:Europe/Amsterdam",
+  "NO:Europe/Oslo",
+  "NP:Asia/Kathmandu,Asia/Katmandu",
+  "NR:Pacific/Nauru",
+  "NU:Pacific/Niue",
+  "NZ:Pacific/Auckland,Pacific/Chatham",
+  "OM:Asia/Muscat",
+  "PA:America/Panama",
+  "PE:America/Lima",
+  "PF:Pacific/Gambier,Pacific/Marquesas,Pacific/Tahiti",
+  "PG:Pacific/Bougainville,Pacific/Port_Moresby",
+  "PH:Asia/Manila",
+  "PK:Asia/Karachi",
+  "PL:Europe/Warsaw",
+  "PM:America/Miquelon",
+  "PN:Pacific/Pitcairn",
+  "PR:America/Puerto_Rico",
+  "PS:Asia/Gaza,Asia/Hebron",
+  "PT:Atlantic/Azores,Atlantic/Madeira,Europe/Lisbon",
+  "PW:Pacific/Palau",
+  "PY:America/Asuncion",
+  "QA:Asia/Qatar",
+  "RE:Indian/Reunion",
+  "RO:Europe/Bucharest",
+  "RS:Europe/Belgrade",
+  "RU:Asia/Anadyr,Asia/Barnaul,Asia/Chita,Asia/Irkutsk,Asia/Kamchatka,Asia/Khandyga,Asia/Krasnoyarsk,Asia/Magadan,Asia/Novokuznetsk,Asia/Novosibirsk,Asia/Omsk,Asia/Sakhalin,Asia/Srednekolymsk,Asia/Tomsk,Asia/Ust-Nera,Asia/Vladivostok,Asia/Yakutsk,Asia/Yekaterinburg,Europe/Astrakhan,Europe/Kaliningrad,Europe/Kirov,Europe/Moscow,Europe/Samara,Europe/Saratov,Europe/Ulyanovsk,Europe/Volgograd",
+  "RW:Africa/Kigali",
+  "SA:Asia/Riyadh",
+  "SB:Pacific/Guadalcanal",
+  "SC:Indian/Mahe",
+  "SD:Africa/Khartoum",
+  "SE:Europe/Stockholm",
+  "SG:Asia/Singapore",
+  "SH:Atlantic/St_Helena",
+  "SI:Europe/Ljubljana",
+  "SJ:Arctic/Longyearbyen",
+  "SK:Europe/Bratislava",
+  "SL:Africa/Freetown",
+  "SM:Europe/San_Marino",
+  "SN:Africa/Dakar",
+  "SO:Africa/Mogadishu",
+  "SR:America/Paramaribo",
+  "SS:Africa/Juba",
+  "ST:Africa/Sao_Tome",
+  "SV:America/El_Salvador",
+  "SX:America/Lower_Princes",
+  "SY:Asia/Damascus",
+  "SZ:Africa/Mbabane",
+  "TC:America/Grand_Turk",
+  "TD:Africa/Ndjamena",
+  "TF:Indian/Kerguelen",
+  "TG:Africa/Lome",
+  "TH:Asia/Bangkok",
+  "TJ:Asia/Dushanbe",
+  "TK:Pacific/Fakaofo",
+  "TL:Asia/Dili",
+  "TM:Asia/Ashgabat",
+  "TN:Africa/Tunis",
+  "TO:Pacific/Tongatapu",
+  "TR:Asia/Istanbul,Europe/Istanbul",
+  "TT:America/Port_of_Spain",
+  "TV:Pacific/Funafuti",
+  "TW:Asia/Taipei",
+  "TZ:Africa/Dar_es_Salaam",
+  "UA:Europe/Kiev,Europe/Kyiv,Europe/Simferopol",
+  "UG:Africa/Kampala",
+  "UM:Pacific/Midway,Pacific/Wake",
+  "US:America/Adak,America/Anchorage,America/Boise,America/Chicago,America/Denver,America/Detroit,America/Indiana/Indianapolis,America/Indiana/Knox,America/Indiana/Marengo,America/Indiana/Petersburg,America/Indiana/Tell_City,America/Indiana/Vevay,America/Indiana/Vincennes,America/Indiana/Winamac,America/Indianapolis,America/Juneau,America/Kentucky/Louisville,America/Kentucky/Monticello,America/Los_Angeles,America/Menominee,America/Metlakatla,America/New_York,America/Nome,America/North_Dakota/Beulah,America/North_Dakota/Center,America/North_Dakota/New_Salem,America/Phoenix,America/Sitka,America/Yakutat,Pacific/Honolulu,US/Central,US/Eastern,US/Mountain,US/Pacific",
+  "UY:America/Montevideo",
+  "UZ:Asia/Samarkand,Asia/Tashkent",
+  "VA:Europe/Vatican",
+  "VC:America/St_Vincent",
+  "VE:America/Caracas",
+  "VG:America/Tortola",
+  "VI:America/St_Thomas",
+  "VN:Asia/Ho_Chi_Minh,Asia/Saigon",
+  "VU:Pacific/Efate",
+  "WF:Pacific/Wallis",
+  "WS:Pacific/Apia",
+  "YE:Asia/Aden",
+  "YT:Indian/Mayotte",
+  "ZA:Africa/Johannesburg",
+  "ZM:Africa/Lusaka",
+  "ZW:Africa/Harare"
+].join(";").split(";").forEach((g) => { const [cc, list] = g.split(":"); list.split(",").forEach((t) => (m[t] = cc)); }); return m; })();
+const ICON = {
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  sync: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg>',
+  x: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/><path d="M19 17v4M17 19h4"/></svg>',
+  dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>',
+};
+function toast(msg, ms = 3200) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), ms); }
+function slugify(s) { return String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "site"; }
+
+// ---------- time zones ----------
+const fmtCache = new Map();
+function zfmt(tz) {
+  if (!fmtCache.has(tz)) fmtCache.set(tz, new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", weekday: "short" }));
+  return fmtCache.get(tz);
+}
+const WD = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+function zparts(ts, tz) {
+  const o = {}; for (const p of zfmt(tz).formatToParts(ts)) o[p.type] = p.value;
+  return { y: +o.year, m: +o.month, d: +o.day, h: +o.hour % 24, mi: +o.minute, wd: WD[o.weekday] };
+}
+function tzOffset(ts, tz) { const p = zparts(ts, tz); return Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi) - Math.floor(ts / 60000) * 60000; }
+function zstart(y, m, d, tz) { const u = Date.UTC(y, m - 1, d); let g = u - tzOffset(u, tz); g = u - tzOffset(g, tz); return g; }
+function addDays(y, m, d, n) { const t = new Date(Date.UTC(y, m - 1, d + n)); return [t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()]; }
+function validTz(tz) { try { zfmt(tz); return true; } catch (e) { return false; } }
+
+const RANGES = [
+  ["today", "Today"], ["yesterday", "Yesterday"], ["7d", "Last 7 days"], ["30d", "Last 30 days"], ["90d", "Last 90 days"],
+  ["month", "This month"], ["lastmonth", "Last month"], ["12m", "Last 12 months"],
+];
+function buildPeriod(kind, tz, now = Date.now()) {
+  const p = zparts(now, tz); const T = [p.y, p.m, p.d];
+  const dayBuckets = (start, n) => { const out = []; for (let i = 0; i < n; i++) { const [y, m, d] = addDays(...start, i); const [y2, m2, d2] = addDays(...start, i + 1); out.push({ s: zstart(y, m, d, tz), e: zstart(y2, m2, d2, tz), label: new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(LOCALE, { month: "short", day: "numeric", timeZone: "UTC" }) }); } return out; };
+  const hourBuckets = (day) => { const s = zstart(...day, tz); const e = zstart(...addDays(...day, 1), tz); const out = []; for (let h = 0; h < 24; h++) out.push({ s: s + h * 36e5, e: Math.min(e, s + (h + 1) * 36e5), label: String(h).padStart(2, "0") + ":00" }); return out; };
+  const monthBuckets = (y, m, n) => { const out = []; for (let i = 0; i < n; i++) { const mm = m - 1 + i; const yy = y + Math.floor(mm / 12), m1 = (mm % 12 + 12) % 12 + 1; const ny = m1 === 12 ? yy + 1 : yy, nm = m1 === 12 ? 1 : m1 + 1; out.push({ s: zstart(yy, m1, 1, tz), e: zstart(ny, nm, 1, tz), label: new Date(Date.UTC(yy, m1 - 1, 1)).toLocaleDateString(LOCALE, { month: "short", year: "2-digit", timeZone: "UTC" }) }); } return out; };
+  let cur, prev, unit;
+  if (kind === "today" || kind === "yesterday") {
+    unit = "hour"; const day = kind === "today" ? T : addDays(...T, -1);
+    cur = hourBuckets(day); prev = hourBuckets(addDays(...day, -1));
+  } else if (kind === "7d" || kind === "30d" || kind === "90d") {
+    unit = "day"; const n = parseInt(kind); const start = addDays(...T, -(n - 1));
+    cur = dayBuckets(start, n); prev = dayBuckets(addDays(...start, -n), n);
+  } else if (kind === "month" || kind === "lastmonth") {
+    unit = "day";
+    let [y, m] = [p.y, p.m]; if (kind === "lastmonth") { m -= 1; if (!m) { m = 12; y -= 1; } }
+    const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    cur = dayBuckets([y, m, 1], days);
+    let py = y, pm = m - 1; if (!pm) { pm = 12; py -= 1; }
+    prev = dayBuckets([py, pm, 1], new Date(Date.UTC(py, pm, 0)).getUTCDate());
+  } else {
+    unit = "month"; let y = p.y, m = p.m - 11; while (m < 1) { m += 12; y -= 1; }
+    cur = monthBuckets(y, m, 12); prev = monthBuckets(y - 1, m, 12);
+  }
+  return { kind, unit, cur, prev, start: cur[0].s, end: cur[cur.length - 1].e, pstart: prev[0].s, pend: prev[prev.length - 1].e };
+}
+function bucketIndex(buckets, ts) { let lo = 0, hi = buckets.length - 1; if (ts < buckets[0].s || ts >= buckets[hi].e) return -1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (buckets[mid].s <= ts) lo = mid; else hi = mid - 1; } return lo; }
+
+// ---------- traffic sources ----------
+const CHANNELS = [ // fixed order = fixed colour slot (colour follows the entity)
+  ["Search", "var(--s1)"], ["Social", "var(--s2)"], ["Direct", "var(--s3)"], ["Newsletter", "var(--s4)"],
+  ["AI assistants", "var(--s5)"], ["Referral", "var(--s6)"], ["Campaigns", "var(--s7)"], ["Paid", "var(--s8)"],
+];
+const CH_COLOR = Object.fromEntries(CHANNELS);
+const CH_DARK_TEXT = { Newsletter: 1 };
+const KNOWN = [ // first match wins: AI assistants and webmail before the search engines they share domains with
+  [/^(chatgpt\.com|chat\.openai\.com)$/, "ChatGPT", "AI assistants"], [/perplexity\.ai$/, "Perplexity", "AI assistants"],
+  [/^claude\.ai$/, "Claude", "AI assistants"], [/gemini\.google\.com$/, "Gemini", "AI assistants"], [/copilot\.microsoft\.com$/, "Copilot", "AI assistants"],
+  [/(^|\.)you\.com$/, "You.com", "AI assistants"], [/phind\.com$/, "Phind", "AI assistants"], [/chat\.deepseek\.com$/, "DeepSeek", "AI assistants"],
+  [/(^|\.)poe\.com$/, "Poe", "AI assistants"], [/(^|\.)meta\.ai$/, "Meta AI", "AI assistants"], [/grok\.com$/, "Grok", "AI assistants"], [/chat\.mistral\.ai$/, "Le Chat", "AI assistants"],
+  [/(^|\.)substack\.com$/, "Substack", "Newsletter"], [/^mail\.|webmail|outlook\.live\.com|mail\.google\.com|buttondown|beehiiv|convertkit|mailchimp|ghost\.io$/, null, "Newsletter"],
+  [/(^|\.)google\.[a-z.]+$/, "Google", "Search"], [/(^|\.)bing\.com$/, "Bing", "Search"], [/duckduckgo\.com$/, "DuckDuckGo", "Search"],
+  [/(^|\.)yahoo\.[a-z.]+$/, "Yahoo", "Search"], [/ecosia\.org$/, "Ecosia", "Search"], [/(^|\.)yandex\.[a-z.]+$/, "Yandex", "Search"],
+  [/baidu\.com$/, "Baidu", "Search"], [/startpage\.com$/, "Startpage", "Search"], [/qwant\.com$/, "Qwant", "Search"],
+  [/search\.brave\.com$/, "Brave Search", "Search"], [/kagi\.com$/, "Kagi", "Search"], [/naver\.com$/, "Naver", "Search"],
+  [/^(t\.co|x\.com|twitter\.com|mobile\.twitter\.com)$/, "X (Twitter)", "Social"], [/(^|\.)facebook\.com$|^fb\.me$|^m\.facebook\.com$/, "Facebook", "Social"],
+  [/(^|\.)instagram\.com$/, "Instagram", "Social"], [/(^|\.)linkedin\.com$|^lnkd\.in$/, "LinkedIn", "Social"], [/(^|\.)reddit\.com$/, "Reddit", "Social"],
+  [/news\.ycombinator\.com$/, "Hacker News", "Social"], [/bsky\.app$/, "Bluesky", "Social"], [/threads\.(net|com)$/, "Threads", "Social"],
+  [/(^|\.)pinterest\.[a-z.]+$/, "Pinterest", "Social"], [/(^|\.)youtube\.com$|^youtu\.be$/, "YouTube", "Social"], [/tiktok\.com$/, "TikTok", "Social"],
+  [/lobste\.rs$/, "Lobsters", "Social"], [/(^|\.)discord(app)?\.com$/, "Discord", "Social"], [/(^|\.)telegram\.(org|me)$|^t\.me$/, "Telegram", "Social"],
+  [/whatsapp\.com$/, "WhatsApp", "Social"], [/quora\.com$/, "Quora", "Social"], [/mastodon|fosstodon|hachyderm|mstdn/, "Mastodon", "Social"],
+
+];
+const SRC_NAMES = { google: "Google", twitter: "X (Twitter)", x: "X (Twitter)", facebook: "Facebook", linkedin: "LinkedIn", reddit: "Reddit", hn: "Hacker News", hackernews: "Hacker News", newsletter: "Newsletter", mastodon: "Mastodon", bluesky: "Bluesky", chatgpt: "ChatGPT", "chatgpt.com": "ChatGPT", perplexity: "Perplexity", rss: "RSS", feed: "RSS" };
+function classify(pv) {
+  const um = pv.um || "", us = pv.us || "";
+  let host = "", name = "", ch = "";
+  if (pv.r) { host = pv.r.split("/")[0]; for (const [re, n, c] of KNOWN) if (re.test(host)) { name = n || host; ch = c; break; } if (!ch) { name = host; ch = "Referral"; } }
+  if (us && !pv.r) { name = SRC_NAMES[us] || us; for (const [re, n, c] of KNOWN) if (re.test(us)) { name = n || us; ch = c; break; } }
+  if (/^(email|e-mail|newsletter)$/.test(um) || /newsletter|substack|mailchimp|buttondown|beehiiv|convertkit|email/.test(us)) ch = "Newsletter";
+  else if (/^(cpc|ppc|paid|paidsocial|display|ads?)$/.test(um)) ch = "Paid";
+  else if (/^(social|social-media|sm)$/.test(um) && !ch) ch = "Social";
+  else if (/^(rss|feed)$/.test(um + us)) ch = ch || "Referral";
+  if (!ch) ch = us || um ? (SRC_NAMES[us] ? "Social" : "Campaigns") : "Direct";
+  if (us && !name) name = SRC_NAMES[us] || us;
+  pv.src = name || "Direct"; pv.ch = ch;
+}
+
+// ---------- runtime ----------
+const db = await lager.use("db");
+const ingest = await lager.use("ingest");
+const downloads = await lager.use("downloads");
+const app = $("#app");
+if (!db) { app.innerHTML = '<div class="hero"><h1>No access</h1><p class="lead">This Byline instance hasn’t been shared with you, or storage isn’t available.</p></div>'; return; }
+
+const S = {
+  isAdmin: false, endpoint: null, foldState: {}, settings: {}, sites: [], siteId: null, range: "30d", filters: [], metric: "visitors",
+  tabs: { pages: "top", sources: "channels", geo: "countries", tech: "devices", goals: "goals" }, data: null, loading: false,
+  folding: false, foldError: null, live: null, showTable: false, lastFold: 0,
+};
+async function loadEndpoint() {
+  if (!ingest) return null;
+  try { S.endpoint = (await ingest.endpoints()).find((e) => e.name === "hits") || null; } catch (e) { S.endpoint = null; }
+  return S.endpoint;
+}
+await loadEndpoint();
+// Managers and the owner run the dashboard's upkeep; everyone else only reads the stored days.
+// (Reading a manager-only path is no test: Lager answers viewers with an empty result instead of an error.)
+S.isAdmin = !!(S.endpoint && S.endpoint.canManage);
+try { const h = new URLSearchParams(location.hash.slice(1)); if (h.get("site")) S.siteId = h.get("site"); if (RANGES.some((r) => r[0] === h.get("range"))) S.range = h.get("range"); } catch (e) {}
+
+const site = () => S.sites.find((s) => s.id === S.siteId) || null;
+function saveHash() { try { history.replaceState(null, "", "#site=" + encodeURIComponent(S.siteId || "") + "&range=" + S.range); } catch (e) {} }
+
+// ---------- data loading ----------
+const chunkCache = new Map(); // doc id -> {updatedAt, events}
+async function loadChunks(siteId, from, to) {
+  const a = utcDay(from - 14 * 36e5), b = utcDay(to + 14 * 36e5);
+  let docs;
+  try { docs = (await db.collection("chunks").where("site", "==", siteId).where("day", ">=", a).where("day", "<=", b).get()).docs; }
+  catch (e) { docs = (await db.collection("chunks").where("site", "==", siteId).get()).docs.filter((d) => { const x = d.data(); return x.day >= a && x.day <= b; }); }
+  const out = [];
+  // Stored documents come back frozen; analysis annotates events, so it works on copies.
+  for (const d of docs) { const x = d.data(); for (const ev of x.events || []) out.push({ ...ev }); }
+  return out;
+}
+function prepare(raw) {
+  const pvs = [], evs = [], eng = new Map();
+  for (const ev of raw) {
+    if (ev.t === "pv") pvs.push(ev);
+    else if (ev.t === "eng") { const o = eng.get(ev.pid); if (!o) eng.set(ev.pid, { e: ev.e || 0, sc: ev.sc || 0, ts: ev.ts }); else { o.e = Math.max(o.e, ev.e || 0); o.sc = Math.max(o.sc, ev.sc || 0); o.ts = Math.max(o.ts, ev.ts); } }
+    else if (ev.t === "ev") evs.push(ev);
+  }
+  pvs.sort((x, y) => x.ts - y.ts);
+  const titles = new Map();
+  for (const pv of pvs) {
+    if (!pv._ok) {
+      classify(pv);
+      pv.cc = pv.c || TZMAP[pv.tz] || "";
+      pv.lang = (pv.l || "").split("-")[0].toLowerCase();
+      pv.camp = pv.uc || "";
+      pv._ok = 1;
+    }
+    const en = eng.get(pv.pid); pv._e = en ? en.e : 0; pv._sc = en ? en.sc : 0;
+    if (pv.ti) titles.set(pv.p, cleanTitle(pv.ti));
+  }
+  return { pvs, evs, eng, titles };
+}
+function cleanTitle(t) { return t.replace(/\s+[|–—·-]\s+[^|–—·-]{2,40}$/, "").trim() || t; }
+
+async function reload() {
+  const s = site(); if (!s) return;
+  S.loading = true; renderDash();
+  const P = buildPeriod(S.range, s.tz || "UTC");
+  try {
+    const raw = await loadChunks(s.id, P.pstart, P.end);
+    S.data = { P, raw, ...prepare(raw), siteId: s.id };
+    // live: last 5 minutes from the same load if it covers now, else a small query
+    const now = Date.now();
+    let liveRaw = P.end >= now ? raw : await loadChunks(s.id, now - 36e5, now);
+    computeLive(liveRaw);
+  } catch (e) { S.data = null; toast("Couldn’t load data: " + (e.message || e.code)); }
+  S.loading = false; renderDash();
+}
+// New events folded in by this tab join the loaded period without downloading every day again.
+function mergeEvents(siteId, events) {
+  const D = S.data; if (!D || D.siteId !== siteId || !events.length) return;
+  const lo = D.P.pstart - 14 * 36e5, hi = D.P.end + 14 * 36e5;
+  for (const ev of events) if (ev.ts >= lo && ev.ts < hi) D.raw.push(ev);
+  Object.assign(D, prepare(D.raw));
+  computeLive(D.raw);
+  renderDash();
+}
+function computeLive(raw) {
+  const cut = Date.now() - 5 * 60e3; const v = new Map();
+  for (const ev of raw) if (ev.ts >= cut && (ev.t === "pv" || ev.t === "eng")) { const o = v.get(ev.v) || {}; if (ev.t === "pv" && (!o.ts || ev.ts > o.ts)) { o.ts = ev.ts; o.p = ev.p; o.ti = ev.ti; } v.set(ev.v, o); }
+  const pages = new Map(); for (const o of v.values()) if (o.p) pages.set(o.p, (pages.get(o.p) || 0) + 1);
+  S.live = { visitors: v.size, pages: [...pages].sort((a, b) => b[1] - a[1]) };
+}
+
+// ---------- analysis ----------
+const SESSION_DIMS = { channel: "ch", source: "src", referrer: "r", campaign: "camp", country: "cc", language: "lang", device: "d", browser: "b", os: "o" };
+const DIM_LABEL = { page: "Page", entry: "Entry page", exit: "Exit page", channel: "Channel", source: "Source", referrer: "Referring link", campaign: "Campaign", country: "Country", language: "Language", device: "Device", browser: "Browser", os: "OS", event: "Event" };
+
+function analyze(D, buckets, filters, withTables) {
+  const start = buckets[0].s, end = buckets[buckets.length - 1].e;
+  const pvs = D.pvs.filter((p) => p.ts >= start && p.ts < end);
+  // sessions: same visitor, < 30 min gap
+  const byV = new Map(); for (const p of pvs) { let l = byV.get(p.v); if (!l) byV.set(p.v, (l = [])); l.push(p); }
+  const pvByPid = new Map(); const sessions = [];
+  for (const list of byV.values()) {
+    let cur = null;
+    for (const p of list) {
+      if (!cur || p.ts - cur.last > 30 * 60e3) { cur = { v: p.v, pvs: [], start: p.ts, last: p.ts, ev: 0 }; sessions.push(cur); }
+      cur.pvs.push(p); cur.last = p.ts; pvByPid.set(p.pid, { p, s: cur });
+    }
+  }
+  const evs = D.evs.filter((e) => e.ts >= start && e.ts < end + 30 * 60e3);
+  for (const e of evs) { const x = pvByPid.get(e.pid); e._s = x ? x.s : null; e._p = x ? x.p : null; if (x) x.s.ev++; }
+  for (const s of sessions) { s.entry = s.pvs[0]; s.exit = s.pvs[s.pvs.length - 1]; s.eng = s.pvs.reduce((a, p) => a + p._e, 0); s.bounce = s.pvs.length === 1 && s.eng < 10000 && !s.ev; }
+  // filters
+  const pageF = filters.filter((f) => f.dim === "page").map((f) => f.val);
+  const evF = filters.filter((f) => f.dim === "event").map((f) => f.val);
+  const keep = sessions.filter((s) => filters.every((f) => {
+    if (SESSION_DIMS[f.dim]) return (s.entry[SESSION_DIMS[f.dim]] || "") === f.val;
+    if (f.dim === "entry") return s.entry.p === f.val;
+    if (f.dim === "exit") return s.exit.p === f.val;
+    if (f.dim === "page") return s.pvs.some((p) => p.p === f.val);
+    if (f.dim === "event") return evs.some((e) => e._s === s && e.n === f.val);
+    return true;
+  }));
+  const keepSet = new Set(keep);
+  const counted = []; for (const s of keep) for (const p of s.pvs) if (!pageF.length || pageF.includes(p.p)) counted.push(p);
+  const visitors = new Set(counted.map((p) => p.v));
+  const bounces = keep.filter((s) => s.bounce).length;
+  const engSum = counted.reduce((a, p) => a + p._e, 0);
+  const kpi = { visitors: visitors.size, visits: keep.length, pageviews: counted.length, ppv: keep.length ? counted.length / keep.length : 0, bounce: keep.length ? bounces / keep.length : NaN, time: counted.length ? engSum / counted.length : 0 };
+  // series
+  const n = buckets.length;
+  const ser = { visitors: Array.from({ length: n }, () => new Set()), pageviews: new Array(n).fill(0), visits: new Array(n).fill(0), bounces: new Array(n).fill(0), eng: new Array(n).fill(0) };
+  for (const p of counted) { const i = bucketIndex(buckets, p.ts); if (i < 0) continue; ser.visitors[i].add(p.v); ser.pageviews[i]++; ser.eng[i] += p._e; }
+  for (const s of keep) { const i = bucketIndex(buckets, s.start); if (i < 0) continue; ser.visits[i]++; if (s.bounce) ser.bounces[i]++; }
+  const series = {
+    visitors: ser.visitors.map((x) => x.size), pageviews: ser.pageviews, visits: ser.visits,
+    ppv: ser.visits.map((v, i) => (v ? ser.pageviews[i] / v : 0)), bounce: ser.visits.map((v, i) => (v ? ser.bounces[i] / v : 0)),
+    time: ser.pageviews.map((v, i) => (v ? ser.eng[i] / v : 0)),
+  };
+  const res = { kpi, series, pageViews: new Map() };
+  for (const p of counted) res.pageViews.set(p.p, (res.pageViews.get(p.p) || 0) + 1);
+  if (!withTables) return res;
+
+  // tables
+  const tally = (keyFn, list) => { const m = new Map(); for (const s of list) { const k = keyFn(s); if (k === undefined || k === null || k === "") continue; let o = m.get(k); if (!o) m.set(k, (o = { k, v: new Set(), n: 0, b: 0, e: 0 })); o.v.add(s.v); o.n++; if (s.bounce) o.b++; o.e += s.eng; } return [...m.values()].map((o) => ({ ...o, visitors: o.v.size })).sort((a, b) => b.visitors - a.visitors || b.n - a.n); };
+  const pages = new Map();
+  for (const p of counted) { let o = pages.get(p.p); if (!o) pages.set(p.p, (o = { k: p.p, v: new Set(), n: 0, e: 0, read: 0 })); o.v.add(p.v); o.n++; o.e += p._e; if (p._sc >= 75) o.read++; }
+  res.pages = [...pages.values()].map((o) => ({ ...o, visitors: o.v.size, time: o.e / o.n, readRate: o.read / o.n })).sort((a, b) => b.visitors - a.visitors || b.n - a.n);
+  res.entry = tally((s) => s.entry.p, keep); res.exit = tally((s) => s.exit.p, keep);
+  for (const [dim, key] of Object.entries(SESSION_DIMS)) res[dim] = tally((s) => s.entry[key], keep);
+  res.channelAll = tally((s) => s.entry.ch, keep);
+  // goals & links
+  const kevs = evs.filter((e) => e._s && keepSet.has(e._s) && (!evF.length || evF.includes(e.n)));
+  const g = new Map(), out = new Map(), dl = new Map();
+  for (const e of kevs) {
+    const add = (m, k) => { let o = m.get(k); if (!o) m.set(k, (o = { k, v: new Set(), n: 0 })); o.v.add(e.v); o.n++; };
+    add(g, e.n);
+    if (e.n === "Outbound link" && e.pr && e.pr.url) add(out, e.pr.url);
+    if (e.n === "File download" && e.pr && e.pr.url) add(dl, e.pr.url);
+  }
+  const fin = (m) => [...m.values()].map((o) => ({ ...o, visitors: o.v.size, cr: visitors.size ? o.v.size / visitors.size : 0 })).sort((a, b) => b.visitors - a.visitors || b.n - a.n);
+  res.goals = fin(g); res.outbound = fin(out); res.downloads = fin(dl);
+  // heatmap weekday x hour (site tz)
+  const tz = (site() || {}).tz || "UTC"; const heat = Array.from({ length: 7 }, () => new Array(24).fill(0));
+  for (const p of counted) { const z = zparts(p.ts, tz); heat[z.wd][z.h]++; }
+  res.heat = heat;
+  return res;
+}
+
+// ---------- rendering: shell ----------
+const BRAND = '<svg viewBox="0 0 512 512"><rect width="512" height="512" rx="0" fill="#16305c"/><rect x="118" y="300" width="56" height="94" rx="14" fill="#7fb2ff"/><rect x="228" y="226" width="56" height="168" rx="14" fill="#a9cbff"/><rect x="338" y="132" width="56" height="262" rx="14" fill="#ffffff"/></svg>';
+function renderShell() {
+  app.innerHTML = `
+  <header class="top"><div class="wrap">
+    <div class="brand">${BRAND}<span>Byline</span></div>
+    <select class="sel" id="siteSel" aria-label="Site"></select>
+    <div class="grow"></div>
+    <div class="sync" id="sync"></div>
+    ${S.isAdmin ? `<button class="btn icon" id="syncBtn" title="Refresh" aria-label="Refresh">${ICON.sync}</button><button class="btn icon" id="setBtn" title="Settings" aria-label="Settings">${ICON.gear}</button>` : ""}
+  </div></header>
+  <main class="wrap" id="main"></main>
+  <div id="tip" class="hidden" role="tooltip"></div>
+  <dialog id="dlg"></dialog>`;
+  $("#siteSel").onchange = (e) => { S.siteId = e.target.value; S.filters = []; saveHash(); reload(); };
+  if (S.isAdmin) { $("#syncBtn").onclick = () => fold(true); $("#setBtn").onclick = () => openSettings(); }
+}
+function renderSites() {
+  const sel = $("#siteSel"); if (!sel) return;
+  sel.innerHTML = S.sites.map((s) => `<option value="${esc(s.id)}" ${s.id === S.siteId ? "selected" : ""}>${esc(s.name)}</option>`).join("");
+  sel.classList.toggle("hidden", S.sites.length < 1);
+}
+function ago(ts) { if (!ts) return "never"; const s = Math.round((Date.now() - ts) / 1000); if (s < 60) return "just now"; if (s < 3600) return Math.floor(s / 60) + " min ago"; if (s < 86400) return Math.floor(s / 3600) + " h ago"; return Math.floor(s / 86400) + " d ago"; }
+function renderSync() {
+  const el = $("#sync"); if (!el) return;
+  const last = Math.max(S.settings.lastSync || 0, S.lastFold || 0);
+  if (S.folding) el.innerHTML = `<span class="spin" style="display:inline-flex;width:14px">${ICON.sync}</span><span class="hide-sm">Updating…</span>`;
+  else if (S.foldError) el.innerHTML = `<span class="dot err"></span><span title="${esc(S.foldError)}">Update failed</span>`;
+  else if (S.isAdmin && S.endpoint && !S.endpoint.enabled) el.innerHTML = `<span class="dot err"></span><span class="hide-sm">Receiving is off</span>`;
+  else el.innerHTML = `<span class="dot ${S.isAdmin || Date.now() - last < 3 * 60e3 ? "live" : ""}"></span><span class="hide-sm">${S.isAdmin ? "Live" : "Updated " + ago(last)}</span>`;
+}
+
+// ---------- rendering: dashboard ----------
+const KPIS = [
+  ["visitors", "Visitors", fmtN, "Unique readers. Counted per day without cookies, so a reader who returns on another day counts again."],
+  ["visits", "Visits", fmtN, "Sessions: a reader’s pageviews with less than 30 minutes between them."],
+  ["pageviews", "Pageviews", fmtN, "Every time a page was opened."],
+  ["ppv", "Views per visit", (x) => x.toFixed(2), "Pageviews divided by visits."],
+  ["bounce", "Bounce rate", fmtPct, "Share of visits with one page, under 10 seconds of reading and no click on a goal. Lower is better."],
+  ["time", "Avg. read time", fmtDur, "Average time a page was actually visible and in focus."],
+];
+const LOWER_BETTER = { bounce: 1 };
+
+function deltaHtml(key, cur, prev) {
+  if (!isFinite(cur) || !isFinite(prev)) return '<span class="delta flat">–</span>';
+  if (prev === 0) return cur > 0 ? '<span class="delta up">new</span>' : '<span class="delta flat">–</span>';
+  const ch = key === "bounce" ? cur - prev : (cur - prev) / prev;
+  if (Math.abs(ch) < 0.005) return '<span class="delta flat">±0%</span>';
+  const good = LOWER_BETTER[key] ? ch < 0 : ch > 0;
+  const txt = (ch > 0 ? "▲ " : "▼ ") + Math.abs(Math.round(ch * 100)) + (key === "bounce" ? " pts" : "%");
+  return `<span class="delta ${good ? "up" : "down"}" aria-label="${good ? "better" : "worse"} than previous period">${txt}</span>`;
+}
+
+function renderDash() {
+  renderSync();
+  const main = $("#main"); if (!main) return;
+  const s = site();
+  if (!s) { main.innerHTML = renderOnboarding(); bindOnboarding(); return; }
+  const D = S.data;
+  if (!D || D.siteId !== s.id) { main.innerHTML = '<div class="empty" style="padding:80px 0">Loading…</div>'; return; }
+  const cur = analyze(D, D.P.cur, S.filters, true);
+  const prev = analyze(D, D.P.prev, S.filters, false);
+  S.view = { cur, prev };
+  const noData = !D.pvs.length;
+  main.innerHTML = `
+    <div class="toolbar">
+      <select class="sel" id="rangeSel" aria-label="Date range">${RANGES.map(([k, l]) => `<option value="${k}" ${k === S.range ? "selected" : ""}>${l}</option>`).join("")}</select>
+      <button class="live-pill" id="livePill" title="Readers active in the last 5 minutes"><span class="dot ${S.live && S.live.visitors ? "live" : ""}"></span><strong>${S.live ? S.live.visitors : 0}</strong> reading now</button>
+      ${S.filters.map((f, i) => `<span class="chip">${esc(DIM_LABEL[f.dim])} <b title="${esc(f.val)}">${esc(labelFor(f.dim, f.val))}</b><button data-rmf="${i}" aria-label="Remove filter">${ICON.x}</button></span>`).join("")}
+      <div class="grow"></div>
+      ${S.loading ? '<span class="muted" style="font-size:13px">Loading…</span>' : ""}
+    </div>
+    ${noData ? emptyState(s) : ""}
+    <section class="card" aria-label="Key metrics">
+      <div class="kpis" role="group">${KPIS.map(([k, l, f, tip]) => `<button class="kpi" data-metric="${k}" aria-pressed="${S.metric === k}" title="${esc(tip)}"><div class="lab">${l}</div><div class="val">${f(cur.kpi[k])}</div>${deltaHtml(k, cur.kpi[k], prev.kpi[k])}</button>`).join("")}</div>
+      <div class="chart-legend" style="padding-top:12px"><span class="key"><i style="background:var(--accent)"></i>${KPIS.find((k) => k[0] === S.metric)[1]}</span><span class="key"><i class="line" style="background:var(--prev)"></i>Previous period</span><span class="grow"></span><button class="tab" id="tblBtn" aria-pressed="${S.showTable}">${S.showTable ? "Chart" : "Table"}</button></div>
+      <div class="chart-box" id="chart"></div>
+    </section>
+    <div class="grid2">
+      ${card("pages", "Posts & pages", [["top", "Top"], ["entry", "Entry"], ["exit", "Exit"], ["trending", "Trending"]])}
+      ${card("sources", "Where readers come from", [["channels", "Channels"], ["sources", "Sources"], ["links", "Links"], ["campaigns", "Campaigns"]])}
+      ${card("goals", "Clicks & goals", [["goals", "Goals"], ["outbound", "Outbound"], ["downloads", "Downloads"]])}
+      ${card("geo", "Locations", [["countries", "Countries"], ["languages", "Languages"]])}
+      ${card("tech", "Devices", [["devices", "Devices"], ["browsers", "Browsers"], ["os", "OS"]])}
+      <section class="card"><div class="card-h"><h2>When readers show up</h2></div><div class="card-b" id="heat"></div></section>
+    </div>
+    ${S.isAdmin ? `<section class="card" style="margin-top:14px"><div class="card-h"><h2>Insights</h2><span class="grow"></span><button class="btn" id="aiBtn">${ICON.spark}Summarize this period</button></div><div class="card-b insights" id="ai"><p class="muted" style="margin:4px 0">Get a short, plain-language read of this period: what grew, what to write more of, and when to publish.</p></div></section>` : ""}
+    <footer class="foot">Byline · cookie-free analytics · times in ${esc(s.tz || "UTC")}</footer>`;
+  $("#rangeSel").onchange = (e) => { S.range = e.target.value; saveHash(); reload(); };
+  $$("[data-rmf]").forEach((b) => (b.onclick = () => { S.filters.splice(+b.dataset.rmf, 1); renderDash(); }));
+  $$(".kpi").forEach((b) => (b.onclick = () => { S.metric = b.dataset.metric; renderDash(); }));
+  $("#tblBtn").onclick = () => { S.showTable = !S.showTable; renderDash(); };
+  $("#livePill").onclick = showLive;
+  if ($("#aiBtn")) $("#aiBtn").onclick = runInsights;
+  const ob = $("#copySnip"); if (ob) ob.onclick = () => openSettings("tracking");
+  drawChart(cur, prev);
+  for (const c of ["pages", "sources", "goals", "geo", "tech"]) renderCard(c);
+  renderHeat(cur.heat);
+}
+function emptyState(s) {
+  return `<div class="note" style="margin-bottom:14px">No pageviews in this period yet. ${S.isAdmin ? `Add the tracking code to <b>${esc(s.domain || s.name)}</b> and visit a page. <a href="#" id="copySnip">Show tracking code</a>` : ""}</div>`;
+}
+function card(id, title, tabs) {
+  return `<section class="card" id="card-${id}"><div class="card-h"><h2>${title}</h2><div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button class="tab" role="tab" data-card="${id}" data-tab="${k}" aria-selected="${S.tabs[id] === k}">${l}</button>`).join("")}</div></div><div class="card-b" id="body-${id}"></div></section>`;
+}
+document.addEventListener("click", (e) => {
+  const t = e.target.closest && e.target.closest("[data-card][data-tab]");
+  if (t) { S.tabs[t.dataset.card] = t.dataset.tab; $$(`[data-card="${t.dataset.card}"]`).forEach((b) => b.setAttribute("aria-selected", b === t)); renderCard(t.dataset.card); }
+});
+
+function labelFor(dim, val) {
+  if (dim === "country") return (regionNames && val ? safe(() => regionNames.of(val), val) : val) || "Unknown";
+  if (dim === "language") return (langNames && val ? safe(() => langNames.of(val), val) : val) || "Unknown";
+  if (dim === "page" || dim === "entry" || dim === "exit") return S.data && S.data.titles.get(val) ? S.data.titles.get(val) : val;
+  return val;
+}
+function safe(fn, d) { try { return fn() || d; } catch (e) { return d; } }
+
+// table spec: rows [{k, label, sub, icon, cols:[...], share, filter:{dim,val}, href}]
+function cardSpec(id) {
+  const C = S.view.cur, P = S.view.prev, tab = S.tabs[id];
+  const sumV = C.kpi.visitors || 1;
+  const sess = (list, dim, opts = {}) => ({
+    head: [opts.head || "", "Visitors", "Share"],
+    rows: list.map((o) => ({ k: o.k, label: opts.label ? opts.label(o.k) : o.k, icon: opts.icon ? opts.icon(o.k) : "", sub: opts.sub ? opts.sub(o.k) : "", cols: [fmtN(o.visitors), fmtPct(o.visitors / sumV)], share: o.visitors, filter: dim ? { dim, val: o.k } : null, href: opts.href ? opts.href(o.k) : null })),
+  });
+  const pageLabel = (p) => (S.data.titles.get(p) || p);
+  const pageSub = (p) => (S.data.titles.get(p) ? p : "");
+  const pageHref = (p) => { const s = site(); return s && !s.demo && s.origins && s.origins[0] ? s.origins[0] + p : null; };
+  if (id === "pages") {
+    if (tab === "top") return { head: ["Post", "Visitors", "Views", "Read time", "Read-through"], opt: [false, false, true, true, true], hint: "Read-through: share of views that scrolled at least 75% of the page.",
+      rows: C.pages.map((o) => ({ k: o.k, label: pageLabel(o.k), sub: pageSub(o.k), cols: [fmtN(o.visitors), fmtN(o.n), fmtDur(o.time), fmtPct(o.readRate)], share: o.visitors, filter: { dim: "page", val: o.k }, href: pageHref(o.k) })) };
+    if (tab === "entry" || tab === "exit") return { head: [tab === "entry" ? "Landing page" : "Exit page", "Visitors", "Visits", "Bounce"], opt: [false, false, true, true],
+      rows: C[tab].map((o) => ({ k: o.k, label: pageLabel(o.k), sub: pageSub(o.k), cols: [fmtN(o.visitors), fmtN(o.n), fmtPct(o.b / o.n)], share: o.visitors, filter: { dim: tab, val: o.k }, href: pageHref(o.k) })) };
+    const prevV = P.pageViews; const rows = [];
+    for (const [k, n] of C.pageViews) { const pv = prevV.get(k) || 0; if (n - pv > 0) rows.push({ k, n, pv, g: n - pv }); }
+    rows.sort((a, b) => b.g - a.g);
+    return { head: ["Post", "Views", "Change"], hint: "Posts that gained the most views compared with the previous period.",
+      rows: rows.map((o) => ({ k: o.k, label: pageLabel(o.k), sub: pageSub(o.k), badge: o.pv === 0 ? "new" : "", cols: [fmtN(o.n), o.pv === 0 ? "+" + fmtN(o.g) : "▲ " + Math.round((o.g / o.pv) * 100) + "%"], share: o.g, filter: { dim: "page", val: o.k }, href: pageHref(o.k) })) };
+  }
+  if (id === "sources") {
+    if (tab === "channels") return { ...sess(C.channel, "channel", { head: "Channel", icon: (k) => `<i class="sw" style="background:${CH_COLOR[k] || "var(--muted)"}"></i>` }), seg: C.channel };
+    if (tab === "sources") return sess(C.source, "source", { head: "Source", sub: (k) => { const o = C.source.find((x) => x.k === k); return ""; } });
+    if (tab === "links") return sess(C.referrer, "referrer", { head: "Referring page", href: (k) => "https://" + k });
+    return { head: ["Campaign", "Visitors", "Share"], hint: C.campaign.length ? "" : "Add ?utm_campaign=… (and utm_source, utm_medium) to links in newsletters and posts to see them here.", rows: sess(C.campaign, "campaign").rows };
+  }
+  if (id === "goals") {
+    if (tab === "goals") return { head: ["Goal", "Visitors", "Events", "Conv. rate"], opt: [false, false, true, false], hint: C.goals.length ? "" : "Outbound links and downloads are tracked automatically. Add data-byline-event=\"Newsletter signup\" to a button or form to track it as a goal.",
+      rows: C.goals.map((o) => ({ k: o.k, label: o.k, cols: [fmtN(o.visitors), fmtN(o.n), fmtPct(o.cr)], share: o.visitors, filter: { dim: "event", val: o.k } })) };
+    const list = tab === "outbound" ? C.outbound : C.downloads;
+    return { head: [tab === "outbound" ? "Link" : "File", "Visitors", "Clicks"],
+      rows: list.map((o) => ({ k: o.k, label: o.k.replace(/^https?:\/\/(www\.)?/, ""), cols: [fmtN(o.visitors), fmtN(o.n)], share: o.visitors, href: o.k })) };
+  }
+  if (id === "geo") {
+    if (tab === "countries") return sess(C.country, "country", { head: "Country", label: (k) => labelFor("country", k), icon: (k) => `<span class="flag">${flag(k)}</span>` });
+    return sess(C.language, "language", { head: "Language", label: (k) => labelFor("language", k) });
+  }
+  if (id === "tech") {
+    const map = { devices: "device", browsers: "browser", os: "os" };
+    return sess(C[map[tab]], map[tab], { head: { devices: "Device", browsers: "Browser", os: "Operating system" }[tab] });
+  }
+}
+function rowsHtml(spec, limit) {
+  const rows = spec.rows.slice(0, limit); const max = Math.max(1, ...spec.rows.map((r) => r.share));
+  const opt = spec.opt || [];
+  return `<table class="blist"><colgroup><col>${spec.head.slice(1).map((h) => `<col style="width:${h.length > 8 ? 92 : 74}px" class="${opt[spec.head.indexOf(h)] ? "opt" : ""}">`).join("")}</colgroup>
+    <thead><tr>${spec.head.map((h, i) => `<th class="${opt[i] ? "opt" : ""}">${h}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map((r, ri) => `<tr class="${r.filter ? "brow" : ""}" ${r.filter ? `data-f="${ri}" tabindex="0"` : ""}><td><div class="bcell"><div class="bar" style="width:${Math.max(2, (r.share / max) * 100)}%"></div>${r.icon || ""}<span title="${esc(r.k)}">${esc(r.label || "(none)")}${r.sub ? ` <span class="sub">${esc(r.sub)}</span>` : ""}</span>${r.badge ? `<span class="badge">${r.badge}</span>` : ""}${r.href ? `<a class="ext" href="${esc(r.href)}" target="_blank" rel="noopener noreferrer" aria-label="Open" onclick="event.stopPropagation()">${ICON.ext}</a>` : ""}</div></td>${r.cols.map((c, i) => `<td class="${i === 0 ? "v1" : ""} ${opt[i + 1] ? "opt" : ""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+function segHtml(list) {
+  const tot = list.reduce((a, o) => a + o.visitors, 0) || 1;
+  const parts = CHANNELS.map(([k]) => list.find((o) => o.k === k)).filter(Boolean);
+  return `<div class="seg" role="img" aria-label="Channel mix: ${parts.map((o) => `${o.k} ${fmtPct(o.visitors / tot)}`).join(", ")}">${parts.map((o) => { const w = o.visitors / tot; return `<div class="${CH_DARK_TEXT[o.k] ? "dark" : ""}" style="flex:${w} 1 0;background:${CH_COLOR[o.k]}" title="${esc(o.k)}: ${fmtPct(w)}">${w > 0.09 ? fmtPct(w) : ""}</div>`; }).join("")}</div>`;
+}
+function renderCard(id) {
+  const body = $("#body-" + id); if (!body || !S.view) return;
+  const spec = cardSpec(id);
+  if (!spec.rows.length) { body.innerHTML = `<div class="empty">${spec.hint ? esc(spec.hint) : "No data for this period"}</div>`; return; }
+  body.innerHTML = (spec.seg ? segHtml(spec.seg) : "") + rowsHtml(spec, 8) + (spec.rows.length > 8 ? `<button class="btn more" data-all>Show all ${spec.rows.length}</button>` : "") + (spec.hint ? `<p class="muted" style="font-size:12.5px;margin:10px 0 0">${esc(spec.hint)}</p>` : "");
+  bindRows(body, spec);
+  const all = body.querySelector("[data-all]");
+  if (all) all.onclick = () => { const t = $(`#card-${id} h2`).textContent + " · " + $(`#card-${id} .tab[aria-selected="true"]`).textContent; openDialog(t, rowsHtml(spec, 500)); bindRows($("#dlg"), spec, true); };
+}
+function bindRows(root, spec, close) {
+  root.querySelectorAll("tr[data-f]").forEach((tr) => {
+    const go = () => { const r = spec.rows[+tr.dataset.f]; if (!S.filters.some((f) => f.dim === r.filter.dim)) S.filters.push(r.filter); else S.filters = S.filters.map((f) => (f.dim === r.filter.dim ? r.filter : f)); if (close) $("#dlg").close(); renderDash(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    tr.onclick = go; tr.onkeydown = (e) => { if (e.key === "Enter") go(); };
+  });
+}
+
+// ---------- chart ----------
+function niceMax(v) { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p; return 10 * p; }
+function drawChart(cur, prev) {
+  const box = $("#chart"); const metric = S.metric; const K = KPIS.find((k) => k[0] === metric); const f = K[2];
+  const B = S.data.P.cur, vals = cur.series[metric], pvals = prev.series[metric];
+  if (S.showTable) {
+    box.innerHTML = `<div style="max-height:360px;overflow:auto;padding:0 12px"><table class="dt"><thead><tr><th>Period</th><th>${K[1]}</th><th>Previous</th></tr></thead><tbody>${B.map((b, i) => `<tr><td>${esc(b.label)}</td><td>${f(vals[i])}</td><td>${f(pvals[i] ?? 0)}</td></tr>`).join("")}</tbody></table></div>`;
+    return;
+  }
+  const W = Math.max(300, box.clientWidth - 12), H = W < 520 ? 200 : 250, padL = 44, padR = 8, padT = 10, padB = 26;
+  const iw = W - padL - padR, ih = H - padT - padB, n = vals.length;
+  const isRatio = metric === "bounce"; const top = isRatio ? Math.min(1, niceMax(Math.max(...vals, ...pvals) || 0.1)) : niceMax(Math.max(...vals, ...pvals, metric === "ppv" ? 1 : 0));
+  const y = (v) => padT + ih - (v / top) * ih; const band = iw / n; const bw = Math.min(24, Math.max(2, band - Math.max(2, band * 0.28)));
+  const now = Date.now();
+  let g = "";
+  for (let i = 0; i <= 4; i++) { const v = (top / 4) * i, yy = y(v); g += `<line x1="${padL}" x2="${W - padR}" y1="${yy}" y2="${yy}" stroke="${i ? "var(--grid)" : "var(--axis)"}" stroke-width="1"/><text x="${padL - 8}" y="${yy + 4}" text-anchor="end">${esc(metric === "time" ? fmtDur(v) : isRatio ? fmtPct(v) : metric === "ppv" ? v.toFixed(1) : fmtN(v))}</text>`; }
+  const step = Math.ceil(n / Math.max(2, Math.floor(iw / 64)));
+  B.forEach((b, i) => { if (i % step === 0) g += `<text x="${padL + band * i + band / 2}" y="${H - 8}" text-anchor="middle">${esc(b.label)}</text>`; });
+  let bars = "", hits = "";
+  vals.forEach((v, i) => {
+    const x = padL + band * i + (band - bw) / 2, yy = y(v), h = padT + ih - yy; const future = B[i].s > now;
+    if (h > 0.5) { const r = Math.min(4, bw / 2, h); bars += `<path d="M${x},${padT + ih}V${yy + r}Q${x},${yy} ${x + r},${yy}H${x + bw - r}Q${x + bw},${yy} ${x + bw},${yy + r}V${padT + ih}Z" fill="var(--accent)"/>`; }
+    if (!future) hits += `<rect class="hit" data-i="${i}" x="${padL + band * i}" y="${padT}" width="${band}" height="${ih}"/>`;
+  });
+  const pts = pvals.map((v, i) => `${padL + band * i + band / 2},${y(v || 0)}`).join(" ");
+  const pline = `<polyline points="${pts}" fill="none" stroke="var(--prev)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  box.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(K[1])} per ${S.data.P.unit}">${g}${bars}${pline}<rect id="hlr" x="0" y="${padT}" width="${band}" height="${ih}" fill="var(--accent)" opacity="0" pointer-events="none"/>${hits}</svg>`;
+  const tip = $("#tip"); const hl = $("#hlr");
+  box.querySelectorAll(".hit").forEach((r) => {
+    r.addEventListener("pointerenter", () => { const i = +r.dataset.i; hl.setAttribute("x", r.getAttribute("x")); hl.setAttribute("opacity", ".08");
+      tip.innerHTML = `<div class="t">${esc(B[i].label)}</div><div class="r"><span>${K[1]}</span><b>${f(vals[i])}</b></div><div class="r"><span>Previous</span><b>${f(pvals[i] ?? 0)}</b></div>`; tip.classList.remove("hidden"); });
+    r.addEventListener("pointermove", (e) => placeTip(e));
+    r.addEventListener("pointerleave", () => { tip.classList.add("hidden"); hl.setAttribute("opacity", "0"); });
+  });
+}
+function placeTip(e) { const tip = $("#tip"); const w = tip.offsetWidth, h = tip.offsetHeight; let x = e.clientX + 14, y = e.clientY - h - 10; if (x + w > innerWidth - 8) x = e.clientX - w - 14; if (y < 8) y = e.clientY + 16; tip.style.left = x + "px"; tip.style.top = y + "px"; }
+let resizeT; addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (S.view) drawChart(S.view.cur, S.view.prev); }, 150); });
+
+// ---------- heatmap ----------
+function renderHeat(heat) {
+  const el = $("#heat"); const flat = heat.flat(); const max = Math.max(...flat);
+  if (!max) { el.innerHTML = '<div class="empty">No data for this period</div>'; return; }
+  const steps = ["var(--q1)", "var(--q2)", "var(--q3)", "var(--q4)", "var(--q5)", "var(--q6)", "var(--q7)"];
+  const col = (v) => (v ? steps[Math.min(6, Math.floor((v / max) * 6.999))] : "var(--grid)");
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  let bd = 0, bh = 0; heat.forEach((r, d) => r.forEach((v, h) => { if (v > heat[bd][bh]) { bd = d; bh = h; } }));
+  const dayTot = heat.map((r) => r.reduce((a, b) => a + b, 0)); const bestDay = dayTot.indexOf(Math.max(...dayTot));
+  const hourTot = Array.from({ length: 24 }, (_, h) => heat.reduce((a, r) => a + r[h], 0)); let bestH = 0, bestSum = -1;
+  for (let h = 0; h < 24; h++) { const s3 = hourTot[h] + hourTot[(h + 1) % 24] + hourTot[(h + 2) % 24]; if (s3 > bestSum) { bestSum = s3; bestH = h; } }
+  const longDay = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][bestDay];
+  el.innerHTML = `<p class="best">Most readers arrive on <strong>${longDay}s</strong>, and the busiest time is <strong>${String(bestH).padStart(2, "0")}:00–${String((bestH + 3) % 24).padStart(2, "0")}:00</strong>. Publishing just before then gives a new post the best start.</p>
+    <div class="heat" role="img" aria-label="Pageviews by weekday and hour">${["", ...Array.from({ length: 24 }, (_, h) => h)].map((h) => `<div class="hl">${h === "" ? "" : h % 6 === 0 ? h : ""}</div>`).join("")}
+    ${heat.map((r, d) => `<div class="rl">${days[d]}</div>${r.map((v, h) => `<div class="c" data-d="${d}" data-h="${h}" style="background:${col(v)}"></div>`).join("")}`).join("")}</div>
+    <div class="heat-legend">Fewer ${steps.map((c) => `<i style="background:${c}"></i>`).join("")} More</div>`;
+  const tip = $("#tip");
+  el.querySelectorAll(".c").forEach((c) => {
+    c.addEventListener("pointerenter", () => { const d = +c.dataset.d, h = +c.dataset.h; tip.innerHTML = `<div class="t">${days[d]} ${String(h).padStart(2, "0")}:00</div><div class="r"><span>Pageviews</span><b>${fmtN(heat[d][h])}</b></div>`; tip.classList.remove("hidden"); });
+    c.addEventListener("pointermove", placeTip); c.addEventListener("pointerleave", () => tip.classList.add("hidden"));
+  });
+}
+
+// ---------- dialogs ----------
+function openDialog(title, html) {
+  const d = $("#dlg"); d.innerHTML = `<div class="dlg-h"><h3>${esc(title)}</h3><span class="grow"></span><button class="btn icon" data-close aria-label="Close">${ICON.x}</button></div><div class="dlg-b">${html}</div>`;
+  d.querySelector("[data-close]").onclick = () => d.close();
+  d.onclick = (e) => { if (e.target === d) d.close(); };
+  if (!d.open) d.showModal(); return d;
+}
+function showLive() {
+  const L = S.live || { visitors: 0, pages: [] };
+  openDialog("Reading now", `<p class="ink2" style="margin-top:0">${L.visitors} ${L.visitors === 1 ? "reader" : "readers"} active in the last 5 minutes${S.isAdmin ? "" : ""}.</p>${L.pages.length ? rowsHtml({ head: ["Page", "Readers"], rows: L.pages.map(([p, n]) => ({ k: p, label: labelFor("page", p), sub: S.data && S.data.titles.get(p) ? p : "", cols: [fmtN(n)], share: n })) }, 50) : '<div class="empty">Nobody right now.</div>'}<p class="muted" style="font-size:12.5px">${S.isAdmin ? "New pings show up here within seconds." : "Updated " + ago(S.settings.lastSync || 0) + "."}</p>`);
+}
+
+// ---------- tracking snippet ----------
+const TRACKER = "!function(){\"use strict\";var t=\"__ENDPOINT__\",e=document,n=window,i=navigator,r=location,a=e.currentScript&&e.currentScript.dataset||{};try{if(\"#byline-ignore\"===r.hash&&localStorage.setItem(\"byline_ignore\",\"1\"),\"#byline-unignore\"===r.hash&&localStorage.removeItem(\"byline_ignore\"),\"1\"===localStorage.getItem(\"byline_ignore\"))return}catch(t){}if(!i.webdriver&&!/bot|crawl|spider|headless|lighthouse|prerender/i.test(i.userAgent)&&\"file:\"!==r.protocol&&(\"true\"!==a.dnt||\"1\"!==i.doNotTrack&&\"1\"!==n.doNotTrack)){var o=\"\";try{o=Intl.DateTimeFormat().resolvedOptions().timeZone||\"\"}catch(t){}var l=null,s=null,c=0,u=null,d=0,h=\"\",v=/\\.(pdf|zip|rar|7z|gz|dmg|exe|pkg|epub|mobi|mp3|mp4|mov|csv|xlsx?|docx?|pptx?|key|txt)(\\?|#|$)/i;e.addEventListener(\"click\",function(t){var e=t.target&&t.target.closest?t.target.closest(\"a,[data-byline-event]\"):null;if(e){var n=e.getAttribute(\"data-byline-event\");if(n){for(var i={},o=e.attributes,l=0;l<o.length;l++){var s=/^data-byline-prop-(.+)$/.exec(o[l].name);s&&(i[s[1]]=o[l].value)}return w(n,i)}if(\"false\"!==a.outbound&&\"A\"===e.tagName&&e.href){var c;try{c=new URL(e.href,r.href)}catch(t){return}/^https?:$/.test(c.protocol)&&(v.test(c.pathname)?w(\"File download\",{url:c.href.split(\"#\")[0]}):c.hostname!==r.hostname&&w(\"Outbound link\",{url:c.origin+c.pathname}))}}},!0),e.addEventListener(\"submit\",function(t){var e=t.target,n=e&&e.getAttribute&&e.getAttribute(\"data-byline-event\");n&&w(n)},!0),e.addEventListener(\"visibilitychange\",function(){\"hidden\"===e.visibilityState?y():b()}),n.addEventListener(\"pagehide\",y),n.addEventListener(\"scroll\",m,{passive:!0});var g=history.pushState;g&&(history.pushState=function(){g.apply(this,arguments),setTimeout(S,0)},n.addEventListener(\"popstate\",function(){setTimeout(S,0)})),n.byline=w,\"loading\"===e.readyState?e.addEventListener(\"DOMContentLoaded\",S):S()}function p(e){e.s=\"__SITE__\",e.h=r.hostname;var n=JSON.stringify(e);try{if(i.sendBeacon&&i.sendBeacon(t,n))return}catch(t){}try{fetch(t,{method:\"POST\",body:n,keepalive:!0,mode:\"no-cors\"})}catch(t){}}function f(t){return t.u=r.href,t.ua=i.userAgent.slice(0,300),t.l=i.language||\"\",t.tz=o,t.sw=n.screen?n.screen.width:0,t}function m(){var t=e.documentElement,i=e.body,r=Math.max(t.scrollHeight,i?i.scrollHeight:0)-n.innerHeight,a=r<=0?100:Math.min(100,Math.round((n.scrollY||t.scrollTop)/r*100));a>d&&(d=a)}function b(){null===u&&\"visible\"===e.visibilityState&&(u=Date.now())}function y(){if(l){null!==u&&(c+=Date.now()-u,u=null);var t=c+\":\"+d;c<500||t===h||(h=t,p({t:\"eng\",pid:l,e:Math.min(c,216e5),sc:d}))}}function S(){var t=r.pathname+r.search;if(t!==s){l&&y();var n=null===s?e.referrer:\"\";s=t,l=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4),c=0,u=null,d=0,h=\"\",b(),m(),p(f({t:\"pv\",pid:l,r:n,ti:e.title.slice(0,200)}))}}function w(t,e){t&&p(f({t:\"ev\",pid:l,n:String(t).slice(0,100),p:e&&\"object\"==typeof e?e:void 0}))}}();";
+function snippet(s) {
+  const url = S.endpoint ? S.endpoint.url : location.origin + "/_ingest/hits";
+  return "<script>" + TRACKER.replace("__SITE__", s.id).replace("__ENDPOINT__", url) + "<\/script>";
+}
+
+// ---------- sites and their addresses ----------
+/** "blog.example.com", "https://Blog.example.com/posts/" → "https://blog.example.com"; null when it isn't a web address. */
+function toOrigin(text) {
+  let t = String(text || "").trim(); if (!t) return null;
+  if (!/^https?:\/\//i.test(t)) t = "https://" + t;
+  try { const u = new URL(t); if (!/^https?:$/.test(u.protocol) || !u.hostname.includes(".") && u.hostname !== "localhost") return null; return u.origin; } catch (e) { return null; }
+}
+/** The address and its www twin, plus any extra addresses: every origin the site's pages may send from. */
+function siteOrigins(main, extra) {
+  const out = []; const add = (o) => { if (o && !out.includes(o)) out.push(o); };
+  const m = toOrigin(main); add(m);
+  if (m) { const u = new URL(m); if (!/^(localhost|\d+\.\d+\.\d+\.\d+)$/.test(u.hostname)) add(u.protocol + "//" + (u.hostname.startsWith("www.") ? u.hostname.slice(4) : "www." + u.hostname) + (u.port ? ":" + u.port : "")); }
+  for (const x of extra) add(toOrigin(x));
+  return out;
+}
+const hostsOf = (s) => (s.origins || []).map((o) => { try { return new URL(o).hostname; } catch (e) { return ""; } });
+/** Tells the ingest endpoint which websites may send: the addresses of every site, kept in step with the site list. */
+async function syncOrigins(sites) {
+  if (!ingest || !S.isAdmin) return;
+  const all = [...new Set(sites.filter((x) => !x.demo).flatMap((x) => x.origins || []))];
+  const e = await ingest.setOrigins("hits", all);
+  S.endpoint = e;
+}
+
+// ---------- settings ----------
+function openSettings(focus) {
+  const s = site(); const E = S.endpoint;
+  const used = S.settings.bytes || 0, quota = 50e6;
+  const status = !E ? `<div class="note err">This version of Byline can’t receive data: the ingest endpoint is missing.</div>`
+    : !E.enabled ? `<div class="note err">Receiving is switched off for this Byline. Turn it on on the Lager instance page under <b>Data from outside</b>.</div>` : "";
+  const html = `
+  ${status}
+  ${s && !s.demo ? `<div class="section" id="sec-tracking"><h4>Tracking code for ${esc(s.name)}</h4>
+    <p class="ink2" style="margin-top:0;font-size:14px">Paste this into the <code>&lt;head&gt;</code> of every page: in WordPress with a header-scripts plugin, in Ghost under Settings → Code injection, in Hugo, Jekyll or Eleventy in your base layout.</p>
+    <pre class="code" id="snip">${esc(snippet(s))}</pre>
+    <div class="row"><button class="btn primary" id="copyS">Copy code</button>${s.origins && s.origins[0] ? `<a class="btn" href="${esc(s.origins[0])}/#byline-ignore" target="_blank" rel="noopener">Exclude my own visits</a>` : ""}</div>
+    <p class="muted" style="font-size:12.5px;margin-bottom:0">Pings are accepted from ${(s.origins || []).map((o) => `<code>${esc(o)}</code>`).join(", ")}. Optional: <code>&lt;script data-dnt="true"&gt;</code> respects Do Not Track · <code>data-outbound="false"</code> turns off link tracking · add <code>data-byline-event="Newsletter signup"</code> to a button or form to count it as a goal · call <code>byline("Name", {key: "value"})</code> from your own scripts. “Exclude my own visits” opens your blog once in this browser and remembers to skip you there.</p>
+  </div>` : ""}
+  <div class="section"><h4>Sites</h4>
+    <div id="siteList">${S.sites.map((x) => `<div class="site-row"><div class="grow"><b>${esc(x.name)}</b> <span class="muted">${esc(x.demo ? "demo data" : (x.origins || []).map((o) => o.replace(/^https?:\/\//, "")).join(", "))}</span><div class="muted" style="font-size:12.5px">${esc(x.tz)}</div></div><button class="btn" data-edit="${esc(x.id)}">Edit</button></div>`).join("") || '<p class="muted">No sites yet.</p>'}</div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="addSite">Add a site</button>${S.sites.some((x) => x.demo) ? "" : '<button class="btn" id="demoBtn">Add demo data</button>'}</div>
+    <p class="muted" style="font-size:12.5px">Up to 20 addresses across all sites.</p>
+  </div>
+  <div class="section"><h4>Data</h4>
+    <div class="ink2" style="font-size:14px">About ${(used / 1e6).toFixed(1)} MB of statistics stored.</div>
+    <div class="meter" role="img" aria-label="Storage used"><div style="width:${Math.min(100, (used / quota) * 100)}%"></div></div>
+    <p class="muted" style="font-size:12.5px;margin-top:0">A Lager instance holds 50 MB by default, roughly 200,000 pageviews.</p>
+    <div class="row">${s ? '<button class="btn" id="csvPv">' + ICON.dl + "Export pageviews (CSV)</button><button class=\"btn\" id=\"csvPages\">" + ICON.dl + "Export posts report (CSV)</button>" : ""}</div>
+    ${s ? `<div class="row" style="margin-top:10px"><label class="ink2" style="font-size:14px" for="pruneSel">Delete raw data older than</label><select class="sel" id="pruneSel"><option value="365">1 year</option><option value="730" selected>2 years</option><option value="180">6 months</option><option value="90">90 days</option></select><button class="btn danger" id="pruneBtn">Delete</button></div>` : ""}
+  </div>
+  <div class="section" style="margin-bottom:0"><h4>Privacy</h4><p class="ink2" style="font-size:14px;margin:0">No cookies and nothing stored in your readers’ browsers. Lager turns each reader into an anonymous ID that changes every day and never stores IP addresses, so in most places you don’t need a cookie banner for Byline. Countries come from the reader’s time zone, or from the server’s country header where your Lager has one.</p></div>`;
+  const d = openDialog("Settings", html);
+  if ($("#copyS", d)) $("#copyS", d).onclick = () => { navigator.clipboard.writeText(snippet(s)).then(() => toast("Copied"), () => toast("Select the code and copy it")); };
+  $("#addSite", d).onclick = () => editSite(null);
+  if ($("#demoBtn", d)) $("#demoBtn", d).onclick = async (e) => { e.target.disabled = true; e.target.textContent = "Generating…"; await makeDemo(); d.close(); };
+  $$("[data-edit]", d).forEach((b) => (b.onclick = () => editSite(b.dataset.edit)));
+  if ($("#csvPv", d)) $("#csvPv", d).onclick = exportPageviews;
+  if ($("#csvPages", d)) $("#csvPages", d).onclick = exportPages;
+  if ($("#pruneBtn", d)) $("#pruneBtn", d).onclick = prune;
+  if (focus === "tracking" && $("#sec-tracking", d)) $("#sec-tracking", d).scrollIntoView();
+}
+function editSite(id) {
+  const x = id ? S.sites.find((s) => s.id === id) : null;
+  const tz = x ? x.tz : Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const main = x && x.origins ? x.origins[0] || "" : "";
+  const extra = x && x.extra ? x.extra.join("\n") : "";
+  const d = openDialog(x ? "Edit site" : "Add a site", `
+    <div class="field"><label for="sName">Name</label><input class="inp" id="sName" value="${esc(x ? x.name : "")}" placeholder="My blog"></div>
+    ${x && x.demo ? "" : `<div class="field"><label for="sUrl">Blog address</label><input class="inp" id="sUrl" type="url" inputmode="url" value="${esc(main)}" placeholder="https://blog.example.com"><span class="hint" id="sHint">The www and non-www versions are both accepted.</span></div>
+    <div class="field"><label for="sExtra">Other addresses <span class="muted">(optional)</span></label><textarea class="inp" id="sExtra" rows="2" placeholder="https://myblog.netlify.app">${esc(extra)}</textarea><span class="hint">One per line, for example a second domain or a preview host.</span></div>`}
+    <div class="field"><label for="sTz">Time zone for reports</label><input class="inp" id="sTz" value="${esc(tz)}" list="tzl"><datalist id="tzl">${(Intl.supportedValuesOf ? Intl.supportedValuesOf("timeZone") : []).map((t) => `<option value="${t}">`).join("")}</datalist></div>
+    <div class="row"><button class="btn primary" id="sSave">${x ? "Save" : "Add site"}</button>${x ? '<span class="grow"></span><button class="btn danger" id="sDel">Delete site and its data</button>' : ""}</div><p id="sMsg" class="ink2" role="status"></p>`);
+  const msg = (t) => ($("#sMsg").textContent = t);
+  if ($("#sUrl")) $("#sUrl").oninput = () => { const o = siteOrigins($("#sUrl").value, []); $("#sHint").textContent = o.length ? "Accepts pings from " + o.join(" and ") + "." : "The www and non-www versions are both accepted."; };
+  $("#sSave", d).onclick = async () => {
+    const name = $("#sName").value.trim(); const tzv = $("#sTz").value.trim();
+    if (!name) return msg("Give the site a name.");
+    if (!validTz(tzv)) return msg("That time zone isn’t known. Try Europe/Berlin, for example.");
+    let origins = x ? x.origins || [] : [], extraList = x ? x.extra || [] : [];
+    if (!(x && x.demo)) {
+      if (!toOrigin($("#sUrl").value)) return msg("Enter your blog’s address, like https://blog.example.com.");
+      extraList = $("#sExtra").value.split(/[\n,]+/).map((v) => v.trim()).filter(Boolean);
+      const badExtra = extraList.find((v) => !toOrigin(v)); if (badExtra) return msg(`“${badExtra}” isn’t a web address.`);
+      origins = siteOrigins($("#sUrl").value, extraList);
+    }
+    const nid = x ? x.id : slugify(name) + "-" + Math.random().toString(36).slice(2, 6);
+    const doc = { name, origins, extra: extraList, domain: origins[0] ? new URL(origins[0]).host : "", tz: tzv, demo: !!(x && x.demo), createdAt: x ? x.createdAt : Date.now() };
+    $("#sSave").disabled = true; msg("Saving…");
+    try {
+      if (!doc.demo) await syncOrigins([...S.sites.filter((o) => o.id !== nid), doc]);
+      await db.doc("sites/" + nid).set(doc);
+      S.siteId = nid; saveHash(); d.close(); setTimeout(() => openSettings("tracking"), 300);
+    } catch (e) {
+      $("#sSave").disabled = false;
+      msg(e && e.code === "invalid_argument" ? "Byline accepts up to 20 addresses across all sites, and each must be a plain web address. " + (e.message || "") : (e && e.message) || "Couldn’t save.");
+    }
+  };
+  if ($("#sDel", d)) $("#sDel", d).onclick = async () => {
+    if (!confirm(`Delete “${x.name}” and all its statistics? This can’t be undone, apart from Lager’s snapshots.`)) return;
+    $("#sDel").disabled = true; $("#sDel").textContent = "Deleting…";
+    try {
+      await db.doc("sites/" + x.id).delete();
+      if (!x.demo) await syncOrigins(S.sites.filter((o) => o.id !== x.id));
+      const snap = await db.collection("chunks").where("site", "==", x.id).get(); let bytes = 0;
+      for (const c of snap.docs) { bytes += c.data().bytes || 0; await db.doc("chunks/" + c.id).delete(); }
+      await bumpBytes(-bytes); if (S.siteId === x.id) S.siteId = null; d.close();
+    } catch (e) { toast(e.message || "Couldn’t delete"); }
+  };
+}
+async function bumpBytes(delta) { try { const cur = ((await db.doc("settings/main").get()).data() || {}).bytes || 0; await db.doc("settings/main").update({ bytes: Math.max(0, cur + delta) }); } catch (e) {} }
+
+// ---------- export ----------
+function csv(rows) { return rows.map((r) => r.map((v) => { const s = String(v ?? ""); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(",")).join("\n"); }
+async function offer(filename, data) {
+  if (downloads) { try { await downloads.save({ filename, data }); return; } catch (e) { if (e && e.code === "cancelled") return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; a.click();
+}
+function exportPageviews() {
+  const D = S.data; const s = site(); const B = D.P.cur; const st = B[0].s, en = B[B.length - 1].e;
+  const rows = [["time", "path", "title", "channel", "source", "referrer", "utm_campaign", "country", "language", "device", "browser", "os", "read_seconds", "scroll_percent"]];
+  for (const p of D.pvs) if (p.ts >= st && p.ts < en) rows.push([new Date(p.ts).toISOString(), p.p, p.ti || "", p.ch, p.src, p.r || "", p.camp, p.cc, p.lang, p.d, p.b, p.o, Math.round(p._e / 1000), p._sc]);
+  offer(`byline-${s.id}-pageviews-${S.range}.csv`, csv(rows));
+}
+function exportPages() {
+  const C = S.view.cur; const s = site();
+  offer(`byline-${s.id}-posts-${S.range}.csv`, csv([["path", "title", "visitors", "views", "avg_read_seconds", "read_through"], ...C.pages.map((o) => [o.k, S.data.titles.get(o.k) || "", o.visitors, o.n, Math.round(o.time / 1000), o.readRate.toFixed(3)])]));
+}
+async function prune() {
+  const days = +$("#pruneSel").value; const s = site(); const cut = utcDay(Date.now() - days * DAY);
+  if (!confirm(`Delete ${s.name}’s raw data from before ${cut}?`)) return;
+  const snap = await db.collection("chunks").where("site", "==", s.id).where("day", "<", cut).get(); let bytes = 0;
+  for (const c of snap.docs) { bytes += c.data().bytes || 0; await db.doc("chunks/" + c.id).delete(); }
+  await bumpBytes(-bytes); toast(`Deleted ${snap.size} day files`); $("#dlg").close();
+}
+
+// ---------- receiving: turning hits into statistics ----------
+// The tracker posts raw pings to the instance's ingest endpoint ("hits"). An open dashboard of a manager turns them into
+// compact day files (chunks/<site>~<day>~<n>), which everyone with access reads, and deletes the pings it has handled.
+const BOT_RE = /bot|crawl|spider|slurp|facebookexternalhit|headless|lighthouse|pingdom|uptime|monitor|curl|wget|python|httpclient|axios|go-http|java\/|phantom|preview|scrapy|semrush|ahrefs|mj12|bytespider|gptbot|claudebot|perplexitybot|ccbot/i;
+function parseUA(ua) {
+  let b = "Other", o = "Other", dv = "Desktop";
+  if (/Edg\//.test(ua)) b = "Edge"; else if (/OPR\/|Opera/.test(ua)) b = "Opera"; else if (/SamsungBrowser/.test(ua)) b = "Samsung Internet";
+  else if (/Firefox\/|FxiOS/.test(ua)) b = "Firefox"; else if (/DuckDuckGo/.test(ua)) b = "DuckDuckGo"; else if (/Chrome\/|CriOS/.test(ua)) b = "Chrome"; else if (/Safari\//.test(ua)) b = "Safari";
+  if (/iPhone|iPod/.test(ua)) o = "iOS"; else if (/iPad/.test(ua)) o = "iPadOS"; else if (/Android/.test(ua)) o = "Android"; else if (/Windows/.test(ua)) o = "Windows";
+  else if (/Mac OS X|Macintosh/.test(ua)) o = "macOS"; else if (/CrOS/.test(ua)) o = "ChromeOS"; else if (/Linux/.test(ua)) o = "Linux";
+  if (/iPad|Tablet/.test(ua) || (/Android/.test(ua) && !/Mobile/.test(ua))) dv = "Tablet"; else if (/Mobi|iPhone|iPod/.test(ua)) dv = "Mobile";
+  return { b, o, d: dv };
+}
+const str = (v, n) => (typeof v === "string" ? v.slice(0, n) : "");
+const int = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(Number(v) || 0)));
+function normPath(p) {
+  p = p || "/"; try { p = decodeURI(p); } catch (e) {}
+  p = p.replace(/\/index\.html?$/i, "/"); if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+  return p.slice(0, 300);
+}
+/** A received ping (untrusted: anyone can post one) as a compact event, or null to drop it. */
+function convertHit(id, x) {
+  const t = x.t; if (t !== "pv" && t !== "eng" && t !== "ev") return null;
+  const ev = { ts: Date.parse(x._receivedAt) || Date.now(), t, v: str(x._visitor, 32) || "x" + id.slice(0, 12) };
+  const site = str(x.s, 60); if (!/^[a-z0-9][a-z0-9-]{1,59}$/.test(site)) return null;
+  if (x.pid) ev.pid = str(String(x.pid), 24);
+  if (t === "eng") { ev.e = int(x.e, 0, 216e5); ev.sc = int(x.sc, 0, 100); return { site, host: str(x.h, 120).toLowerCase(), ev }; }
+  const ua = str(x.ua, 300); if (!ua || BOT_RE.test(ua)) return null;
+  let url; try { url = new URL(String(x.u)); } catch (e) { return null; }
+  if (!/^https?:$/.test(url.protocol)) return null;
+  ev.p = normPath(url.pathname);
+  const q = url.searchParams, us = q.get("utm_source") || q.get("ref") || q.get("source");
+  if (us) ev.us = us.slice(0, 80).toLowerCase();
+  if (q.get("utm_medium")) ev.um = q.get("utm_medium").slice(0, 80).toLowerCase();
+  if (q.get("utm_campaign")) ev.uc = q.get("utm_campaign").slice(0, 120);
+  Object.assign(ev, parseUA(ua));
+  if (x.sw) ev.sw = int(x.sw, 0, 10000);
+  if (x.l) ev.l = str(x.l, 16);
+  if (x.tz) ev.tz = str(x.tz, 50);
+  if (/^[A-Z]{2}$/.test(x._country || "")) ev.c = x._country;
+  if (t === "pv") {
+    if (x.ti) ev.ti = str(x.ti, 200);
+    if (x.r) { try { const r = new URL(String(x.r)); if (/^https?:$/.test(r.protocol) && r.hostname.toLowerCase() !== url.hostname.toLowerCase()) { const rp = normPath(r.pathname); ev.r = (r.hostname.replace(/^www\./, "") + (rp === "/" ? "" : rp)).toLowerCase().slice(0, 200); } } catch (e) {} }
+  } else {
+    ev.n = str(x.n, 100); if (!ev.n) return null;
+    if (x.p && typeof x.p === "object" && !Array.isArray(x.p)) { const pr = {}; for (const [k, v] of Object.entries(x.p).slice(0, 10)) pr[k.slice(0, 40)] = String(v).slice(0, 300); ev.pr = pr; }
+  }
+  return { site, host: url.hostname.toLowerCase(), ev };
+}
+async function appendEvents(groups, cache) {
+  let added = 0;
+  for (const [key, list] of groups) {
+    const [siteId, day] = key.split("~");
+    let cur = cache.get(key);
+    if (!cur) {
+      const snap = await db.collection("chunks").where("site", "==", siteId).where("day", "==", day).get();
+      let best = null; for (const d of snap.docs) { const x = d.data(); if (!best || x.n > best.n) best = x; }
+      cur = best ? { site: siteId, day, n: best.n, events: [...best.events], bytes: best.bytes || JSON.stringify(best.events).length } : { site: siteId, day, n: 0, events: [], bytes: 2 };
+    }
+    const write = (c) => db.doc(`chunks/${siteId}~${day}~${c.n}`).set({ site: siteId, day, n: c.n, count: c.events.length, bytes: c.bytes, events: c.events, updatedAt: Date.now() });
+    for (const ev of list) {
+      const sz = JSON.stringify(ev).length + 1;
+      if (cur.bytes + sz > 190000 && cur.events.length) { await write(cur); cur = { site: siteId, day, n: cur.n + 1, events: [], bytes: 2 }; }
+      cur.events.push(ev); cur.bytes += sz; added += sz;
+    }
+    await write(cur); cache.set(key, cur);
+  }
+  return added;
+}
+const toDelete = [];
+async function fold(manual) {
+  if (!S.isAdmin || S.folding) return;
+  S.folding = true; renderSync();
+  let kept = 0;
+  try {
+    try { const l = await db.doc("locks/fold").acquire({ holder: TAB_ID, ttlMs: 60000 }); if (l && l.acquired === false) { if (manual) toast("Another open Byline tab is already updating"); return; } } catch (e) {}
+    let st = (await db.doc("state/fold").get()).data() || { at: "", ids: [] };
+    const bySite = new Map(S.sites.map((x) => [x.id, x])); const cache = new Map(); let bytes = 0; const fresh = [];
+    for (let round = 0; round < 20; round++) {
+      const q = st.at ? db.collection("hits").where("_receivedAt", ">=", st.at).orderBy("_receivedAt").limit(500) : db.collection("hits").orderBy("_receivedAt").limit(500);
+      const snap = await q.get();
+      const docs = snap.docs.filter((d) => !(d.data()._receivedAt === st.at && st.ids.includes(d.id)));
+      if (!docs.length) break;
+      const groups = new Map();
+      for (const d of docs) {
+        const c = convertHit(d.id, d.data()); if (!c) continue;
+        const sx = bySite.get(c.site); if (!sx || sx.demo || !hostsOf(sx).includes(c.host)) continue;
+        const k = c.site + "~" + utcDay(c.ev.ts); let l = groups.get(k); if (!l) groups.set(k, (l = [])); l.push(c.ev); fresh.push([c.site, c.ev]); kept++;
+      }
+      bytes += await appendEvents(groups, cache);
+      const lastAt = docs[docs.length - 1].data()._receivedAt;
+      const atLast = docs.filter((d) => d.data()._receivedAt === lastAt).map((d) => d.id);
+      st = { at: lastAt, ids: lastAt === st.at ? [...st.ids, ...atLast] : atLast };
+      await db.doc("state/fold").set(st);
+      for (const d of docs) toDelete.push(d.id);
+      if (snap.size < 500) break;
+    }
+    S.foldState = st; S.lastFold = Date.now(); S.foldError = null;
+    if (kept) {
+      const cur = (await db.doc("settings/main").get()).data() || {};
+      await db.doc("settings/main").update({ lastSync: Date.now(), bytes: (cur.bytes || 0) + bytes });
+      const mine = site(); if (mine) mergeEvents(mine.id, fresh.filter(([sid]) => sid === mine.id).map(([, ev]) => ev));
+    }
+    if (manual) toast(kept ? `Added ${kept} new ${kept === 1 ? "event" : "events"}` : "Up to date");
+  } catch (e) { S.foldError = (e && e.message) || String(e); if (manual) toast(S.foldError); }
+  finally { S.folding = false; renderSync(); }
+}
+// Handled pings are deleted slowly in the background, so the write budget stays free for the dashboard.
+let deleting = false;
+async function trickleDelete() {
+  if (deleting || !toDelete.length) return; deleting = true;
+  try { for (let i = 0; i < 3 && toDelete.length; i++) { const id = toDelete.shift(); try { await db.doc("hits/" + id).delete(); } catch (e) { if (e && e.code === "unavailable") { toDelete.unshift(id); break; } } } }
+  finally { deleting = false; }
+}
+async function queueOldHits() {
+  if (!S.foldState.at || toDelete.length > 200) return;
+  try { const snap = await db.collection("hits").where("_receivedAt", "<", S.foldState.at).orderBy("_receivedAt").limit(200).get(); for (const d of snap.docs) if (!toDelete.includes(d.id)) toDelete.push(d.id); } catch (e) {}
+}
+
+// ---------- demo data ----------
+async function makeDemo() {
+  const id = "demo"; const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  await db.doc("sites/" + id).set({ name: "Demo blog", domain: "demo.byline.blog", origins: [], extra: [], tz, demo: true, createdAt: Date.now() });
+  const posts = [["/", "Field Notes – a blog about slow software"], ["/posts/why-i-left-the-cloud", "Why I left the cloud"], ["/posts/sqlite-is-enough", "SQLite is enough"], ["/posts/my-2026-reading-list", "My 2026 reading list"], ["/posts/writing-every-day", "What 100 days of writing taught me"], ["/posts/self-hosting-for-humans", "Self-hosting for humans"], ["/posts/the-boring-stack", "In praise of the boring stack"], ["/posts/keyboard-review", "A year with a split keyboard"], ["/posts/newsletter-lessons", "Lessons from 1,000 newsletter subscribers"], ["/about", "About"], ["/archive", "Archive"], ["/posts/rss-is-back", "RSS is back (it never left)"], ["/posts/photo-walk-lisbon", "A photo walk through Lisbon"], ["/now", "Now"]];
+  const weight = [9, 6, 10, 3, 5, 4, 3, 2, 3, 2, 2, 3, 2, 1];
+  const sources = [["google.com", "", "", 34], ["", "", "", 20], ["news.ycombinator.com/item", "", "", 6], ["", "newsletter", "email", 9], ["bsky.app", "", "", 5], ["reddit.com/r/selfhosted", "", "", 5], ["chatgpt.com", "", "", 4], ["perplexity.ai", "", "", 2], ["duckduckgo.com", "", "", 5], ["t.co", "", "", 3], ["linkedin.com", "", "", 2], ["kottke.org/26/11/slow-software", "", "", 2], ["bing.com", "", "", 2], ["", "mastodon", "social", 2]];
+  const zones = [["America/New_York", 22], ["Europe/Berlin", 16], ["Europe/London", 11], ["America/Los_Angeles", 10], ["Europe/Paris", 5], ["Asia/Kolkata", 5], ["Europe/Amsterdam", 4], ["America/Toronto", 4], ["Australia/Sydney", 3], ["Asia/Tokyo", 3], ["America/Sao_Paulo", 3], ["Europe/Stockholm", 2], ["Europe/Madrid", 2], ["Europe/Zurich", 2]];
+  const langs = { "America/New_York": "en-US", "Europe/Berlin": "de-DE", "Europe/London": "en-GB", "America/Los_Angeles": "en-US", "Europe/Paris": "fr-FR", "Asia/Kolkata": "en-IN", "Europe/Amsterdam": "nl-NL", "America/Toronto": "en-CA", "Australia/Sydney": "en-AU", "Asia/Tokyo": "ja-JP", "America/Sao_Paulo": "pt-BR", "Europe/Stockholm": "sv-SE", "Europe/Madrid": "es-ES", "Europe/Zurich": "de-CH" };
+  const techs = [["Chrome", "Windows", "Desktop", 1920, 16], ["Chrome", "macOS", "Desktop", 1512, 12], ["Safari", "macOS", "Desktop", 1512, 10], ["Safari", "iOS", "Mobile", 393, 22], ["Chrome", "Android", "Mobile", 412, 14], ["Firefox", "Linux", "Desktop", 2560, 8], ["Firefox", "Windows", "Desktop", 1920, 5], ["Edge", "Windows", "Desktop", 1920, 5], ["Safari", "iPadOS", "Tablet", 820, 3], ["Samsung Internet", "Android", "Mobile", 384, 2]];
+  const pick = (arr, wi = arr[0].length - 1) => { const tot = arr.reduce((a, x) => a + x[wi], 0); let r = Math.random() * tot; for (const x of arr) { r -= x[wi]; if (r <= 0) return x; } return arr[0]; };
+  const pickIdx = (w) => { const tot = w.reduce((a, b) => a + b, 0); let r = Math.random() * tot; for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) return i; } return 0; };
+  const hex = () => Array.from({ length: 16 }, () => "0123456789abcdef"[Math.floor(Math.random() * 16)]).join("");
+  const hourW = [2, 1, 1, 1, 1, 2, 4, 7, 9, 10, 10, 9, 9, 10, 11, 10, 9, 8, 8, 9, 8, 6, 4, 3];
+  const groups = new Map(); const now = Date.now();
+  for (let dd = 120; dd >= 0; dd--) {
+    const dayStart = Math.floor((now - dd * DAY) / DAY) * DAY; const wd = new Date(dayStart).getUTCDay();
+    let n = Math.round((55 + (120 - dd) * 0.35) * (wd === 0 || wd === 6 ? 0.7 : 1) * (0.85 + Math.random() * 0.3));
+    const spike = dd === 18 ? 9 : dd === 17 ? 3.2 : dd === 16 ? 1.6 : 1; n = Math.round(n * spike);
+    const dayVisitors = [];
+    for (let i = 0; i < n; i++) {
+      let ts = dayStart + pickIdx(hourW) * 36e5 + Math.floor(Math.random() * 36e5); if (ts > now) continue;
+      // Some readers come back later the same day: a second visit by the same visitor.
+      const v = dayVisitors.length && Math.random() < 0.12 ? dayVisitors[Math.floor(Math.random() * dayVisitors.length)] : hex(); dayVisitors.push(v); let src = pick(sources); if (spike > 1 && Math.random() < 0.7) src = sources[2];
+      const z = pick(zones); const t = pick(techs);
+      let pi = src === sources[2] ? 2 : pickIdx(weight); if (dd < 10 && Math.random() < 0.18) pi = 11;
+      const pages = 1 + (Math.random() < 0.28 ? 1 : 0) + (Math.random() < 0.1 ? 1 : 0);
+      for (let k = 0; k < pages; k++) {
+        if (k) pi = pickIdx(weight);
+        const pid = hex().slice(0, 10); const [path, title] = posts[pi];
+        const pv = { ts, t: "pv", v, pid, p: path, ti: title + " | Field Notes", b: t[0], o: t[1], d: t[2], sw: t[3], l: langs[z[0]] || "en-US", tz: z[0] };
+        if (k === 0 && src[0]) pv.r = src[0]; if (k === 0 && src[1]) { pv.us = src[1]; if (src[2]) pv.um = src[2]; if (src[1] === "newsletter") pv.uc = Math.random() < 0.6 ? "november-digest" : "october-digest"; }
+        const k2 = utcDay(ts); const key = id + "~" + k2; let l = groups.get(key); if (!l) groups.set(key, (l = [])); l.push(pv);
+        const long = path.startsWith("/posts/"); const e = Math.random() < 0.18 ? 2000 + Math.random() * 6000 : (long ? 40e3 : 12e3) * Math.exp((Math.random() - 0.5) * 2) * (pi === 2 ? 1.6 : 1);
+        const sc = Math.min(100, Math.round(Math.min(1, e / (long ? 150e3 : 40e3)) * 100 + Math.random() * 20));
+        l.push({ ts: ts + e, t: "eng", v, pid, e: Math.round(e), sc });
+        if (long && Math.random() < 0.03) l.push({ ts: ts + e * 0.8, t: "ev", v, pid, n: "Newsletter signup", p: path });
+        if (Math.random() < 0.05) l.push({ ts: ts + e * 0.6, t: "ev", v, pid, n: "Outbound link", p: path, pr: { url: pick([["https://github.com/dm807cam/lager", 3], ["https://sqlite.org/whentouse.html", 2], ["https://www.amazon.com/dp/B0C1KEYBRD", 2], ["https://kottke.org/", 1]]) [0] } });
+        if (pi === 3 && Math.random() < 0.08) l.push({ ts: ts + e * 0.7, t: "ev", v, pid, n: "File download", p: path, pr: { url: "https://demo.byline.blog/files/reading-list-2026.pdf" } });
+        ts += e + 5000 + Math.random() * 30000;
+      }
+    }
+  }
+  for (const l of groups.values()) l.sort((a, b) => a.ts - b.ts);
+  const bytes = await appendEvents(groups, new Map());
+  await bumpBytes(bytes);
+  await db.doc("settings/main").update({ lastSync: Date.now() });
+  S.siteId = id; saveHash(); toast("Demo data added");
+}
+
+// ---------- AI insights ----------
+async function runInsights() {
+  const out = $("#ai"); const btn = $("#aiBtn"); const C = S.view.cur, P = S.view.prev, s = site();
+  const top = (list, n, f) => list.slice(0, n).map(f);
+  const facts = {
+    site: s.name, period: RANGES.find((r) => r[0] === S.range)[1], filters: S.filters,
+    now: C.kpi, previous: P.kpi,
+    topPosts: top(C.pages, 10, (o) => ({ title: S.data.titles.get(o.k) || o.k, path: o.k, visitors: o.visitors, views: o.n, avgReadSec: Math.round(o.time / 1000), readThrough: +o.readRate.toFixed(2), prevViews: P.pageViews.get(o.k) || 0 })),
+    channels: top(C.channel, 8, (o) => ({ channel: o.k, visitors: o.visitors })), sources: top(C.source, 10, (o) => ({ source: o.k, visitors: o.visitors })),
+    countries: top(C.country, 6, (o) => ({ country: labelFor("country", o.k), visitors: o.visitors })), devices: top(C.device, 3, (o) => ({ device: o.k, visitors: o.visitors })),
+    goals: top(C.goals, 6, (o) => ({ goal: o.k, visitors: o.visitors, conversion: +o.cr.toFixed(3) })),
+    busiest: $(".best") ? $(".best").textContent : "",
+  };
+  btn.disabled = true; out.innerHTML = '<p class="muted">Reading your numbers…</p>';
+  try {
+    const text = await lager.complete(
+      "Here are a blog's analytics as JSON (times in ms unless named Sec; bounce is a fraction). Write 4–6 short bullet points, each starting with '- ', for the blogger: what changed and why it likely happened, which posts and sources deserve attention, one concrete idea for what to write or promote next, and one tip on timing. Use the real numbers and post titles. No intro, no outro, no markdown headings.\n\n" + JSON.stringify(facts),
+      { system: "You are a friendly, sharp blog-growth analyst. Be specific and concise. Never invent numbers.", maxTokens: 700 });
+    const lines = String(text).split("\n").map((l) => l.trim()).filter(Boolean);
+    const bold = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    out.innerHTML = "<ul>" + lines.map((l) => "<li>" + bold(l.replace(/^[-*•]\s*/, "")) + "</li>").join("") + '</ul><p class="muted" style="font-size:12px;margin-bottom:0">Written by an AI model from the numbers above. Check before acting on it.</p>';
+  } catch (e) {
+    out.innerHTML = `<p class="muted">${esc(e && e.code === "not_configured" ? "No language model is set up on this Lager server." : e && e.code === "rate_limited" ? "Too many requests this hour. Try again later." : "Couldn’t get a summary right now.")}</p>`;
+  }
+  btn.disabled = false;
+}
+
+// ---------- onboarding ----------
+function renderOnboarding() {
+  if (!S.isAdmin) return `<div class="hero"><h1>No sites yet</h1><p class="lead">The owner of this Byline hasn’t added a site yet.</p></div>`;
+  const off = S.endpoint && !S.endpoint.enabled;
+  return `<div class="hero">
+    <h1>Know what your readers read.</h1>
+    <p class="lead">Byline is cookie-free analytics for your blog: which posts people actually finish, where they come from, and when to publish.</p>
+    <ul class="feat"><li>Visitors, visits & pageviews</li><li>Read time & read-through per post</li><li>Search, social, newsletter & AI sources</li><li>Trending posts vs. last period</li><li>Outbound links, downloads & goals</li><li>Best day and hour to publish</li><li>Countries, languages, devices</li><li>No cookies, no IPs stored</li></ul>
+    ${off ? `<div class="note err">Receiving is switched off for this Byline. Turn it on on the Lager instance page under <b>Data from outside</b>.</div>` : ""}
+    <div class="steps">
+      <div class="card step"><h3>Add your blog</h3><p class="ink2" style="margin:0 0 10px">Its address and the time zone you want reports in. You can add several blogs.</p><button class="btn primary" id="obSite">Add a site</button></div>
+      <div class="card step"><h3>Paste the tracking code</h3><p class="ink2" style="margin:0">One snippet in your blog’s <code>&lt;head&gt;</code>, about 3 KB, no cookie banner needed. Pageviews show up here within seconds.</p></div>
+    </div>
+    <p class="ink2" style="margin-top:22px">Just looking? <button class="btn" id="obDemo">Explore with demo data</button></p>
+  </div>`;
+}
+function bindOnboarding() {
+  if (!$("#obSite")) return;
+  $("#obSite").onclick = () => editSite(null);
+  $("#obDemo").onclick = async (e) => { e.target.disabled = true; e.target.textContent = "Generating 4 months of demo data…"; try { await makeDemo(); } catch (err) { toast(err.message || "Failed"); e.target.disabled = false; } };
+}
+
+// ---------- boot ----------
+renderShell(); renderSync();
+let first = true; let reloadT; let lastReload = 0;
+const scheduleReload = (soon) => { clearTimeout(reloadT); const wait = soon ? 250 : Math.max(250, 60e3 - (Date.now() - lastReload)); reloadT = setTimeout(() => { lastReload = Date.now(); reload(); }, wait); };
+db.collection("sites").onSnapshot((snap) => {
+  S.sites = snap.docs.map((d) => ({ tz: "UTC", origins: [], ...d.data(), id: d.id })).sort((a, b) => (a.demo ? 1 : 0) - (b.demo ? 1 : 0) || a.createdAt - b.createdAt);
+  if (!site() && S.sites.length) S.siteId = S.sites[0].id;
+  renderSites();
+  if (site()) { if (first || !S.data || S.data.siteId !== S.siteId) scheduleReload(true); else renderDash(); }
+  else renderDash();
+  first = false;
+}, (e) => { $("#main").innerHTML = `<div class="hero"><h1>Can’t load</h1><p class="lead">${esc(e.message)}</p></div>`; });
+db.doc("settings/main").onSnapshot((snap) => {
+  const prev = S.settings.lastSync; S.settings = snap.exists ? snap.data() : {};
+  // Managers merge what they fold in place; everyone else reloads, at most once a minute.
+  if (!S.isAdmin && prev !== undefined && S.settings.lastSync !== prev && site()) scheduleReload(false);
+  renderSync();
+}, () => {});
+if (S.isAdmin) {
+  try { S.foldState = (await db.doc("state/fold").get()).data() || {}; } catch (e) {}
+  let foldT;
+  // A new ping arrives → fold it in a few seconds later (several pings in a row are handled together).
+  db.collection("hits").orderBy("_receivedAt", "desc").limit(1).onSnapshot(() => { clearTimeout(foldT); foldT = setTimeout(() => fold(false), 2500); }, () => {});
+  setInterval(trickleDelete, 2000);
+  setInterval(queueOldHits, 120e3); setTimeout(queueOldHits, 15e3);
+  setInterval(loadEndpoint, 120e3);
+}
+setInterval(() => { renderSync(); if (S.data && document.visibilityState === "visible") { computeLive(S.data.raw || []); const pill = $("#livePill strong"); if (pill && S.live) pill.textContent = S.live.visitors; } }, 30e3);
+})();
+
+</script>
+</body>
+</html>
+

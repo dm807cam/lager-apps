@@ -1,0 +1,27 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "wissensfunke",
+  "title": "Wissensfunke",
+  "description": "Jeden Tag ein überraschender Funfact aus der Wissenschaft – mit Archiv und Merkliste.",
+  "version": 4,
+  "language": "de",
+  "category": "education",
+  "themeColor": "#2a3a8f",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {
+    "db": {
+      "rules": [
+        {
+          "path": "facts",
+          "read": "view",
+          "write": "owner"
+        }
+      ]
+    },
+    "user": {}
+  },
+  "seed": [
+    "seed/facts.json"
+  ]
+}

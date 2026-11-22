@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "repository": "https://github.com/dm807cam/lager-apps",
+  "apps": [
+    {
+      "slug": "byline",
+      "title": "Byline",
+      "description": "Cookie-free blog analytics: readers, read time, read-through, sources, trending posts and the best time to publish.",
+      "version": 1,
+      "status": "beta",
+      "language": "en",
+      "category": "analytics",
+      "themeColor": "#16305c",
+      "path": "apps/byline",
+      "entry": "apps/byline/index.html",
+      "icon": "apps/byline/icon.svg",
+      "capabilities": [
+        "complete",
+        "db",
+        "downloads",
+        "ingest"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "deutsch-dino",
+      "title": "Deutsch-Dino",
+      "description": "Endloses Deutsch-Spiel für die Klassen 1 bis 4: Aufgaben lösen, Dino-Eier knacken und alle Dinos für den Dino-Park sammeln.",
+      "version": 4,
+      "status": "stable",
+      "language": "de",
+      "category": "education",
+      "themeColor": "#8fd96b",
+      "path": "apps/deutsch-dino",
+      "entry": "apps/deutsch-dino/index.html",
+      "icon": null,
+      "capabilities": [
+        "db",
+        "user"
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com"
+      ],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "gesichtsschutz",
+      "title": "Gesichtsschutz",
+      "description": "Erkennt Gesichter in deinen Fotos und macht sie direkt im Browser unkenntlich – irreversibel und ohne Upload.",
+      "version": 3,
+      "status": "stable",
+      "language": "de",
+      "category": "privacy",
+      "themeColor": "#1b2a4d",
+      "path": "apps/gesichtsschutz",
+      "entry": "apps/gesichtsschutz/index.html",
+      "icon": "apps/gesichtsschutz/icon.svg",
+      "capabilities": [],
+      "externalHosts": [
+        "cdn.jsdelivr.net"
+      ],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "ghostberry",
+      "title": "Ghostberry",
+      "description": "A Ghost-style blog: write with cards, publish or schedule, tags, authors, members, Ghost themes. Almanac is the default theme.",
+      "version": 1,
+      "status": "beta",
+      "language": "en",
+      "category": "publishing",
+      "themeColor": "#2f5d46",
+      "path": "apps/ghostberry",
+      "entry": "apps/ghostberry/index.html",
+      "icon": null,
+      "capabilities": [
+        "assets",
+        "db",
+        "downloads",
+        "user"
+      ],
+      "externalHosts": [
+        "cdn.jsdelivr.net",
+        "data.jsdelivr.com"
+      ],
+      "integrations": {},
+      "seed": [
+        "apps/ghostberry/seed/system.json"
+      ],
+      "tests": 0
+    },
+    {
+      "slug": "habit-tracker",
+      "title": "Habits",
+      "description": "Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves.",
+      "version": 1,
+      "status": "beta",
+      "language": "en",
+      "category": "health",
+      "themeColor": "#c2521f",
+      "path": "apps/habit-tracker",
+      "entry": "apps/habit-tracker/index.html",
+      "icon": "apps/habit-tracker/icon.svg",
+      "capabilities": [
+        "db",
+        "ingest",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {
+        "activity-api/v1": "receiver"
+      },
+      "seed": [],
+      "tests": 1
+    },
+    {
+      "slug": "kommentare",
+      "title": "Kommentare",
+      "description": "Einbettbares Kommentarsystem mit verschachtelten Antworten, Daumen hoch/runter, Moderation und Site-Auswahl für mehrere Websites.",
+      "version": 4,
+      "status": "stable",
+      "language": "de",
+      "category": "publishing",
+      "themeColor": "#2f5bea",
+      "path": "apps/kommentare",
+      "entry": "apps/kommentare/index.html",
+      "icon": null,
+      "capabilities": [
+        "db",
+        "downloads",
+        "embed",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "leanline",
+      "title": "Leanline",
+      "description": "Log weight and body fat as often as you like and see your trend against your ideal BMI and body-fat zones.",
+      "version": 3,
+      "status": "stable",
+      "language": "en",
+      "category": "health",
+      "themeColor": "#0b4a3e",
+      "path": "apps/leanline",
+      "entry": "apps/leanline/index.html",
+      "icon": "apps/leanline/icon.svg",
+      "capabilities": [
+        "db"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "mathe-monster",
+      "title": "Mathe-Monster",
+      "description": "Endloses Mathe-Spiel für die Klassen 1 bis 4: Aufgaben lösen, Monster besiegen, Münzen sammeln und Helden freischalten.",
+      "version": 4,
+      "status": "stable",
+      "language": "de",
+      "category": "education",
+      "themeColor": "#ffd23f",
+      "path": "apps/mathe-monster",
+      "entry": "apps/mathe-monster/index.html",
+      "icon": null,
+      "capabilities": [
+        "db",
+        "user"
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com"
+      ],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "portfolio-pulse",
+      "title": "Portfolio Pulse",
+      "description": "Log your portfolio value and see it plotted over time against 1–10% yearly growth lines.",
+      "version": 3,
+      "status": "stable",
+      "language": "en",
+      "category": "finance",
+      "themeColor": "#0d366b",
+      "path": "apps/portfolio-pulse",
+      "entry": "apps/portfolio-pulse/index.html",
+      "icon": "apps/portfolio-pulse/icon.svg",
+      "capabilities": [
+        "db"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "satz",
+      "title": "Satz",
+      "description": "Fokussiertes Schreiben für ganze Bücher – mit Kapiteln, Fokusmodus und einer sortierbaren Ablage für Gedankenfetzen.",
+      "version": 3,
+      "status": "stable",
+      "language": "de",
+      "category": "writing",
+      "themeColor": "#16181c",
+      "path": "apps/satz",
+      "entry": "apps/satz/index.html",
+      "icon": null,
+      "capabilities": [
+        "db",
+        "downloads",
+        "user"
+      ],
+      "externalHosts": [
+        "cdn.jsdelivr.net"
+      ],
+      "integrations": {},
+      "seed": [],
+      "tests": 0
+    },
+    {
+      "slug": "stillwater",
+      "title": "Stillwater",
+      "description": "A calm meditation timer with breathing guide, synthesised bells and ambience, a journal, and stats with streaks and a yearly heatmap.",
+      "version": 3,
+      "status": "stable",
+      "language": "en",
+      "category": "health",
+      "themeColor": "#1d3b3c",
+      "path": "apps/stillwater",
+      "entry": "apps/stillwater/index.html",
+      "icon": "apps/stillwater/icon.svg",
+      "capabilities": [
+        "db",
+        "downloads",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {
+        "activity-api/v1": "sender"
+      },
+      "seed": [],
+      "tests": 1
+    },
+    {
+      "slug": "wissensfunke",
+      "title": "Wissensfunke",
+      "description": "Jeden Tag ein überraschender Funfact aus der Wissenschaft – mit Archiv und Merkliste.",
+      "version": 4,
+      "status": "stable",
+      "language": "de",
+      "category": "education",
+      "themeColor": "#2a3a8f",
+      "path": "apps/wissensfunke",
+      "entry": "apps/wissensfunke/index.html",
+      "icon": "apps/wissensfunke/icon.svg",
+      "capabilities": [
+        "db",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [
+        "apps/wissensfunke/seed/facts.json"
+      ],
+      "tests": 1
+    },
+    {
+      "slug": "workout-tracker",
+      "title": "Workout Tracker",
+      "description": "Workout tracker: plans, custom exercises, workouts from a plan or on the go, records, charts, a yearly heatmap and an AI coach.",
+      "version": 3,
+      "status": "stable",
+      "language": "en",
+      "category": "health",
+      "themeColor": "#1b4f8c",
+      "path": "apps/workout-tracker",
+      "entry": "apps/workout-tracker/index.html",
+      "icon": "apps/workout-tracker/icon.svg",
+      "capabilities": [
+        "complete",
+        "db",
+        "downloads",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {
+        "activity-api/v1": "sender"
+      },
+      "seed": [],
+      "tests": 1
+    }
+  ]
+}
