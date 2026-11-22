@@ -2,7 +2,7 @@
 
 Log weight and body fat as often as you like and see your trend against your ideal BMI and body-fat zones.
 
-**Language:** English · **Category:** health · **Status:** stable · **Deployed version:** 3
+**Language:** English · **Category:** health · **Status:** stable · **Deployed version:** 4
 
 ## Notes
 

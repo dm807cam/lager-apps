@@ -8,19 +8,24 @@
  * Tests read and drive it through window.__lager:
  *   __lager.store       path -> data
  *   __lager.writes      every write [{op, path, data}]
+ *   __lager.reads       every query read with get() [{path, ids}]
  *   __lager.downloads   files offered through downloads.save
  *   __lager.ingest(collection, body)  add a document as if it arrived at an ingest endpoint
  *   __lager.flush()     resolves once pending snapshot listeners have run
+ *   __lager.fail        rules that make reads fail, to test bad connections: [{op: "get" | "snapshot", path: "<regex>"}]
+ *                       (also settable as config.fail). A failing get rejects with code "unavailable"; a failing snapshot
+ *                       delivers nothing until the rule is removed and __lager.flush() runs.
  */
 (() => {
   "use strict";
   const cfg = window.__LAGER_CONFIG__ || {};
   const declared = cfg.capabilities || null;            // null: everything available
   const store = new Map();
-  const writes = [], downloads = [], assets = new Map();
+  const writes = [], reads = [], downloads = [], assets = new Map();
   (cfg.seed || []).forEach(d => store.set(d.path, clone(d.data)));
   const subs = new Set();
   let pending = null;
+  const failing = (op, path) => ((window.__lager && window.__lager.fail) || []).some(f => f.op === op && new RegExp(f.path).test(path));
 
   function clone(o) { return o === undefined ? undefined : JSON.parse(JSON.stringify(o)); }
   function freeze(o) { if (o && typeof o === "object") { Object.values(o).forEach(freeze); Object.freeze(o); } return o; }
@@ -57,12 +62,12 @@
     if (segs(path).length % 2) throw new TypeError("Document paths have an even number of segments: " + path);
     return {
       id: path.split("/").pop(), path,
-      async get() { return dsnap(path); },
+      async get() { if (failing("get", path)) throw err("unavailable", "Network error (test)"); return dsnap(path); },
       async set(data) { checkData(data); store.set(path, clone(data)); writes.push({ op: "set", path, data: clone(data) }); notify(); },
       async update(data) { checkData(data); store.set(path, merge(clone(store.get(path)) || {}, data)); writes.push({ op: "update", path, data: clone(data) }); notify(); },
       async delete() { store.delete(path); writes.push({ op: "delete", path }); notify(); },
       collection: name => collRef(path + "/" + name),
-      onSnapshot(next, error) { const f = () => next(dsnap(path)); subs.add(f); setTimeout(f, 0); return () => subs.delete(f); },
+      onSnapshot(next, error) { const f = () => { if (!failing("snapshot", path)) next(dsnap(path)); }; subs.add(f); setTimeout(f, 0); return () => subs.delete(f); },
       async acquire({ ttlMs = 30000 } = {}) { return { acquired: true, version: 1, expiresAt: Date.now() + ttlMs }; }
     };
   }
@@ -88,10 +93,10 @@
       where(f, op, v) { if (!OPS[op]) throw new TypeError("Unknown operator " + op); return query(path, wh.concat([[f, op, v]]), ob, lim); },
       orderBy(f, dir) { return query(path, wh, ob.concat([[f, dir || "asc"]]), lim); },
       limit(n) { return query(path, wh, ob, n); },
-      async get() { return run(); },
+      async get() { if (failing("get", path)) throw err("unavailable", "Network error (test)"); const r = run(); reads.push({ path, ids: r.docs.map(d => d.id) }); return r; },
       onSnapshot(next, error) {
         let last = null;
-        const f = () => { const s = run(); const sig = JSON.stringify(s.docs.map(d => [d.id, d.data()])); if (sig === last) return; last = sig; next(s); };
+        const f = () => { if (failing("snapshot", path)) return; const s = run(); const sig = JSON.stringify(s.docs.map(d => [d.id, d.data()])); if (sig === last) return; last = sig; next(s); };
         subs.add(f); setTimeout(f, 0); return () => subs.delete(f);
       }
     };
@@ -145,7 +150,7 @@
     }
   };
   window.__lager = {
-    store, writes, downloads,
+    store, writes, reads, downloads, fail: cfg.fail || [],
     ingest(collection, body) { const id = Math.random().toString(36).slice(2, 14); store.set(collection + "/" + id, Object.assign(clone(body), { _receivedAt: new Date().toISOString() })); return notify(); },
     set(path, data) { store.set(path, clone(data)); return notify(); },
     flush: () => notify(),

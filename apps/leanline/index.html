@@ -275,8 +275,21 @@
   }
   const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
 
+  // A query returns at most 1000 documents: read the measurements page by page, oldest first.
+  async function loadMeasurements() {
+    const out = [], seen = new Set(); let from = null;
+    for (let i = 0; i < 100; i++) {
+      const q = from === null ? db.collection('measurements').orderBy('t').limit(1000) : db.collection('measurements').where('t', '>=', from).orderBy('t').limit(1000);
+      const page = normalize(await q.get());
+      let added = 0;
+      page.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); out.push(d); added++; } });
+      if (page.length < 1000 || !added) break;
+      from = page[page.length - 1].t;
+    }
+    return out;
+  }
   async function load() {
-    const [res, pres] = await Promise.all([db.collection('measurements').get(), db.doc('settings/profile').get().catch(() => null)]);
+    const [res, pres] = await Promise.all([loadMeasurements(), db.doc('settings/profile').get().catch(() => null)]);
     ms = normalize(res)
       .map(d => ({ id: d.key || d.id, t: num(d.t), w: num(d.w), f: num(d.f) }))
       .filter(d => d.t && (d.w !== null || d.f !== null))

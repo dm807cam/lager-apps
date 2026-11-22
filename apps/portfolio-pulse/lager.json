@@ -3,7 +3,7 @@
   "slug": "portfolio-pulse",
   "title": "Portfolio Pulse",
   "description": "Log your portfolio value and see it plotted over time against 1–10% yearly growth lines.",
-  "version": 3,
+  "version": 4,
   "language": "en",
   "category": "finance",
   "themeColor": "#0d366b",

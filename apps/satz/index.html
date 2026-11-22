@@ -318,7 +318,7 @@ function toast(msg, action, ms = 4200) {
   if (action) { const b = el("button", "", action.label); b.onclick = () => { t.classList.remove("show"); action.fn(); }; t.append(b); }
   t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), action ? Math.max(ms, 6000) : ms);
 }
-function fatal(msg) { const f = $("#fatal"); f.textContent = msg; f.style.display = "grid"; }
+function fatal(msg) { const f = $("#fatal"); f.textContent = msg; f.style.display = "grid"; window.__satzReady = true; /* the message says what happened; no second "start takes too long" bar */ }
 
 /* ================= runtime ================= */
 let db = null, user = null, dl = null, uid = null, uname = "", base = "", C = null, setRef = null;
@@ -498,6 +498,7 @@ function dayStats() {
 /* ================= saving ================= */
 function setDot(state, title) { const d = $("#dot"); d.className = state; d.title = title || (state === "ok" ? "Gespeichert" : state === "pending" ? "Wird gespeichert …" : "Nicht gespeichert"); }
 function markDirty() {
+  if (ta.readOnly) return; // chapter still loading
   S.dirty = true; setDot("pending");
   const t = now(); if (!S.firstDirty) S.firstDirty = t;
   clearTimeout(S.saveT);
@@ -506,7 +507,7 @@ function markDirty() {
 function doSave() {
   clearTimeout(S.saveT);
   if (S.saving) return S.saving;
-  if (!S.dirty || !S.chId) return Promise.resolve();
+  if (!S.dirty || !S.chId || ta.readOnly) return Promise.resolve();
   S.dirty = false; S.firstDirty = 0;
   const id = S.chId, text = ta.value, t = now(), caret = ta.selectionEnd;
   S.saving = (async () => {
@@ -546,11 +547,15 @@ async function openChapter(id, opt = {}) {
   if (S.chId && S.chId !== id) await flushSave();
   S.chId = id; S.bookId = ch.bookId;
   if (unsubText) { unsubText(); unsubText = null; }
-  let text = "";
+  // No typing until the chapter's text is here: anything typed now would be saved over it.
+  ta.readOnly = true; S.loadFail = null;
+  let text = "", failed = false;
   try { const s = await withTimeout(C.texts.doc(id).get(), 10000, null); if (!s) throw new Error("timeout"); text = s.exists ? (s.data().text || "") : ""; }
-  catch (e) { toast("Kapitel konnte nicht geladen werden."); }
+  catch (e) { failed = true; toast("Kapitel konnte nicht geladen werden – neuer Versuch läuft …"); }
   if (S.chId !== id) return;
-  ta.value = text; S.dirty = false; setDot("ok");
+  ta.value = text; S.dirty = false;
+  if (failed) { S.loadFail = id; setDot("err", "Kapitel nicht geladen – bitte warten"); }
+  else { ta.readOnly = false; setDot("ok"); }
   const pos = Math.min(opt.pos ?? ch.caret ?? text.length, text.length);
   ta.setSelectionRange(pos, pos); S.lastSel = pos;
   render("open");
@@ -560,6 +565,12 @@ async function openChapter(id, opt = {}) {
   if (opt.focus !== false && !coarse) ta.focus({ preventScroll: true });
 }
 function onRemoteText(s) {
+  if (S.loadFail && S.loadFail === S.chId) {
+    // The first load failed; this is the chapter's text arriving after all.
+    S.loadFail = null; ta.value = s.exists ? (s.data().text || "") : ""; S.dirty = false; ta.readOnly = false; setDot("ok");
+    const q = Math.min(chap(S.chId)?.caret ?? ta.value.length, ta.value.length); ta.setSelectionRange(q, q);
+    render("remote"); return;
+  }
   if (!s.exists) return; const d = s.data();
   if (d.client === CLIENT || S.dirty || S.saving || d.text === ta.value) return;
   const p = ta.selectionEnd; ta.value = d.text || ""; const q = Math.min(p, ta.value.length); ta.setSelectionRange(q, q);
@@ -582,6 +593,7 @@ addEventListener("scroll", () => { if (now() - progScroll > 300 && coarse) untyp
 ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) untype(); }, 50));
 
 function insertText(str) {
+  if (ta.readOnly) { toast("Das Kapitel wird noch geladen."); return; }
   if (document.activeElement !== ta) ta.focus({ preventScroll: true });
   let ok = false; try { ok = document.execCommand("insertText", false, str); } catch (e) {}
   if (!ok) { const s = ta.selectionStart, e = ta.selectionEnd; ta.setRangeText(str, s, e, "end"); ta.dispatchEvent(new Event("input", { bubbles: true })); }
@@ -881,7 +893,9 @@ async function newBook() {
 async function deleteChapter(id) {
   const c = chap(id); if (!c) return;
   if (id === S.chId) await flushSave();
-  let text = ""; try { text = (await C.texts.doc(id).get()).data()?.text || ""; } catch (e) {}
+  let text = "";
+  if (id === S.chId && !ta.readOnly) text = ta.value;
+  else { try { text = (await C.texts.doc(id).get()).data()?.text || ""; } catch (e) { toast("Kapitel nicht gelöscht: Der Text ließ sich nicht sichern. Bitte später noch einmal."); return; } }
   const keep = { ...c }; delete keep.id;
   if (id === S.chId) {
     const chs = chaptersOf(c.bookId), i = chs.findIndex(x => x.id === id), nb = chs[i + 1] || chs[i - 1];
@@ -894,7 +908,9 @@ async function deleteChapter(id) {
 async function deleteBook(bid) {
   await flushSave();
   const b = book(bid), chs = chaptersOf(bid);
-  const texts = await Promise.all(chs.map(c => C.texts.doc(c.id).get().then(s => s.data()?.text || "").catch(() => "")));
+  let texts;
+  try { texts = await Promise.all(chs.map(c => c.id === S.chId && !ta.readOnly ? ta.value : C.texts.doc(c.id).get().then(s => s.data()?.text || ""))); }
+  catch (e) { toast("Buch nicht gelöscht: Die Texte ließen sich nicht sichern. Bitte später noch einmal."); return; }
   if (bid === S.bookId) {
     const other = S.books.find(x => x.id !== bid);
     if (other) { const f = chaptersOf(other.id)[0]; if (f) await openChapter(f.id); else { S.bookId = other.id; await newChapter(other.id, "", null); } }
@@ -917,6 +933,7 @@ async function moveChapter(c, bid) {
   toast("Verschoben nach „" + (book(bid)?.title || "") + "“"); renderLib();
 }
 async function splitChapter() {
+  if (ta.readOnly) return;
   const p = ta.selectionStart, v = ta.value;
   const a = v.slice(0, p).replace(/\s+$/, ""), b = v.slice(p).replace(/^\s+/, "");
   if (!b) { toast("Setze den Cursor dorthin, wo das neue Kapitel beginnen soll."); return; }
@@ -1041,6 +1058,7 @@ function deleteNote(n) {
   toast("Gedanke gelöscht", { label: "Rückgängig", fn: () => { S.notes.push({ id: n.id, ...keep }); C.notes.doc(n.id).set(keep); renderNotes(); } });
 }
 function insertNote(n, at) {
+  if (ta.readOnly) { toast("Das Kapitel wird noch geladen."); return; }
   const v = ta.value; if (at == null) at = Math.min(S.lastSel ?? v.length, v.length);
   const body = n.text.trim().replace(/(^|\s)#[\p{L}\p{N}_\-\/]+/gu, "$1").replace(/[ \t]+\n/g, "\n").trim() || n.text.trim();
   const before = v.slice(0, at), after = v.slice(at);
@@ -1348,12 +1366,13 @@ document.fonts && document.fonts.ready.then(() => render("look"));
 function listen(kind, sortFn, onChange) {
   return new Promise(res => {
     let first = true;
-    setTimeout(() => { if (!first) return; C[kind].get().then(s => { if (!first) return; first = false; S[kind] = s.docs.map(d => ({ id: d.id, ...d.data() })); res(); }).catch(() => { if (first) { first = false; res(); } }); }, 8000);
+    // Resolves true once the data is here, false if it could not be loaded at all.
+    setTimeout(() => { if (!first) return; C[kind].get().then(s => { if (!first) return; first = false; S[kind] = s.docs.map(d => ({ id: d.id, ...d.data() })); res(true); }).catch(() => { if (first) { first = false; res(false); } }); }, 8000);
     C[kind].onSnapshot(s => {
       S[kind] = s.docs.map(d => ({ id: d.id, ...d.data() }));
       if (sortFn) S[kind].sort(sortFn);
-      if (first) { first = false; res(); } else onChange();
-    }, err => { toast("Verbindungsproblem: " + (err.message || err.code)); if (first) { first = false; res(); } });
+      if (first) { first = false; res(true); } else onChange();
+    }, err => { toast("Verbindungsproblem: " + (err.message || err.code)); if (first) { first = false; res(false); } });
   });
 }
 const onMeta = () => {
@@ -1378,7 +1397,9 @@ stage("Einstellungen");
 try { const s = await withTimeout(setRef.get(), 8000, null); if (s && s.exists) Object.assign(S.set, s.data()); } catch (e) {}
 applyLook();
 stage("Daten");
-await Promise.all([listen("books", null, onMeta), listen("chapters", null, onMeta), listen("notes", null, () => { renderNotes(); updateBadge(); })]);
+const loaded = await Promise.all([listen("books", null, onMeta), listen("chapters", null, onMeta), listen("notes", null, () => { renderNotes(); updateBadge(); })]);
+// Without the library a new empty book would be created next to the real ones.
+if (!loaded[0] || !loaded[1]) { fatal("Deine Bücher konnten gerade nicht geladen werden. Prüfe die Verbindung und lade die Seite neu."); return; }
 if (!S.books.length) {
   const bref = C.books.doc(), t = now(), bd = { title: "Mein Buch", goal: 0, order: 1000, createdAt: t };
   const cref = C.chapters.doc(), cd = { bookId: bref.id, title: "", auto: "", order: 1000, words: 0, chars: 0, caret: 0, createdAt: t, updatedAt: t };

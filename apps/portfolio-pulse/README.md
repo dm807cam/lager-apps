@@ -2,7 +2,7 @@
 
 Log your portfolio value and see it plotted over time against 1–10% yearly growth lines.
 
-**Language:** English · **Category:** finance · **Status:** stable · **Deployed version:** 3
+**Language:** English · **Category:** finance · **Status:** stable · **Deployed version:** 4
 
 ## Notes
 
