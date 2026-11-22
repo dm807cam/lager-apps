@@ -13,3 +13,14 @@ test("Stillwater sends its sessions to the Habit Tracker as meditation activitie
   expect(ingested[0].body).not.toContain("mood");
   expect(errors).toEqual([]);
 });
+
+test("Stillwater sends no deletes while the snapshot is capped at 1000 documents", async ({ openApp }) => {
+  const now = Date.now();
+  const seed = Array.from({ length: 1005 }, (_, i) => { const at = now - (i + 1) * 8 * 3600e3, id = "s_" + at; return { path: `data/users/test-user/${id}`, data: { id, kind: "session", at, dur: 600, type: "mind", breath: "off", updatedAt: at } }; })
+    .concat([{ path: "data/users/test-user/bridge/habit-tracker/state", data: { sent: { s_gone: "x" }, full: now, at: now } }]);
+  const { ingested } = await openApp("stillwater", { seed, waitFor: 0 });
+  await expect.poll(() => ingested.filter(x => x.slug === "habit-tracker").length, { timeout: 15000 }).toBeGreaterThan(0);
+  await new Promise(r => setTimeout(r, 1500));
+  const events = ingested.filter(x => x.slug === "habit-tracker").flatMap(x => JSON.parse(x.body).events);
+  expect(events.filter(e => e.op === "delete")).toEqual([]);
+});

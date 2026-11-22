@@ -330,11 +330,12 @@ function parseEvent(e){
   if(typeof e.url==="string"&&/^https?:\/\//.test(e.url))ev.url=e.url.slice(0,300);
   return ev;
 }
-let procBusy=false,procAgain=null;
+let procBusy=false,procAgain=null;const handled=new Set();
 async function processInbox(docs){
   if(procBusy){procAgain=docs;return}procBusy=true;
   try{
     for(const d of docs){
+      if(handled.has(d.id))continue;
       const p=parseEnvelope(d.data());const w=[];
       if(p.error){w.push(db.doc("apps/_rejected").set({at:Date.now(),error:p.error}).catch(()=>{}))}
       else{
@@ -348,6 +349,7 @@ async function processInbox(docs){
         w.push(db.doc("apps/"+seg(app)).update(info));
       }
       await Promise.all(w);
+      handled.add(d.id);
       await db.collection("inbox").doc(d.id).delete();
     }
   }catch(e){setSync("error")}
@@ -365,7 +367,7 @@ function toggle(h,k){
 }
 async function saveHabit(h){S.habits[h.id]=h;bump();await w(db.doc("habits/"+h.id).set(h),"the habit")}
 async function deleteHabit(h){delete S.habits[h.id];Object.keys(S.checks).forEach(k=>{if(S.checks[k].habit===h.id)delete S.checks[k]});bump();
-  await w((async()=>{const q=await db.collection("checks").where("habit","==",h.id).get();await Promise.all(q.docs.map(d=>db.doc("checks/"+d.id).delete()));await db.doc("habits/"+h.id).delete()})())}
+  await w((async()=>{for(let i=0;i<100;i++){const q=await db.collection("checks").where("habit","==",h.id).limit(500).get();if(!q.size)break;await Promise.all(q.docs.map(d=>db.doc("checks/"+d.id).delete()));if(q.size<500)break}await db.doc("habits/"+h.id).delete()})())}
 function newHabit(p){const id="h_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   return Object.assign({id,name:"",icon:"",color:COLORS[Object.keys(S.habits).length%COLORS.length],freq:{t:"daily"},link:null,createdAt:Date.now(),order:Date.now(),archived:false},p||{})}
 function fromSuggestion(app,sg){return newHabit({name:sg.name,icon:sg.icon,color:sg.color,freq:JSON.parse(JSON.stringify(sg.freq)),link:app?{app,kind:sg.kind||null,min:sg.min||0}:null})}
@@ -596,7 +598,14 @@ async function init(){
   const from=addD(today(),-WINDOW);
   const listen=(q,key,fill)=>q.onSnapshot(snap=>{const m={};snap.docs.forEach(d=>{let v=d.data();if(v&&fill)v=fill(d.id,v);if(v)m[d.id]=v});S[key]=m;S.loaded[key]=1;setSync("ok");bump()},err=>{setSync("error");S.loaded[key]=1;bump()});
   listen(db.collection("habits"),"habits",(id,v)=>Object.assign({},v,{id,freq:v.freq&&v.freq.t?v.freq:{t:"daily"}}));
-  listen(db.collection("checks").where("date",">=",from),"checks");
+  /* A query returns at most 1000 documents: read the window's checks in 50-day slices, merged into one map. */
+  const parts=[],SLICE=50;let partsIn=0;
+  for(let a=from,i=0;a<=today();a=addD(a,SLICE),i++){const b=addD(a,SLICE),last=b>today();
+    let q=db.collection("checks").where("date",">=",a);if(!last)q=q.where("date","<",b);
+    parts.push(null);q.onSnapshot(snap=>{const m={};snap.docs.forEach(d=>{const v=d.data();if(v)m[d.id]=v});if(parts[i]===null)partsIn++;parts[i]=m;
+      if(partsIn===parts.length){S.checks=Object.assign({},...parts);S.loaded.checks=1}setSync("ok");bump()},
+      ()=>{setSync("error");if(parts[i]===null){partsIn++;parts[i]={}}if(partsIn===parts.length)S.loaded.checks=1;bump()});
+    if(last)break}
   listen(db.collection("activities").where("date",">=",from).orderBy("date","desc").limit(1000),"acts");
   listen(db.collection("apps"),"apps",(id,v)=>id==="_rejected"?null:v);
   db.doc("settings/main").onSnapshot(s=>{S.settings=s.exists?s.data():{};bump()},()=>{});

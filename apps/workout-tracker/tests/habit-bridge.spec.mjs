@@ -46,4 +46,13 @@ test.describe("Habit Tracker bridge", () => {
     await expect.poll(() => sent(ingested).length, { timeout: 15000 }).toBe(2);
     expect(sent(ingested)[1].events).toEqual([{ op: "delete", id: victim.data.id }]);
   });
+
+  test("sends no deletes while the snapshot is capped at 1000 documents", async ({ openApp }) => {
+    const seed = workouts(1005).concat([{ path: `data/users/${UID}/bridge/habit-tracker/state`, data: { sent: { s_gone: "x" }, full: Date.now(), at: Date.now() } }]);
+    const { ingested } = await openApp("workout-tracker", { seed, waitFor: 0 });
+    await expect.poll(() => sent(ingested).length, { timeout: 15000 }).toBeGreaterThan(0);
+    await new Promise(r => setTimeout(r, 1500));
+    const events = sent(ingested).flatMap(b => b.events);
+    expect(events.filter(e => e.op === "delete")).toEqual([]);
+  });
 });

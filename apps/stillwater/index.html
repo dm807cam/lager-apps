@@ -427,7 +427,7 @@ let toastT=null;
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),3000)}
 
 /* ---------- sync ---------- */
-const dirty={},inflight={};let flushTimer=null,firstSnap=true;
+const dirty={},inflight={};let flushTimer=null,firstSnap=true,partial=false;
 const SYNC_TXT={local:"Not signed in: saved on this device only.",loading:"Loading your journal…",slow:"Can’t reach your journal yet. Sessions are kept on this device.",ok:"Saved to your account.",saving:"Saving…",error:"Not synced. Sessions are kept on this device and retried."};
 function setSync(s){
   if(s==="error"&&sync!=="error")toast("Not synced. Kept on this device.");
@@ -454,7 +454,12 @@ async function initRemote(){
       snap.docs.forEach(d=>{const data=d.data();if(!data)return;seen[d.id]=1;const mine=docs[d.id];
         if(!mine||ts(data)>ts(mine)){docs[d.id]=clone(data);changed=true}
         else if(firstSnap&&ts(mine)>ts(data))dirty[d.id]=1});
-      if(firstSnap){Object.keys(docs).forEach(id=>{if(!seen[id])dirty[id]=1});firstSnap=false;
+      /* A query returns at most 1000 documents. Below that, a document missing from the snapshot is not stored yet;
+         at the cap it may be stored and newer than this copy, so it is looked up before this copy is sent. */
+      partial=snap.size>=1000;
+      if(firstSnap){Object.keys(docs).forEach(id=>{if(seen[id])return;if(!partial){dirty[id]=1;return}
+          col.doc(id).get().then(s=>{const data=s.exists?s.data():null;
+            if(!data||ts(docs[id])>ts(data)){dirty[id]=1;flush()}else if(ts(data)>ts(docs[id])){docs[id]=clone(data);saveLocal();refresh()}},()=>{})});firstSnap=false;
         if(Object.keys(dirty).length){setSync("saving");flush()}else setSync("ok")}
       if(changed){saveLocal();refresh()}
     },()=>{clearTimeout(t);setSync("error")});
@@ -888,7 +893,7 @@ function habitBridge(cfg){
       const now=Date.now(),full=!state.full||now-state.full>30*DAY,cur={},out=[];
       cfg.collect().forEach(a=>{try{const e=event(a);cur[e.id]=e}catch(x){}});
       Object.keys(cur).forEach(id=>{const hs=hash(JSON.stringify(cur[id]));if(full||state.sent[id]!==hs)out.push([id,hs,cur[id]])});
-      Object.keys(state.sent).forEach(id=>{if(!cur[id])out.push([id,null,{op:"delete",id}])});
+      if(!(cfg.partial&&cfg.partial()))Object.keys(state.sent).forEach(id=>{if(!cur[id])out.push([id,null,{op:"delete",id}])});
       const source={app:cfg.app,name:cfg.name,url:location.origin+"/",kinds:cfg.kinds};
       if(!out.length&&!full)return;
       if(!out.length)out.push(null);                 /* nothing to say: still announce the app once a month */
@@ -912,7 +917,7 @@ function habitBridge(cfg){
   kick(5000);
   return{kick};
 }
-HB=habitBridge({R,app:"stillwater",name:"Stillwater",kinds:[{kind:"meditation",label:"Meditation",unit:"min"}],ready:()=>!firstSnap,
+HB=habitBridge({R,app:"stillwater",name:"Stillwater",kinds:[{kind:"meditation",label:"Meditation",unit:"min"}],ready:()=>!firstSnap,partial:()=>partial,
   collect:()=>sessions().map(s=>({id:s.id,kind:"meditation",title:TY(s.type)[0],start:s.at,end:s.at+s.dur*1000,minutes:s.dur/60,url:location.origin+"/#journal"}))});
 loadLocal();render();restoreRun();initRemote();
 })();

@@ -18,7 +18,7 @@ export const appUrl = (slug, path = "/") => `https://${slug}.${DOMAIN}${path}`;
 
 /**
  * openApp(slug, options) loads apps/<slug>/index.html at https://<slug>.lager.test/ with the mock runtime.
- * options: seed (docs, default: the app's seed files), user, completeReply, path, ingest (handler for
+ * options: seed (docs, default: the app's seed files), user, completeReply, fail (see tools/lager-mock.js), path, ingest (handler for
  * POSTs to any *.lager.test/_ingest/*), waitFor (ms to let the app settle, default 800).
  * Returns { page, errors, requests, ingested }.
  */
@@ -40,7 +40,7 @@ export const test = base.extend({
     });
     const open = async (slug, opts = {}) => {
       const m = manifest(slug);
-      const config = { seed: opts.seed ?? seedOf(slug), user: opts.user, completeReply: opts.completeReply ?? null, capabilities: m.capabilities };
+      const config = { seed: opts.seed ?? seedOf(slug), user: opts.user, completeReply: opts.completeReply ?? null, capabilities: m.capabilities, fail: opts.fail || [] };
       await page.addInitScript(`window.__LAGER_CONFIG__=${JSON.stringify(config)};\n${MOCK}`);
       await page.goto(appUrl(slug, opts.path || "/"));
       await page.waitForTimeout(opts.waitFor ?? 800);

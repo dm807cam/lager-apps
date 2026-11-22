@@ -2,7 +2,7 @@
 
 Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves.
 
-**Language:** English · **Category:** health · **Status:** beta · **Deployed version:** 1
+**Language:** English · **Category:** health · **Status:** beta · **Deployed version:** 2
 
 ## Notes
 

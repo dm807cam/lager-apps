@@ -2,7 +2,7 @@
 
 Fokussiertes Schreiben für ganze Bücher – mit Kapiteln, Fokusmodus und einer sortierbaren Ablage für Gedankenfetzen.
 
-**Language:** German · **Category:** writing · **Status:** stable · **Deployed version:** 3
+**Language:** German · **Category:** writing · **Status:** stable · **Deployed version:** 4
 
 ## Notes
 

@@ -2,7 +2,7 @@
 
 A calm meditation timer with breathing guide, synthesised bells and ambience, a journal, and stats with streaks and a yearly heatmap.
 
-**Language:** English · **Category:** health · **Status:** stable · **Deployed version:** 3
+**Language:** English · **Category:** health · **Status:** stable · **Deployed version:** 4
 
 ## Notes
 
