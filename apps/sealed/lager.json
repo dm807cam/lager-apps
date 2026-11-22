@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "sealed",
+  "title": "Sealed",
+  "description": "End-to-end encrypted messenger: private chats, groups and photos with signed messages, safety numbers and disappearing messages.",
+  "version": 1,
+  "status": "beta",
+  "language": "en",
+  "category": "social",
+  "themeColor": "#0f3d3a",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {
+    "db": {
+      "rules": [
+        { "path": "directory", "read": "view", "write": "self" },
+        { "path": "directory/{self}", "write": "interact" },
+        { "path": "inbox", "read": "self", "write": "interact" },
+        { "path": "inbox/{self}", "read": "view" }
+      ]
+    },
+    "user": {}
+  }
+}

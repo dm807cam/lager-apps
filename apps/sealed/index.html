@@ -1,0 +1,1479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>Sealed</title>
+<style>
+:root{--bg:#f2f5f4;--panel:#fff;--ink:#111b21;--muted:#62716d;--line:#e1e7e4;--accent:#1f8a70;--accent-ink:#fff;--head:#0f3d3a;--head-ink:#e9f5f1;--out:#d6f2e6;--in:#fff;--chat:#e8eeeb;--warn:#8a4b06;--warnbg:#fff2db;--danger:#c0392b;--chip:#edf2f0;--shadow:0 1px 1px rgba(0,0,0,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#0a1311;--panel:#101b19;--ink:#e5ecea;--muted:#8c9c98;--line:#1d2b28;--accent:#2fb38f;--accent-ink:#04110d;--head:#0c2724;--head-ink:#dff3ec;--out:#164638;--in:#192623;--chat:#0c1614;--warn:#f5b45a;--warnbg:#2b1f0d;--danger:#ff6b5b;--chip:#182522;--shadow:none}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,textarea{font:inherit;color:inherit}
+#root{height:100dvh;height:100vh;height:100dvh;display:flex;flex-direction:column}
+.center{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
+.card{width:100%;max-width:420px;background:var(--panel);border-radius:18px;padding:28px 22px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.card h1{margin:12px 0 6px;font-size:24px}
+.card p{color:var(--muted);margin:6px 0 14px}
+.brand{width:56px;height:56px;border-radius:16px;background:var(--head);color:var(--head-ink);display:flex;align-items:center;justify-content:center}
+.brand svg{width:30px;height:30px}
+label.f{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
+.in{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);outline:none;min-width:0}
+.in:focus{border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.wide{width:100%;margin-top:18px}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.btn.danger{background:var(--danger);color:#fff}
+.link{color:var(--accent);font-weight:600}
+.row{display:flex;align-items:center;gap:10px}
+.meter{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--danger);transition:width .2s}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.err{color:var(--danger);font-size:13.5px;min-height:1.2em;margin-top:10px}
+.note{background:var(--warnbg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:14px}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14px}
+.chk input{margin-top:3px;accent-color:var(--accent);width:18px;height:18px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+/* app shell */
+#app{flex:1;display:flex;min-height:0;position:relative}
+.pane{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--panel)}
+#list{width:100%}
+#conv{display:none;flex:1;background:var(--chat)}
+#app.in-chat #list{display:none}
+#app.in-chat #conv{display:flex}
+@media (min-width:820px){#list{width:360px;flex:none;border-right:1px solid var(--line)}#app.in-chat #list{display:flex}#conv{display:flex}.back-btn{display:none!important}}
+.bar{display:flex;align-items:center;gap:6px;padding:10px 8px 10px 14px;padding-top:max(10px,env(safe-area-inset-top));background:var(--head);color:var(--head-ink);min-height:58px;flex:none}
+.bar h2{font-size:19px;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.bar h2 svg{width:16px;height:16px;opacity:.8;flex:none}
+.ib{width:40px;height:40px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.ib:hover{background:rgba(255,255,255,.08)}
+.ib svg{width:22px;height:22px}
+.search{padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+.search .in{padding:9px 14px;border-radius:20px;background:var(--chip);border:0}
+.scroll{flex:1;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
+.item{display:flex;align-items:center;gap:12px;padding:10px 14px;width:100%;text-align:left;border-bottom:1px solid var(--line)}
+.item:hover,.item.on{background:var(--chip)}
+.av{width:46px;height:46px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;letter-spacing:.5px}
+.av.sm{width:36px;height:36px;font-size:13px}
+.av svg{width:22px;height:22px}
+.meta{flex:1;min-width:0}
+.meta .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.meta .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px;min-width:0}
+.meta .n svg{width:14px;height:14px;color:var(--accent);flex:none}
+.meta .time{font-size:12px;color:var(--muted);flex:none}
+.meta .s{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:14px;margin-top:2px}
+.meta .s span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.badge{background:var(--accent);color:var(--accent-ink);border-radius:11px;min-width:22px;height:22px;padding:0 6px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.unread .time{color:var(--accent);font-weight:600}
+.empty{padding:40px 24px;text-align:center;color:var(--muted)}
+.empty svg{width:42px;height:42px;opacity:.6}
+.fab{position:absolute;right:18px;bottom:max(18px,env(safe-area-inset-bottom));width:56px;height:56px;border-radius:18px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.fab svg{width:26px;height:26px}
+@media (min-width:820px){.fab{left:286px;right:auto}}
+/* conversation */
+.conv-head{cursor:pointer;flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+.conv-head .sub{font-size:12.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-head .nm{font-weight:600;font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.conv-head .nm svg{width:15px;height:15px}
+.msgs{flex:1;overflow-y:auto;min-height:0;padding:10px 4% 8px;display:flex;flex-direction:column;gap:3px;background:var(--chat)}
+.e2e{align-self:center;max-width:340px;background:var(--warnbg);color:var(--warn);font-size:12.5px;text-align:center;border-radius:10px;padding:8px 12px;margin:6px 0 10px;display:flex;gap:6px;align-items:flex-start}
+.e2e svg{width:14px;height:14px;flex:none;margin-top:2px}
+.day{align-self:center;background:var(--panel);color:var(--muted);font-size:12px;border-radius:8px;padding:4px 10px;margin:8px 0;box-shadow:var(--shadow)}
+.sys{align-self:center;color:var(--muted);font-size:12.5px;background:var(--panel);border-radius:8px;padding:4px 10px;margin:4px 0;text-align:center;max-width:90%;box-shadow:var(--shadow);display:flex;gap:6px;align-items:center}
+.sys svg{width:13px;height:13px;flex:none}
+.b{max-width:min(78%,520px);padding:6px 9px 5px;border-radius:12px;background:var(--in);box-shadow:var(--shadow);align-self:flex-start;position:relative;word-wrap:break-word;overflow-wrap:anywhere;cursor:pointer;user-select:text}
+.b.me{align-self:flex-end;background:var(--out)}
+.b.first{margin-top:6px}
+.b .who{font-size:12.5px;font-weight:700;margin-bottom:1px}
+.b .tx{white-space:pre-wrap}
+.b .ft{float:right;font-size:11px;color:var(--muted);margin:6px 0 -2px 10px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.b .ft svg{width:15px;height:15px}
+.b .ft .rd{color:#34b7f1}
+.b img{display:block;max-width:100%;max-height:320px;border-radius:8px;margin:2px 0 2px;min-width:120px;background:var(--chip)}
+.b .q{border-left:3px solid var(--accent);background:rgba(0,0,0,.05);border-radius:6px;padding:4px 8px;margin:2px 0 4px;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b.bad{background:var(--warnbg);color:var(--warn);font-size:13.5px;font-style:italic}
+.b.bad svg{width:14px;height:14px;vertical-align:-2px;margin-right:4px}
+.banner{background:var(--warnbg);color:var(--warn);padding:10px 14px;font-size:13.5px;display:flex;gap:10px;align-items:center;flex:none;border-bottom:1px solid var(--line)}
+.banner .grow{flex:1}
+.banner .btn{padding:7px 12px;font-size:13px}
+.replybar{display:flex;align-items:center;gap:8px;background:var(--panel);padding:8px 12px;border-top:1px solid var(--line);flex:none}
+.replybar .q{flex:1;border-left:3px solid var(--accent);padding:2px 8px;font-size:13px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.compose{display:flex;align-items:flex-end;gap:6px;padding:8px;padding-bottom:max(8px,env(safe-area-inset-bottom));background:var(--chat);flex:none}
+.compose .box{flex:1;display:flex;align-items:flex-end;background:var(--panel);border-radius:22px;padding:2px 4px 2px 14px;min-width:0;box-shadow:var(--shadow)}
+.compose textarea{flex:1;border:0;outline:0;background:transparent;resize:none;padding:10px 0;max-height:140px;min-width:0;line-height:1.35}
+.compose .ib{color:var(--muted)}
+.send{width:46px;height:46px;border-radius:23px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;flex:none}
+.send svg{width:22px;height:22px}
+.send:disabled{opacity:.5}
+.closed{padding:14px;text-align:center;color:var(--muted);background:var(--panel);font-size:14px;flex:none;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);text-align:center;padding:24px;gap:10px}
+.placeholder svg{width:56px;height:56px;opacity:.5}
+/* panels and sheets */
+.panel{position:absolute;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;animation:slide .16s ease-out}
+@media (min-width:820px){.panel{left:auto;width:420px;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.12)}}
+@keyframes slide{from{transform:translateX(24px);opacity:.4}to{transform:none;opacity:1}}
+.sec{background:var(--panel);margin:10px 0;padding:6px 0}
+.sec h3{font-size:13px;color:var(--accent);margin:8px 16px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.opt{display:flex;align-items:center;gap:14px;padding:12px 16px;width:100%;text-align:left}
+.opt:hover{background:var(--chip)}
+.opt svg{width:22px;height:22px;color:var(--muted);flex:none}
+.opt .l{flex:1;min-width:0}
+.opt .l small{display:block;color:var(--muted);font-size:13px}
+.opt.danger,.opt.danger svg{color:var(--danger)}
+.pad{padding:12px 16px}
+.hero{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 16px;background:var(--panel)}
+.hero .av{width:84px;height:84px;font-size:28px}
+.hero .nm{font-size:21px;font-weight:600;text-align:center;overflow-wrap:anywhere}
+.hero .sub{color:var(--muted);font-size:13.5px;text-align:center}
+.safety{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;letter-spacing:.06em;padding:14px 16px;text-align:center}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:12px;padding:3px 10px;font-size:12.5px;font-weight:600;background:var(--chip)}
+.pill.ok{color:var(--accent)}
+.pill.warn{color:var(--warn);background:var(--warnbg)}
+.pill svg{width:14px;height:14px}
+.switch{position:relative;width:44px;height:26px;flex:none}
+.switch input{opacity:0;position:absolute;inset:0;margin:0;cursor:pointer;z-index:1}
+.switch i{position:absolute;inset:0;border-radius:13px;background:var(--line);transition:.15s}
+.switch i:after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.switch input:checked+i{background:var(--accent)}
+.switch input:checked+i:after{left:21px}
+.pick{width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);flex:none;display:flex;align-items:center;justify-content:center}
+.pick.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pick svg{width:14px;height:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.chips:empty{display:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .12s}
+@media (min-width:600px){.overlay{align-items:center}}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--panel);width:100%;max-width:440px;border-radius:18px 18px 0 0;padding:8px 0 max(8px,env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
+@media (min-width:600px){.sheet{border-radius:16px}}
+.sheet .pad p{margin:4px 0 10px;color:var(--muted)}
+.sheet .acts{display:flex;gap:10px;justify-content:flex-end;padding:8px 16px 8px}
+.viewer{position:fixed;inset:0;background:#000;z-index:60;display:flex;align-items:center;justify-content:center}
+.viewer img{max-width:100%;max-height:100%}
+.viewer .ib{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.15)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:70;max-width:90vw;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div id="root"><div class="center"><div class="card"><div class="spin"></div><p style="text-align:center">Loading Sealed…</p></div></div></div>
+<script>
+(async () => {
+"use strict";
+
+/* =====================================================================
+ * Sealed – end-to-end encrypted messenger for Lager.
+ *
+ * Crypto (WebCrypto only, no third-party code):
+ *  - Identity: ECDSA P-256 (signing) + ECDH P-256 (key agreement) per person.
+ *  - Private keys live only in the person's private area, encrypted with
+ *    AES-256-GCM under a key derived from their passphrase (PBKDF2-SHA256,
+ *    600 000 iterations). The passphrase never leaves the device.
+ *  - Each message: fresh random 256-bit content key (AES-256-GCM), wrapped
+ *    for every recipient with a fresh ephemeral ECDH key + HKDF-SHA256, and
+ *    signed by the sender's identity key over header, ciphertext and wraps.
+ *  - Contacts are pinned on first use; safety numbers allow out-of-band
+ *    verification; any key change blocks sending until it is accepted.
+ *  - The private vault (contacts, chats, settings) is encrypted too.
+ * ===================================================================== */
+
+const root = document.getElementById("root");
+const S = crypto && crypto.subtle;
+const te = new TextEncoder(), td = new TextDecoder();
+const ITER = 600000, MIN_ITER = 100000, MAX_ITER = 10000000;
+const MAX_IMG = 165000, MAX_TEXT = 8000, SKEW = 5 * 60 * 1000;
+const SIGN = { name: "ECDSA", hash: "SHA-256" };
+const EC = { name: "ECDSA", namedCurve: "P-256" }, DH = { name: "ECDH", namedCurve: "P-256" };
+
+/* ---------------- DOM helpers ---------------- */
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  if (props) for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "text") el.textContent = v;
+    else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
+    else if (k === "value") el.value = v;
+    else el.setAttribute(k, v === true ? "" : String(v));
+  }
+  for (const k of kids.flat(Infinity)) if (k != null && k !== false) el.append(k instanceof Node ? k : String(k));
+  return el;
+}
+const ICONS = {
+  lock: "M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3",
+  shield: "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z",
+  shieldok: "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6zM8.5 12l2.5 2.5 4.5-5",
+  back: "M15 5l-7 7 7 7",
+  send: "M4 12L20 4l-6 16-3-7z",
+  image: "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15.5 8.5h.01",
+  plus: "M12 5v14M5 12h14",
+  chat: "M4 5h16v11H9l-5 4zM9 10h6",
+  gear: "M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4",
+  check: "M5 12.5l4 4L19 7",
+  checks: "M2.5 12.5l4 4L14 9M10.5 16l.5.5L21.5 7",
+  x: "M6 6l12 12M18 6L6 18",
+  users: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 19c0-3 2.7-5 6-5s6 2 6 5M16 5.3a3 3 0 0 1 0 5.4M18 14.2c1.8.7 3 2.4 3 4.8",
+  timer: "M12 9v4l2.5 1.5M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM9.5 2h5",
+  reply: "M10 7L5 12l5 5M5 12h9a5 5 0 0 1 5 5v1",
+  trash: "M5 7h14M10 11v6M14 11v6M7 7l1 13h8l1-13M9.5 7V4h5v3",
+  copy: "M9 9h11v11H9zM5 15V4h11",
+  info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5v.5",
+  warn: "M12 3l10 18H2zM12 10v5M12 18v.5",
+  key: "M14.5 9.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0zM13 13l7 7M17 17l2-2M15 15l2-2",
+  block: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM5.6 5.6l12.8 12.8",
+  out: "M10 5H5v14h5M14 8l4 4-4 4M18 12H9",
+  edit: "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4",
+  user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5",
+  eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"
+};
+function icon(name) {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = document.createElementNS(NS, "svg");
+  s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "2"); s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round");
+  s.setAttribute("aria-hidden", "true");
+  const p = document.createElementNS(NS, "path"); p.setAttribute("d", ICONS[name] || ""); s.append(p);
+  return s;
+}
+function toast(msg, ms = 2600) {
+  const t = h("div", { class: "toast", role: "status", text: msg });
+  document.body.append(t); setTimeout(() => t.remove(), ms);
+}
+function screen(...kids) { root.replaceChildren(...kids); }
+function fatal(title, text) {
+  screen(h("div", { class: "center" }, h("div", { class: "card" }, h("div", { class: "brand" }, icon("lock")), h("h1", { text: title }), h("p", { text: text }))));
+}
+function sheet(build) {
+  return new Promise(resolve => {
+    let done = false;
+    const close = v => { if (done) return; done = true; ov.remove(); resolve(v); };
+    const box = h("div", { class: "sheet", role: "dialog", "aria-modal": "true" });
+    const ov = h("div", { class: "overlay", onclick: e => { if (e.target === ov) close(null); } }, box);
+    build(box, close);
+    document.body.append(ov);
+    const f = box.querySelector("input,textarea,button"); if (f) setTimeout(() => f.focus(), 30);
+  });
+}
+function confirmBox(title, text, ok = "OK", danger = false) {
+  return sheet((box, close) => box.append(h("div", { class: "pad" }, h("h3", { style: "margin:6px 0", text: title }), h("p", { text })),
+    h("div", { class: "acts" }, h("button", { class: "btn ghost", onclick: () => close(false), text: "Cancel" }), h("button", { class: "btn" + (danger ? " danger" : ""), onclick: () => close(true), text: ok }))));
+}
+function promptBox(title, text, value = "", ok = "Save", max = 40) {
+  return sheet((box, close) => {
+    const inp = h("input", { class: "in", value, maxlength: max, "aria-label": title });
+    const f = h("form", { onsubmit: e => { e.preventDefault(); close(inp.value.trim()); } }, h("div", { class: "pad" }, h("h3", { style: "margin:6px 0", text: title }), text ? h("p", { text }) : null, inp),
+      h("div", { class: "acts" }, h("button", { type: "button", class: "btn ghost", onclick: () => close(null), text: "Cancel" }), h("button", { class: "btn", text: ok })));
+    box.append(f);
+  });
+}
+const hue = s => { let x = 0; for (const c of String(s)) x = (x * 31 + c.charCodeAt(0)) >>> 0; return x % 360; };
+const initials = n => (String(n || "?").trim().split(/\s+/).slice(0, 2).map(w => [...w][0] || "").join("") || "?").toUpperCase();
+function avatar(seed, name, small, iconName) {
+  return h("div", { class: "av" + (small ? " sm" : ""), style: `background:hsl(${hue(seed)} 45% 42%)`, "aria-hidden": "true" }, iconName ? icon(iconName) : initials(name));
+}
+const pad2 = n => String(n).padStart(2, "0");
+function fmtTime(ts) { const d = new Date(ts); return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
+function fmtDay(ts) {
+  const d = new Date(ts), now = new Date(), y = new Date(); y.setDate(now.getDate() - 1);
+  if (d.toDateString() === now.toDateString()) return "Today";
+  if (d.toDateString() === y.toDateString()) return "Yesterday";
+  return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
+}
+function fmtListTime(ts) { const d = new Date(ts); return d.toDateString() === new Date().toDateString() ? fmtTime(ts) : fmtDay(ts); }
+const TTLS = [[0, "Off"], [3600, "1 hour"], [86400, "24 hours"], [604800, "7 days"], [2592000, "30 days"]];
+const ttlLabel = s => (TTLS.find(t => t[0] === s) || [0, s ? Math.round(s / 3600) + " hours" : "Off"])[1];
+// Strip control and bidi-override characters (used for spoofing), keep newlines and tabs in messages.
+const cleanText = s => String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B-\u001F\u007F\u202A-\u202E\u2066-\u2069\u200E\u200F]/g, "").slice(0, MAX_TEXT);
+const cleanName = s => cleanText(s).replace(/[\n\t]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40);
+
+/* ---------------- byte helpers ---------------- */
+const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+const hex = b => Array.from(b, x => x.toString(16).padStart(2, "0")).join("");
+function b64(u8) { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function ub64(s) { if (typeof s !== "string") throw new Error("bad encoding"); const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+function cat(...a) { const o = new Uint8Array(a.reduce((n, x) => n + x.length, 0)); let p = 0; for (const x of a) { o.set(x, p); p += x.length; } return o; }
+const sha256 = async d => new Uint8Array(await S.digest("SHA-256", typeof d === "string" ? te.encode(d) : d));
+const isId = s => typeof s === "string" && s.length > 0 && s.length <= 200 && /^[A-Za-z0-9_\-.~:@+]+$/.test(s) && s !== "." && s !== "..";
+
+/* ---------------- crypto core ---------------- */
+async function passKey(pass, salt, iter) {
+  const base = await S.importKey("raw", te.encode(pass.normalize("NFKC")), "PBKDF2", false, ["deriveKey"]);
+  return S.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt, iterations: iter }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function gcmEnc(key, data, aad) {
+  const iv = rnd(12);
+  const ct = new Uint8Array(await S.encrypt({ name: "AES-GCM", iv, additionalData: te.encode(aad) }, key, data));
+  return { iv: b64(iv), ct: b64(ct) };
+}
+async function gcmDec(key, box, aad) {
+  return new Uint8Array(await S.decrypt({ name: "AES-GCM", iv: ub64(box.iv), additionalData: te.encode(aad) }, key, ub64(box.ct)));
+}
+const keyCache = new Map();
+async function importPub(raw, kind) {
+  const k = kind + raw;
+  if (keyCache.has(k)) return keyCache.get(k);
+  const bytes = ub64(raw);
+  if (bytes.length !== 65 || bytes[0] !== 4) throw new Error("bad public key");
+  const key = kind === "sig" ? await S.importKey("raw", bytes, EC, true, ["verify"]) : await S.importKey("raw", bytes, DH, true, []);
+  keyCache.set(k, key);
+  return key;
+}
+async function newSecret() {
+  const sig = await S.generateKey(EC, true, ["sign", "verify"]);
+  const dh = await S.generateKey(DH, true, ["deriveBits"]);
+  return { v: 1, sigJwk: await S.exportKey("jwk", sig.privateKey), dhJwk: await S.exportKey("jwk", dh.privateKey), vk: b64(rnd(32)) };
+}
+async function loadIdentity(secret) {
+  const pubJwk = j => ({ kty: "EC", crv: "P-256", x: j.x, y: j.y, ext: true });
+  const sigPriv = await S.importKey("jwk", secret.sigJwk, EC, false, ["sign"]);
+  const sigPub = await S.importKey("jwk", pubJwk(secret.sigJwk), EC, true, ["verify"]);
+  const dhPriv = await S.importKey("jwk", secret.dhJwk, DH, false, ["deriveBits"]);
+  const dhPub = await S.importKey("jwk", pubJwk(secret.dhJwk), DH, true, []);
+  const vk = await S.importKey("raw", ub64(secret.vk), "AES-GCM", false, ["encrypt", "decrypt"]);
+  const sigRaw = b64(new Uint8Array(await S.exportKey("raw", sigPub)));
+  const dhRaw = b64(new Uint8Array(await S.exportKey("raw", dhPub)));
+  return { sigPriv, sigPub, dhPriv, dhPub, vk, sigRaw, dhRaw };
+}
+const sign = async str => b64(new Uint8Array(await S.sign(SIGN, ID.sigPriv, te.encode(str))));
+async function verifySig(raw, sigB64, str) {
+  try { return await S.verify(SIGN, await importPub(raw, "sig"), ub64(sigB64), te.encode(str)); } catch { return false; }
+}
+// Key-encryption key for one recipient of one message: ECDH(ephemeral, recipient) -> HKDF-SHA256.
+async function kek(priv, pub, id, ephRaw, uid) {
+  const bits = await S.deriveBits({ name: "ECDH", public: pub }, priv, 256);
+  const hk = await S.importKey("raw", bits, "HKDF", false, ["deriveKey"]);
+  return S.deriveKey({ name: "HKDF", hash: "SHA-256", salt: te.encode(id), info: te.encode(JSON.stringify(["sealed-wrap-v1", ephRaw, uid])) },
+    hk, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+const keyringAad = () => "sealed-keyring-v1|" + ME.id;
+async function lockSecret(secret, pass) {
+  const salt = rnd(16), key = await passKey(pass, salt, ITER);
+  const box = await gcmEnc(key, te.encode(JSON.stringify(secret)), keyringAad());
+  return { doc: { v: 1, kdf: { alg: "PBKDF2-SHA256", iter: ITER, salt: b64(salt) }, box, at: Date.now() }, key };
+}
+function keyringParams(doc) {
+  if (!doc || doc.v !== 1 || !doc.kdf || doc.kdf.alg !== "PBKDF2-SHA256" || !doc.box) throw new Error("Unknown key format");
+  const iter = doc.kdf.iter;
+  if (!Number.isInteger(iter) || iter < MIN_ITER || iter > MAX_ITER) throw new Error("Unsafe key parameters");
+  return { salt: ub64(doc.kdf.salt), iter };
+}
+async function unlockSecret(doc, key) {
+  const secret = JSON.parse(td.decode(await gcmDec(key, doc.box, keyringAad())));
+  if (!secret || secret.v !== 1 || !secret.sigJwk || !secret.dhJwk || typeof secret.vk !== "string") throw new Error("Damaged keys");
+  return secret;
+}
+async function fingerprint(uid, sig, dh) {
+  let d = te.encode(JSON.stringify(["sealed-fp-v1", uid, sig, dh]));
+  for (let i = 0; i < 512; i++) d = await sha256(cat(d, te.encode(sig)));
+  let out = "";
+  for (let i = 0; i < 6; i++) { let n = 0; for (let j = 0; j < 5; j++) n = n * 256 + d[i * 5 + j]; out += String(n % 100000).padStart(5, "0"); }
+  return out;
+}
+async function safetyNumber(a, b) {
+  const fa = await fingerprint(a.uid, a.sig, a.dh), fb = await fingerprint(b.uid, b.sig, b.dh);
+  const all = [fa, fb].sort().join("");
+  return all.match(/.{5}/g);
+}
+async function dmId(a, b) { return "d" + hex(await sha256(JSON.stringify(["sealed-dm-v1", ...[a, b].sort()]))).slice(0, 32); }
+function genPassphrase() {
+  const A = "abcdefghijkmnpqrstuvwxyz23456789", b = rnd(20);
+  return Array.from(b, x => A[x % 32]).join("").match(/.{4}/g).join("-");
+}
+function strength(p) {
+  let pool = 0;
+  if (/[a-z]/.test(p)) pool += 26; if (/[A-Z]/.test(p)) pool += 26; if (/\d/.test(p)) pool += 10; if (/[^a-zA-Z\d]/.test(p)) pool += 33;
+  const uniq = new Set(p).size;
+  return Math.round(Math.min(p.length, uniq * 1.5) * Math.log2(Math.max(pool, 1)));
+}
+
+/* ---------------- optional device unlock (non-extractable key in IndexedDB) ---------------- */
+const dev = {
+  open() { return new Promise((res, rej) => { const r = indexedDB.open("sealed-device", 1); r.onupgradeneeded = () => r.result.createObjectStore("k"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); },
+  async run(mode, fn) { const d = await this.open(); return new Promise((res, rej) => { const tx = d.transaction("k", mode); const r = fn(tx.objectStore("k")); tx.oncomplete = () => { d.close(); res(r && r.result); }; tx.onerror = () => { d.close(); rej(tx.error); }; }); },
+  async get(k) { try { return await this.run("readonly", s => s.get(k)); } catch { return null; } },
+  async put(k, v) { try { await this.run("readwrite", s => s.put(v, k)); return true; } catch { return false; } },
+  async del(k) { try { await this.run("readwrite", s => s.delete(k)); } catch { /* ignore */ } }
+};
+
+/* ---------------- runtime ---------------- */
+if (!S || !window.isSecureContext) return fatal("Secure connection required", "Sealed needs a secure (HTTPS) connection and a browser with WebCrypto.");
+const db = await lager.use("db");
+const userNs = await lager.use("user");
+if (!db) return fatal("Storage unavailable", "This instance has no storage for you. Ask its owner to share it with you.");
+const ME = { id: userNs ? await userNs.id() : null, lagerName: userNs ? (await userNs.name()) || "" : "" };
+if (!ME.id) return fatal("Sign in required", "Sign in to Lager to use Sealed. Everyone you chat with needs an account on this server.");
+if (!isId(ME.id)) return fatal("Unsupported account", "Your account id can't be used as a storage path.");
+
+const P = {
+  keyring: () => `data/users/${ME.id}/keyring`,
+  vault: () => `data/users/${ME.id}/vault`,
+  contacts: () => `data/users/${ME.id}/vault/contacts`,
+  chats: () => `data/users/${ME.id}/vault/chats`,
+  inbox: uid => `inbox/${uid}/msgs`
+};
+let ID = null, keyringCt = null;
+let SETTINGS = { name: "", readReceipts: true, remember: false };
+const CONTACTS = new Map(), CHATS = new Map(), DIR = new Map(), dupNames = new Set();
+let INBOX = [];           // opened messages from the newest part of my inbox (chat list)
+let CHATMSGS = [];        // opened messages of the open chat
+let ticker = null, current = null, unsubChat = null, replyTo = null, lastInboxSnap = null, lastChatSnap = null;
+const subs = [];
+const opened = new Map(); // id|signature -> opened message
+const blobUrls = new Map();
+let chain = Promise.resolve();
+const serial = fn => (chain = chain.then(fn, fn).catch(e => console.warn(e)));
+
+/* ---------------- vault (encrypted private records) ---------------- */
+async function seal(path, obj) { return { v: 1, box: await gcmEnc(ID.vk, te.encode(JSON.stringify(obj)), "sealed-vault-v1|" + path) }; }
+async function unseal(path, doc) {
+  if (!doc || doc.v !== 1 || !doc.box) return null;
+  try { return JSON.parse(td.decode(await gcmDec(ID.vk, doc.box, "sealed-vault-v1|" + path))); } catch { return null; }
+}
+async function saveContact(c) { CONTACTS.set(c.uid, c); const p = P.contacts() + "/" + c.uid; await db.doc(p).set(await seal(p, c)); }
+async function saveChat(c) { CHATS.set(c.id, c); const p = P.chats() + "/" + c.id; await db.doc(p).set(await seal(p, c)); }
+async function saveSettings() { const p = P.vault(); await db.doc(p).set(await seal(p, SETTINGS)); }
+async function readColl(path, docs, check) {
+  const out = new Map();
+  for (const d of docs) {
+    if (!isId(d.id)) continue;
+    const v = await unseal(path + "/" + d.id, d.data());
+    if (v && check(v, d.id)) out.set(d.id, v);
+  }
+  return out;
+}
+const contactOk = (c, id) => c.uid === id && c.current && typeof c.current.sig === "string" && typeof c.current.dh === "string" && Array.isArray(c.trusted);
+const chatOk = (c, id) => c.id === id && Array.isArray(c.members) && (c.kind === "dm" || c.kind === "group");
+
+/* ---------------- directory ---------------- */
+const dirCache = new Map();
+async function verifyDir(uid, d) {
+  if (!d || d.v !== 1 || typeof d.name !== "string" || typeof d.sig !== "string" || typeof d.dh !== "string" || typeof d.s !== "string" || typeof d.at !== "number") return null;
+  const ck = uid + "|" + d.s;
+  if (dirCache.has(ck)) return dirCache.get(ck);
+  let r = null;
+  try {
+    await importPub(d.dh, "dh");
+    if (await verifySig(d.sig, d.s, JSON.stringify(["sealed-dir-v1", uid, d.name, d.sig, d.dh, d.at]))) r = { uid, name: cleanName(d.name) || "Unnamed", sig: d.sig, dh: d.dh, at: d.at };
+  } catch { r = null; }
+  dirCache.set(ck, r);
+  return r;
+}
+async function publishDir() {
+  const name = cleanName(SETTINGS.name || ME.lagerName) || "Sealed user", at = Date.now();
+  const s = await sign(JSON.stringify(["sealed-dir-v1", ME.id, name, ID.sigRaw, ID.dhRaw, at]));
+  await db.doc("directory/" + ME.id).set({ v: 1, name, sig: ID.sigRaw, dh: ID.dhRaw, at, s });
+}
+const myName = () => cleanName(SETTINGS.name || ME.lagerName) || "Me";
+function nameOf(uid) {
+  if (uid === ME.id) return "You";
+  const c = CONTACTS.get(uid); if (c && c.nick) return c.nick;
+  const d = DIR.get(uid), n = d ? d.name : c ? c.name : "Unknown";
+  return dupNames.has(n) ? n + " (" + uid.slice(-4) + ")" : n;
+}
+const missingDir = new Map();
+async function ensureContact(uid) {
+  let c = CONTACTS.get(uid);
+  if (c) return c;
+  let d = DIR.get(uid);
+  if (!d) {
+    if (!isId(uid) || (missingDir.get(uid) || 0) > Date.now() - 60000) return null;
+    const s = await db.doc("directory/" + uid).get(); d = s.exists ? await verifyDir(uid, s.data()) : null;
+    if (d) DIR.set(uid, d); else missingDir.set(uid, Date.now());
+  }
+  if (!d) return null;
+  c = { uid, name: d.name, current: { sig: d.sig, dh: d.dh }, trusted: [d.sig], verified: false, changed: null, blocked: false, added: Date.now() };
+  await saveContact(c);
+  return c;
+}
+async function syncContactsWithDir() {
+  for (const c of CONTACTS.values()) {
+    const d = DIR.get(c.uid); if (!d) continue;
+    let dirty = false;
+    const same = d.sig === c.current.sig && d.dh === c.current.dh;
+    if (!same && !(c.changed && c.changed.sig === d.sig && c.changed.dh === d.dh)) { c.changed = { sig: d.sig, dh: d.dh }; c.verified = false; dirty = true; }
+    if (same && c.changed) { c.changed = null; dirty = true; }
+    if (d.name !== c.name) { c.name = d.name; dirty = true; }
+    if (dirty) await saveContact(c);
+  }
+}
+
+/* ---------------- messages: seal & open ---------------- */
+class KeyChanged extends Error { constructor(uid) { super(nameOf(uid) + "'s security key changed. Review it before sending."); this.uid = uid; } }
+async function recipientsFor(uids) {
+  const out = [];
+  for (const u of uids) {
+    if (u === ME.id) { out.push({ uid: u, dh: ID.dhPub }); continue; }
+    const c = await ensureContact(u);
+    if (!c) throw new Error("No security key found for " + nameOf(u) + ".");
+    if (c.changed) throw new KeyChanged(u);
+    out.push({ uid: u, dh: await importPub(c.current.dh, "dh") });
+  }
+  return out;
+}
+function pack(payload, img) {
+  const j = te.encode(JSON.stringify(payload)), len = new Uint8Array(4);
+  new DataView(len.buffer).setUint32(0, j.length);
+  return cat(len, j, img || new Uint8Array(0));
+}
+function unpack(bytes) {
+  if (bytes.length < 4) throw new Error("short");
+  const n = new DataView(bytes.buffer, bytes.byteOffset, 4).getUint32(0);
+  if (n > bytes.length - 4) throw new Error("bad length");
+  return { p: JSON.parse(td.decode(bytes.subarray(4, 4 + n))), img: bytes.subarray(4 + n) };
+}
+// Message ids are derived from the sender, so nobody can store their own message under someone else's id.
+const msgId = async (from, c, n) => hex(await sha256(JSON.stringify(["sealed-id-v1", from, c, n]))).slice(0, 32);
+// Key commitment: binds the ciphertext to exactly one content key, so one message can't decrypt differently per recipient.
+const cekCommit = async cek => b64((await sha256(cat(te.encode("sealed-cek-v1"), cek))).subarray(0, 16));
+async function sealMsg(chatId, uids, payload, img) {
+  const nonce = b64(rnd(16)), at = Date.now();
+  const id = await msgId(ME.id, chatId, nonce);
+  if (payload.ttl) payload.x = at + payload.ttl * 1000;
+  const recips = await recipientsFor(uids);
+  const eph = await S.generateKey(DH, false, ["deriveBits"]);
+  const ephRaw = b64(new Uint8Array(await S.exportKey("raw", eph.publicKey)));
+  const cek = rnd(32), iv = rnd(12);
+  const kc = await cekCommit(cek);
+  const head = JSON.stringify(["sealed-msg-v1", id, ME.id, chatId, at, ephRaw, nonce, kc]);
+  const cekKey = await S.importKey("raw", cek, "AES-GCM", false, ["encrypt"]);
+  const ct = b64(new Uint8Array(await S.encrypt({ name: "AES-GCM", iv, additionalData: te.encode(head) }, cekKey, pack(payload, img))));
+  const k = {};
+  for (const r of recips) {
+    const wk = await kek(eph.privateKey, r.dh, id, ephRaw, r.uid), wiv = rnd(12);
+    k[r.uid] = b64(cat(wiv, new Uint8Array(await S.encrypt({ name: "AES-GCM", iv: wiv, additionalData: te.encode(id) }, wk, cek))));
+  }
+  cek.fill(0);
+  const kList = Object.keys(k).sort().map(u => [u, k[u]]);
+  const s = await sign(JSON.stringify([head, b64(iv), ct, kList]));
+  const e = { v: 1, id, n: nonce, kc, from: ME.id, c: chatId, at, eph: ephRaw, iv: b64(iv), ct, k, s };
+  const doc = { v: 1, from: ME.id, c: chatId, at, e };
+  const res = await Promise.allSettled(recips.map(r => db.doc(P.inbox(r.uid) + "/" + id).set(doc)));
+  const failed = res.filter(r => r.status === "rejected");
+  if (failed.length === res.length) throw failed[0].reason;
+  if (failed.length) toast("Some recipients couldn't be reached.");
+  return { id, at };
+}
+async function sigKeysFor(uid) {
+  if (uid === ME.id) return [ID.sigRaw];
+  const c = CONTACTS.get(uid) || await ensureContact(uid);
+  return c ? c.trusted.slice() : [];
+}
+async function openMsg(id, d) {
+  const e = d && d.e;
+  const bad = status => ({ id, status, from: d && typeof d.from === "string" ? d.from : null, c: d && typeof d.c === "string" ? d.c : null, at: d && typeof d.at === "number" ? d.at : 0 });
+  if (!e || e.v !== 1 || e.id !== id || e.from !== d.from || e.c !== d.c || e.at !== d.at || !isId(e.from) || !isId(e.c) || typeof e.at !== "number" || !isFinite(e.at)
+    || typeof e.eph !== "string" || typeof e.iv !== "string" || typeof e.ct !== "string" || typeof e.s !== "string" || typeof e.n !== "string" || typeof e.kc !== "string"
+    || !e.k || typeof e.k !== "object" || Array.isArray(e.k)) return bad("invalid");
+  if (e.at > Date.now() + SKEW || e.at < 0) return bad("invalid");    // future-dated documents can't push real messages out of view
+  const ck = id + "|" + e.s;
+  if (opened.has(ck)) return opened.get(ck);
+  if (await msgId(e.from, e.c, e.n) !== id) return bad("invalid");
+  const kList = Object.keys(e.k).sort().map(u => [u, e.k[u]]);
+  if (kList.some(([u, w]) => !isId(u) || typeof w !== "string")) return bad("invalid");
+  const head = JSON.stringify(["sealed-msg-v1", e.id, e.from, e.c, e.at, e.eph, e.n, e.kc]);
+  const signed = JSON.stringify([head, e.iv, e.ct, kList]);
+  const keys = await sigKeysFor(e.from);
+  if (!keys.length) return bad("nokey");
+  let ok = null;
+  for (const raw of keys) if (await verifySig(raw, e.s, signed)) { ok = raw; break; }
+  if (!ok) return bad("unverified");          // not cached: may verify after a key change is accepted
+  const curKey = e.from === ME.id ? ID.sigRaw : (CONTACTS.get(e.from) || {}).current?.sig;
+  if (opened.size > 5000) opened.clear();
+  const mine = e.k[ME.id];
+  let r;
+  if (!mine) r = bad("notforme");
+  else {
+    try {
+      const w = ub64(mine);
+      const wk = await kek(ID.dhPriv, await importPub(e.eph, "dh"), e.id, e.eph, ME.id);
+      const cek = new Uint8Array(await S.decrypt({ name: "AES-GCM", iv: w.subarray(0, 12), additionalData: te.encode(e.id) }, wk, w.subarray(12)));
+      if (await cekCommit(cek) !== e.kc) throw new Error("key commitment");
+      const cekKey = await S.importKey("raw", cek, "AES-GCM", false, ["decrypt"]);
+      cek.fill(0);
+      const plain = new Uint8Array(await S.decrypt({ name: "AES-GCM", iv: ub64(e.iv), additionalData: te.encode(head) }, cekKey, ub64(e.ct)));
+      const u = unpack(plain), p = normPayload(u.p);
+      if (!p) throw new Error("bad payload");
+      r = { id, status: "ok", from: e.from, c: e.c, at: e.at, p, img: u.img.length && p.t === "img" ? u.img.slice() : null, recips: Object.keys(e.k), oldKey: ok !== curKey };
+    } catch { r = bad("undecryptable"); }
+  }
+  opened.set(ck, r);
+  return r;
+}
+// Strict shape for decrypted payloads: wrong types are dropped, so a signed but malformed message can't break rendering.
+function normPayload(p) {
+  if (!p || typeof p !== "object" || Array.isArray(p) || !["text", "img", "sys", "leave", "read"].includes(p.t)) return null;
+  const str = (v, n) => typeof v === "string" ? v.slice(0, n) : undefined;
+  const num = v => typeof v === "number" && isFinite(v) && v >= 0 ? v : undefined;
+  const o = { t: p.t, text: str(p.text, MAX_TEXT), n: str(p.n, 80), ev: str(p.ev, 16), gn: str(p.gn, 64),
+    o: isId(p.o) ? p.o : undefined, o0: isId(p.o0) ? p.o0 : undefined, m: validMembers(p.m) || undefined,
+    who: Array.isArray(p.who) ? p.who.filter(isId).slice(0, 64) : undefined,
+    ttl: num(p.ttl) !== undefined && p.ttl <= 31536000 ? p.ttl : 0, x: num(p.x) || 0, upTo: num(p.upTo),
+    ep: Number.isInteger(p.ep) && p.ep >= 0 && p.ep < 1e9 ? p.ep : undefined, w: num(p.w), h: num(p.h) };
+  if (p.r && typeof p.r === "object" && typeof p.r.s === "string") o.r = { id: str(p.r.id, 64), f: isId(p.r.f) ? p.r.f : undefined, s: p.r.s.slice(0, 120) };
+  return o;
+}
+const isContent = m => m.status !== "ok" || m.p.t === "text" || m.p.t === "img";
+const expired = m => m.status === "ok" && typeof m.p.x === "number" && m.p.x > 0 && Date.now() > m.p.x;
+
+/* ---------------- applying messages to chat state ---------------- */
+async function groupId(o0, gn) { return "g" + hex(await sha256(JSON.stringify(["sealed-grp-v1", o0, gn]))).slice(0, 32); }
+function validMembers(list) { return Array.isArray(list) && list.length >= 1 && list.length <= 64 && list.every(isId) ? [...new Set(list)] : null; }
+async function applyMsgs(list) {
+  const dirty = new Set(), now = Date.now();
+  for (const m of list) {
+    if (m.status === "unverified" && m.from && m.from !== ME.id && !CHATS.has(m.c) && isId(m.from) && m.c === await dmId(ME.id, m.from)) {
+      // Show the warning in the direct chat it claims to belong to, so it isn't silently dropped.
+      const chat = { id: m.c, kind: "dm", name: "", members: [ME.id, m.from], owner: null, ttl: 0, ttlRev: 0, lastRead: 0, reads: {}, created: m.at };
+      CHATS.set(chat.id, chat); dirty.add(chat);
+    }
+    if (m.status !== "ok") continue;
+    const p = m.p, from = m.from;
+    if (expired(m)) {
+      m.gone = true;
+      if (from === ME.id) m.recips.forEach(u => db.doc(P.inbox(u) + "/" + m.id).delete().catch(() => {}));
+      else db.doc(P.inbox(ME.id) + "/" + m.id).delete().catch(() => {});
+      continue;
+    }
+    if (p.t === "read") {
+      m.gone = true;
+      if (from === ME.id) continue;
+      const chat = CHATS.get(m.c);
+      if (chat && p.upTo !== undefined && chat.members.includes(from)) {
+        const upTo = Math.min(p.upTo, m.at);              // nobody can claim to have read the future
+        chat.reads = chat.reads || {};
+        if ((chat.reads[from] || 0) < upTo) { chat.reads[from] = upTo; dirty.add(chat); }
+      }
+      db.doc(P.inbox(ME.id) + "/" + m.id).delete().catch(() => {});
+      continue;
+    }
+    let chat = CHATS.get(m.c);
+    if (!chat) {
+      const members = p.m;
+      if (!members || !members.includes(ME.id) || !members.includes(from)) { m.bad = true; continue; }
+      if (m.c[0] === "d") {
+        if (members.length !== 2 || await dmId(members[0], members[1]) !== m.c) { m.bad = true; continue; }
+        chat = { id: m.c, kind: "dm", name: "", members, owner: null, ttl: 0, ttlRev: 0, lastRead: 0, reads: {}, created: m.at };
+      } else if (/^g[0-9a-f]{32}$/.test(m.c)) {
+        // A group only starts from a message by its admin; the id is bound to the creator.
+        if (!p.o0 || !p.gn || p.ep === undefined || from !== p.o || await groupId(p.o0, p.gn) !== m.c) { m.bad = true; continue; }
+        if (!(p.o === p.o0 || (!members.includes(p.o0) && p.o === [...members].sort()[0]))) { m.bad = true; continue; }
+        chat = { id: m.c, kind: "group", name: cleanName(p.n) || "Group", members, owner: p.o, o0: p.o0, gn: p.gn, ep: p.ep, gone: {}, ttl: 0, ttlRev: 0, lastRead: 0, reads: {}, created: m.at };
+      } else { m.bad = true; continue; }
+      if (p.ttl) { chat.ttl = p.ttl; chat.ttlRev = m.at; }
+      dirty.add(chat);
+    }
+    if (chat.kind === "group") {
+      if (p.t === "leave") {
+        const L = p.ep !== undefined ? p.ep : 0;
+        chat.gone = chat.gone || {};
+        if (chat.members.includes(from) || chat.gone[from] !== undefined) {
+          if ((chat.gone[from] ?? -1) < L) { chat.gone[from] = L; dirty.add(chat); }
+          if (L >= (chat.ep || 0) && chat.members.includes(from)) {
+            chat.members = chat.members.filter(u => u !== from);
+            if (chat.owner === from) chat.owner = [...chat.members].sort()[0] || null;
+            dirty.add(chat);
+          }
+        } else m.bad = true;
+        continue;
+      }
+      if (!chat.members.includes(from)) { m.bad = true; continue; }        // removed or never a member
+      // Membership and name are ordered by the admin's signed epoch counter, never by timestamps.
+      if (from === chat.owner && p.ep !== undefined && p.ep > (chat.ep || 0) && p.m) {
+        chat.members = p.m.filter(u => !((chat.gone || {})[u] >= p.ep));
+        chat.name = cleanName(p.n) || chat.name; chat.ep = p.ep;
+        if (!chat.members.includes(chat.owner)) chat.owner = [...chat.members].sort()[0] || null;
+        dirty.add(chat);
+      }
+    } else if (!chat.members.includes(from)) { m.bad = true; continue; }
+    if (p.t === "sys" && p.ev === "ttl" && m.at > (chat.ttlRev || 0) && m.at <= now + SKEW) { chat.ttl = p.ttl; chat.ttlRev = m.at; dirty.add(chat); }
+  }
+  for (const c of dirty) await saveChat(c);
+}
+const JUNK = new Set(["invalid", "notforme", "nokey"]);
+async function openAll(snap) {
+  const out = [];
+  for (const d of snap.docs) {
+    const m = Object.assign({}, await openMsg(d.id, d.data()));   // fresh flags on every pass
+    if (JUNK.has(m.status)) db.doc(P.inbox(ME.id) + "/" + d.id).delete().catch(() => {});   // clear junk from my inbox
+    out.push(m);
+  }
+  out.sort((a, b) => a.at - b.at || (a.id < b.id ? -1 : 1));
+  await applyMsgs(out);
+  return out.filter(m => !m.gone && !m.bad && !JUNK.has(m.status) && !(m.from && CONTACTS.get(m.from) && CONTACTS.get(m.from).blocked));
+}
+
+/* ---------------- sending ---------------- */
+async function sendTo(chat, payload, img, onlyTo) {
+  const base = { m: chat.members, ttl: chat.ttl || 0 };
+  if (chat.kind === "group") Object.assign(base, { n: chat.name, o: chat.owner, o0: chat.o0, gn: chat.gn, ep: chat.ep || 0 });
+  const uids = onlyTo || [...new Set([ME.id, ...chat.members])];
+  return sealMsg(chat.id, uids, Object.assign(base, payload), img);
+}
+async function trySend(chat, payload, img, onlyTo) {
+  try { await sendTo(chat, payload, img, onlyTo); return true; }
+  catch (e) {
+    if (e instanceof KeyChanged) { toast(e.message, 4000); renderConv(); }
+    else toast(e && e.code === "not_granted" ? "You can only read on this instance." : e && e.code === "quota_exceeded" ? "Storage is full. Delete some chats." : (e && e.message) || "Couldn't send.");
+    return false;
+  }
+}
+
+/* ---------------- start: keys ---------------- */
+async function start() {
+  const kr = await db.doc(P.keyring()).get();
+  if (!kr.exists) return showSetup(false);
+  const doc = kr.data();
+  try { keyringParams(doc); } catch (e) { return fatal("Keys can't be used", e.message); }
+  const saved = await dev.get("u:" + ME.id);
+  if (saved && saved.key && saved.salt === doc.kdf.salt && !(await dev.get("lock:" + ME.id))) {
+    try { await enter(await unlockSecret(doc, saved.key), doc, null); return; } catch { await dev.del("u:" + ME.id); }
+  }
+  showUnlock(doc);
+}
+function brandHead(title, text) { return [h("div", { class: "brand" }, icon("lock")), h("h1", { text: title }), h("p", { text })]; }
+function showSetup(reset) {
+  const pass = h("input", { class: "in", type: "password", autocomplete: "new-password", id: "pass1", "aria-label": "Passphrase" });
+  const pass2 = h("input", { class: "in", type: "password", autocomplete: "new-password", id: "pass2", "aria-label": "Repeat passphrase" });
+  const name = h("input", { class: "in", id: "name", maxlength: 40, value: cleanName(SETTINGS.name || ME.lagerName), "aria-label": "Your name" });
+  const remember = h("input", { type: "checkbox", id: "remember" });
+  const bar = h("i"), hint = h("div", { class: "hint", text: "At least 10 characters. Longer is better." }), err = h("div", { class: "err" });
+  const btn = h("button", { class: "btn wide", text: reset ? "Create new keys" : "Create my keys" });
+  const upd = () => {
+    const s = strength(pass.value);
+    bar.style.width = Math.min(100, s) + "%";
+    bar.style.background = s < 50 ? "var(--danger)" : s < 75 ? "#e0a100" : "var(--accent)";
+    hint.textContent = !pass.value ? "At least 10 characters. Longer is better." : s < 50 ? "Too weak" : s < 75 ? "Okay – longer would be stronger" : "Strong";
+  };
+  pass.addEventListener("input", upd);
+  const suggest = h("button", { type: "button", class: "link", style: "font-size:13px;margin-top:8px", text: "Suggest a strong passphrase", onclick: () => {
+    const p = genPassphrase(); pass.value = p; pass2.value = p; pass.type = "text"; upd();
+    err.textContent = ""; hint.textContent = "Strong – write it down somewhere safe: " + p;
+  } });
+  const form = h("form", { onsubmit: async e => {
+    e.preventDefault(); err.textContent = "";
+    if (pass.value.length < 10 || strength(pass.value) < 50) return (err.textContent = "Choose a stronger passphrase (at least 10 characters, mixed).");
+    if (pass.value !== pass2.value) return (err.textContent = "The passphrases don't match.");
+    btn.disabled = true; btn.textContent = "Generating keys…";
+    try {
+      const secret = await newSecret();
+      const { doc, key } = await lockSecret(secret, pass.value);
+      if (reset) await wipeMine();
+      await db.doc(P.keyring()).set(doc);
+      SETTINGS = { name: cleanName(name.value) || cleanName(ME.lagerName) || "Sealed user", readReceipts: true, remember: remember.checked };
+      if (remember.checked) await dev.put("u:" + ME.id, { key, salt: doc.kdf.salt }); else await dev.del("u:" + ME.id);
+      await enter(secret, doc, SETTINGS);
+    } catch (x) {
+      btn.disabled = false; btn.textContent = "Create my keys";
+      err.textContent = x && x.code === "not_granted" ? "You have read-only access to this instance. Ask the owner to let you write." : "Couldn't create keys: " + ((x && x.message) || x);
+    }
+  } },
+    ...brandHead(reset ? "New security keys" : "Welcome to Sealed", reset ? "Old messages will no longer be readable and your contacts will see that your key changed." : "Messages are encrypted on your device. Only the people in a chat can read them – not the server, not its owner."),
+    h("label", { class: "f", for: "name", text: "Your name (visible to other people)" }), name,
+    h("label", { class: "f", for: "pass1", text: "Passphrase – protects your keys" }), pass, h("div", { class: "meter" }, bar), hint, suggest,
+    h("label", { class: "f", for: "pass2", text: "Repeat passphrase" }), pass2,
+    h("label", { class: "chk" }, remember, h("span", null, "Stay unlocked on this device", h("div", { class: "hint", text: "Only on a device you alone use. You can change it in settings." }))),
+    h("div", { class: "note", text: "There is no way to recover a forgotten passphrase. Without it your messages can't be read – by anyone." }),
+    err, btn);
+  screen(h("div", { class: "center" }, h("div", { class: "card" }, form)));
+}
+function showUnlock(doc) {
+  const pass = h("input", { class: "in", type: "password", autocomplete: "current-password", id: "unlock", "aria-label": "Passphrase" });
+  const remember = h("input", { type: "checkbox", id: "remember" });
+  const err = h("div", { class: "err" }), btn = h("button", { class: "btn wide", text: "Unlock" });
+  const form = h("form", { onsubmit: async e => {
+    e.preventDefault(); err.textContent = ""; btn.disabled = true; btn.textContent = "Unlocking…";
+    try {
+      const { salt, iter } = keyringParams(doc);
+      const key = await passKey(pass.value, salt, iter);
+      let secret;
+      try { secret = await unlockSecret(doc, key); } catch { throw new Error("Wrong passphrase."); }
+      if (remember.checked) await dev.put("u:" + ME.id, { key, salt: doc.kdf.salt }); else await dev.del("u:" + ME.id);
+      await enter(secret, doc, null);
+    } catch (x) { btn.disabled = false; btn.textContent = "Unlock"; err.textContent = (x && x.message) || "Couldn't unlock."; pass.select(); }
+  } },
+    ...brandHead("Unlock Sealed", "Enter your passphrase to decrypt your keys on this device."),
+    h("label", { class: "f", for: "unlock", text: "Passphrase" }), pass,
+    h("label", { class: "chk" }, remember, h("span", null, "Stay unlocked on this device")),
+    err, btn,
+    h("p", { style: "margin-top:18px;font-size:13px" }, "Forgot it? ", h("button", { type: "button", class: "link", text: "Start over with new keys", onclick: async () => {
+      if (await confirmBox("Start over?", "Your current keys, chats and contacts will be deleted. Messages encrypted to your old key can never be read again.", "Start over", true)) showSetup(true);
+    } })));
+  screen(h("div", { class: "center" }, h("div", { class: "card" }, form)));
+  setTimeout(() => pass.focus(), 50);
+}
+async function wipeMine() {
+  const dels = [];
+  for (const path of [P.contacts(), P.chats(), P.inbox(ME.id)]) {
+    for (;;) {
+      const s = await db.collection(path).limit(500).get();
+      if (s.empty) break;
+      await Promise.all(s.docs.map(d => db.doc(path + "/" + d.id).delete()));
+      if (s.size < 500) break;
+    }
+  }
+  dels.push(db.doc(P.vault()).delete().catch(() => {}));
+  await Promise.all(dels);
+  await dev.del("u:" + ME.id);
+}
+async function enter(secret, krDoc, freshSettings) {
+  ID = await loadIdentity(secret);
+  await dev.del("lock:" + ME.id);
+  keyringCt = krDoc.box.ct;
+  if (freshSettings) await saveSettings();
+  else {
+    const s = await db.doc(P.vault()).get();
+    const v = s.exists ? await unseal(P.vault(), s.data()) : null;
+    SETTINGS = Object.assign({ name: "", readReceipts: true, remember: false }, v || {});
+  }
+  const [cs, ch] = await Promise.all([db.collection(P.contacts()).get(), db.collection(P.chats()).get()]);
+  for (const [k, v] of await readColl(P.contacts(), cs.docs, contactOk)) CONTACTS.set(k, v);
+  for (const [k, v] of await readColl(P.chats(), ch.docs, chatOk)) CHATS.set(k, v);
+  const mine = await db.doc("directory/" + ME.id).get();
+  const md = mine.exists ? await verifyDir(ME.id, mine.data()) : null;
+  if (!md || md.sig !== ID.sigRaw || md.dh !== ID.dhRaw || md.name !== myName()) await publishDir();
+  shell();
+  subs.push(db.doc(P.keyring()).onSnapshot(s => {
+    const d = s.data();
+    if (!d || !d.box || d.box.ct !== keyringCt) lockNow(false);
+  }));
+  subs.push(db.collection("directory").limit(1000).onSnapshot(s => serial(async () => {
+    DIR.clear();
+    for (const d of s.docs) { if (!isId(d.id)) continue; const v = await verifyDir(d.id, d.data()); if (v) DIR.set(d.id, v); }
+    const seen = new Map(); dupNames.clear();
+    for (const d of DIR.values()) { if (seen.has(d.name)) dupNames.add(d.name); seen.set(d.name, 1); }
+    await syncContactsWithDir();
+    renderList(); if (current) renderConv();
+  })));
+  subs.push(db.collection(P.contacts()).onSnapshot(s => serial(async () => {
+    const m = await readColl(P.contacts(), s.docs, contactOk);
+    CONTACTS.clear(); m.forEach((v, k) => CONTACTS.set(k, v));
+    renderList(); if (current) renderConv();
+  })));
+  subs.push(db.collection(P.chats()).onSnapshot(s => serial(async () => {
+    const m = await readColl(P.chats(), s.docs, chatOk);
+    for (const k of [...CHATS.keys()]) if (!m.has(k)) CHATS.delete(k);
+    m.forEach((v, k) => CHATS.set(k, v));
+    renderList(); if (current) renderConv();
+  })));
+  subs.push(db.collection(P.inbox(ME.id)).orderBy("at", "desc").limit(1000).onSnapshot(s => serial(() => onInbox(s)), e => toast(e.message)));
+  ticker = setInterval(() => serial(async () => { if (lastInboxSnap) await onInbox(lastInboxSnap); if (lastChatSnap && current) await onChat(lastChatSnap); }), 20000);
+}
+function teardown() {
+  ID = null;
+  subs.splice(0).forEach(u => { try { u(); } catch { /* ignore */ } });
+  if (unsubChat) unsubChat();
+  unsubChat = null; current = null; lastInboxSnap = null; lastChatSnap = null;
+  if (ticker) clearInterval(ticker);
+  ticker = null;
+  blobUrls.forEach(u => URL.revokeObjectURL(u)); blobUrls.clear();
+  CONTACTS.clear(); CHATS.clear(); opened.clear(); INBOX = []; CHATMSGS = [];
+}
+async function lockNow(manual = true) {
+  if (manual) await dev.put("lock:" + ME.id, 1);   // "Lock" always asks for the passphrase next time
+  teardown();
+  location.reload();
+}
+
+/* ---------------- inbox handling ---------------- */
+async function onInbox(snap) {
+  if (!ID) return;
+  lastInboxSnap = snap;
+  INBOX = await openAll(snap);
+  renderList();
+}
+async function onChat(snap) {
+  if (!ID || !current) return;
+  lastChatSnap = snap;
+  CHATMSGS = (await openAll(snap)).filter(m => m.c === current);
+  renderMsgs();
+  const chat = CHATS.get(current);
+  if (!chat || document.hidden) return;
+  const latest = CHATMSGS.filter(m => m.status === "ok" && isContent(m)).reduce((a, m) => Math.max(a, m.at), 0);
+  if (latest > (chat.lastRead || 0)) { chat.lastRead = latest; await saveChat(chat); }
+  if (SETTINGS.readReceipts && chat.members.includes(ME.id)) {
+    const per = {};
+    for (const m of CHATMSGS) if (m.status === "ok" && isContent(m) && m.from !== ME.id && chat.members.includes(m.from)) per[m.from] = Math.max(per[m.from] || 0, m.at);
+    chat.sentReads = chat.sentReads || {};
+    let changed = false;
+    for (const [u, at] of Object.entries(per)) {
+      const c = CONTACTS.get(u);
+      if ((chat.sentReads[u] || 0) >= at || !c || c.blocked || c.changed) continue;
+      try { await sendTo(chat, { t: "read", upTo: at, ttl: 0 }, null, [u]); chat.sentReads[u] = at; changed = true; } catch { /* retried next time */ }
+    }
+    if (changed) await saveChat(chat);
+  }
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && lastChatSnap && current) serial(() => onChat(lastChatSnap)); });
+
+/* ---------------- UI: shell and chat list ---------------- */
+let els = {};
+function shell() {
+  els.search = h("input", { class: "in", placeholder: "Search chats", "aria-label": "Search chats", oninput: () => renderList() });
+  els.items = h("div", { class: "scroll", id: "chatlist" });
+  els.list = h("section", { class: "pane", id: "list" },
+    h("div", { class: "bar" }, h("h2", null, icon("lock"), "Sealed"),
+      h("button", { class: "ib", title: "Lock", "aria-label": "Lock", onclick: () => lockNow() }, icon("lock")),
+      h("button", { class: "ib", title: "Settings", "aria-label": "Settings", onclick: openSettings }, icon("gear"))),
+    h("div", { class: "search" }, els.search), els.items,
+    h("button", { class: "fab", title: "New chat", "aria-label": "New chat", onclick: openNewChat }, icon("chat")));
+  els.conv = h("section", { class: "pane", id: "conv" }, placeholder());
+  els.app = h("div", { id: "app" }, els.list, els.conv);
+  screen(els.app);
+  renderList();
+}
+function placeholder() {
+  return h("div", { class: "placeholder" }, icon("shield"), h("strong", { text: "End-to-end encrypted" }), h("span", { text: "Pick a chat or start a new one. Messages are encrypted on this device before they're stored." }));
+}
+function summary(m) {
+  if (m.status !== "ok") return "🔒 Message can't be read";
+  const p = m.p;
+  if (p.t === "text") return (p.text || "").replace(/\s+/g, " ").slice(0, 120);
+  if (p.t === "img") return "📷 Photo" + (p.text ? " · " + p.text.replace(/\s+/g, " ").slice(0, 80) : "");
+  return sysText(m);
+}
+function chatTitle(chat) {
+  if (chat.kind === "group") return chat.name || "Group";
+  const other = chat.members.find(u => u !== ME.id) || ME.id;
+  return other === ME.id ? myName() + " (you)" : nameOf(other);
+}
+const dmPeer = chat => chat.kind === "dm" ? chat.members.find(u => u !== ME.id) || null : null;
+function renderList() {
+  if (!els.items) return;
+  const by = new Map();
+  for (const m of INBOX) {
+    const s = by.get(m.c) || { last: null, unread: 0, lastAny: null };
+    if (m.status === "ok" && !isContent(m) && m.p.t !== "sys") continue;
+    s.lastAny = m;
+    if (isContent(m)) s.last = m;
+    const chat = CHATS.get(m.c);
+    if (isContent(m) && m.from !== ME.id && chat && m.at > (chat.lastRead || 0)) s.unread++;
+    by.set(m.c, s);
+  }
+  const q = els.search.value.trim().toLowerCase();
+  const rows = [...CHATS.values()].filter(c => !c.hidden || by.has(c.id)).map(c => ({ c, s: by.get(c.id) || { last: null, unread: 0, lastAny: null } }))
+    .filter(r => { const p = dmPeer(r.c); return !(p && CONTACTS.get(p) && CONTACTS.get(p).blocked); })
+    .filter(r => !q || chatTitle(r.c).toLowerCase().includes(q))
+    .sort((a, b) => ((b.s.lastAny && b.s.lastAny.at) || b.c.created || 0) - ((a.s.lastAny && a.s.lastAny.at) || a.c.created || 0));
+  let total = 0;
+  const nodes = rows.map(({ c, s }) => {
+    total += s.unread;
+    const peer = dmPeer(c), contact = peer && CONTACTS.get(peer);
+    const lm = s.lastAny;
+    const text = lm ? (lm.from === ME.id && isContent(lm) ? "You: " : c.kind === "group" && isContent(lm) ? nameOf(lm.from) + ": " : "") + summary(lm) : (c.kind === "group" ? "Group created" : "No messages yet");
+    return h("button", { class: "item" + (s.unread ? " unread" : "") + (c.id === current ? " on" : ""), onclick: () => openChat(c.id) },
+      avatar(c.kind === "group" ? c.id : peer, chatTitle(c), false, c.kind === "group" ? "users" : null),
+      h("div", { class: "meta" },
+        h("div", { class: "t" }, h("span", { class: "n" }, h("span", { style: "overflow:hidden;text-overflow:ellipsis", text: chatTitle(c) }), contact && contact.verified ? icon("shieldok") : null, contact && contact.changed ? h("span", { style: "color:var(--warn)" }, icon("warn")) : null),
+          h("span", { class: "time", text: lm ? fmtListTime(lm.at) : "" })),
+        h("div", { class: "s" }, h("span", { text }), s.unread ? h("span", { class: "badge", text: s.unread > 99 ? "99+" : String(s.unread) }) : null)));
+  });
+  els.items.replaceChildren(...(nodes.length ? nodes : [h("div", { class: "empty" }, icon("chat"), h("p", { text: q ? "No chats match." : "No chats yet. Tap the button below to message someone who uses Sealed on this server." }))]));
+  document.title = total ? `(${total}) Sealed` : "Sealed";
+}
+
+/* ---------------- UI: conversation ---------------- */
+async function openChat(id) {
+  current = id; replyTo = null; CHATMSGS = []; lastChatSnap = null; els.convFor = null;
+  if (unsubChat) unsubChat();
+  blobUrls.forEach(u => URL.revokeObjectURL(u)); blobUrls.clear();
+  els.app.classList.add("in-chat");
+  const chat = CHATS.get(id);
+  if (chat && chat.hidden) { chat.hidden = false; saveChat(chat); }
+  renderConv();
+  renderList();
+  unsubChat = db.collection(P.inbox(ME.id)).where("c", "==", id).orderBy("at", "desc").limit(1000).onSnapshot(s => serial(() => onChat(s)), e => toast(e.message));
+}
+function closeChat() {
+  current = null; if (unsubChat) unsubChat(); unsubChat = null; lastChatSnap = null; els.convFor = null;
+  els.app.classList.remove("in-chat");
+  els.conv.replaceChildren(placeholder());
+  renderList();
+}
+async function startDm(uid) {
+  const id = await dmId(ME.id, uid);
+  if (!CHATS.has(id)) {
+    const c = await ensureContact(uid);
+    if (!c) return toast("That person has no security key yet.");
+    await saveChat({ id, kind: "dm", name: "", members: [...new Set([ME.id, uid])], owner: null, ttl: 0, ttlRev: 0, lastRead: 0, reads: {}, created: Date.now() });
+  }
+  closePanels();
+  openChat(id);
+}
+function renderConv() {
+  const chat = CHATS.get(current);
+  if (!chat) { closeChat(); return; }
+  const peer = dmPeer(chat), contact = peer && CONTACTS.get(peer);
+  const isMember = chat.members.includes(ME.id);
+  const changed = chat.members.filter(u => u !== ME.id && CONTACTS.get(u) && CONTACTS.get(u).changed);
+  const sub = chat.kind === "group"
+    ? chat.members.map(nameOf).join(", ")
+    : contact && contact.verified ? "Verified · end-to-end encrypted" : "End-to-end encrypted · tap to verify";
+  const head = h("div", { class: "bar" },
+    h("button", { class: "ib back-btn", "aria-label": "Back", onclick: closeChat }, icon("back")),
+    h("div", { class: "conv-head", role: "button", tabindex: 0, onclick: () => openInfo(chat.id), onkeydown: e => { if (e.key === "Enter") openInfo(chat.id); } },
+      avatar(chat.kind === "group" ? chat.id : peer, chatTitle(chat), true, chat.kind === "group" ? "users" : null),
+      h("div", { style: "min-width:0" }, h("div", { class: "nm" }, h("span", { style: "overflow:hidden;text-overflow:ellipsis", text: chatTitle(chat) }), contact && contact.verified ? icon("shieldok") : null),
+        h("div", { class: "sub" }, chat.ttl ? [icon("timer"), " "] : null, sub))),
+    h("button", { class: "ib", "aria-label": "Chat info", title: "Chat info", onclick: () => openInfo(chat.id) }, icon("info")));
+  const banners = changed.map(u => h("div", { class: "banner", role: "alert" }, icon("warn"),
+    h("div", { class: "grow", text: `${nameOf(u)}'s security key changed. This happens when they reset Sealed – or if someone is trying to intercept. Compare safety numbers before you continue.` }),
+    h("button", { class: "btn", text: "Review", onclick: () => openContact(u) })));
+  const fresh = els.convFor !== chat.id;
+  if (fresh) { els.msgs = h("div", { class: "msgs", id: "msgs" }); els.composer = null; els.convFor = chat.id; }
+  let bottom;
+  if (!isMember) bottom = h("div", { class: "closed", text: "You're no longer a member of this group." });
+  else if (contact && contact.blocked) bottom = h("div", { class: "closed" }, "You blocked this contact. ", h("button", { class: "link", text: "Unblock", onclick: async () => { contact.blocked = false; await saveContact(contact); renderConv(); } }));
+  else if (changed.length) bottom = h("div", { class: "closed", text: "Sending is paused until you review the key change." });
+  else bottom = els.composer || (els.composer = composer(chat.id));
+  const focused = document.activeElement;
+  els.conv.replaceChildren(head, ...banners, els.msgs, bottom);
+  if (focused && focused.id === "composer" && bottom.contains(focused)) focused.focus();
+  renderMsgs(fresh);
+}
+function composer(chatId) {
+  const ta = h("textarea", { rows: 1, placeholder: "Message", "aria-label": "Message", maxlength: MAX_TEXT, id: "composer" });
+  const sendBtn = h("button", { class: "send", "aria-label": "Send", title: "Send", type: "submit" }, icon("send"));
+  const file = h("input", { type: "file", accept: "image/*", class: "sr", "aria-label": "Send a photo", tabindex: -1 });
+  const grow = () => { ta.style.height = "auto"; ta.style.height = Math.min(140, ta.scrollHeight) + "px"; };
+  let sending = false;
+  const send = async () => {
+    const text = cleanText(ta.value).trim();
+    if (!text || sending) return;
+    sending = true; sendBtn.disabled = true;
+    const payload = { t: "text", text };
+    if (replyTo) payload.r = replyTo;
+    const chat = CHATS.get(chatId);
+    if (chat && await trySend(chat, payload)) { if (cleanText(ta.value).trim() === text) ta.value = ""; grow(); replyTo = null; renderReply(); }
+    sending = false; sendBtn.disabled = false; ta.focus();
+  };
+  ta.addEventListener("input", grow);
+  ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !matchMedia("(pointer:coarse)").matches) { e.preventDefault(); send(); } });
+  file.addEventListener("change", async () => {
+    const f = file.files && file.files[0]; file.value = "";
+    if (!f) return;
+    try {
+      const img = await prepareImage(f);
+      const cap = await sheet((box, close) => {
+        const url = URL.createObjectURL(new Blob([img.bytes], { type: "image/jpeg" }));
+        const inp = h("input", { class: "in", placeholder: "Add a caption", maxlength: 1000, "aria-label": "Caption" });
+        box.append(h("form", { onsubmit: e => { e.preventDefault(); URL.revokeObjectURL(url); close({ text: inp.value }); } },
+          h("div", { class: "pad" }, h("img", { src: url, alt: "Photo to send", style: "max-width:100%;max-height:50vh;border-radius:10px;display:block;margin:0 auto 10px" }), inp,
+            h("div", { class: "hint", text: `Encrypted before upload · ${img.w}×${img.h} · location data removed` })),
+          h("div", { class: "acts" }, h("button", { type: "button", class: "btn ghost", text: "Cancel", onclick: () => { URL.revokeObjectURL(url); close(null); } }), h("button", { class: "btn", text: "Send" }))));
+      });
+      if (!cap) return;
+      const payload = { t: "img", w: img.w, h: img.h };
+      const t = cleanText(cap.text).trim(); if (t) payload.text = t;
+      if (replyTo) payload.r = replyTo;
+      toast("Encrypting photo…", 1500);
+      const chat = CHATS.get(chatId);
+      if (chat && await trySend(chat, payload, img.bytes)) { replyTo = null; renderReply(); }
+    } catch (e) { toast(e.message || "Couldn't use that image."); }
+  });
+  els.reply = h("div");
+  const form = h("form", { class: "compose", onsubmit: e => { e.preventDefault(); send(); } },
+    h("div", { class: "box" }, ta, h("button", { type: "button", class: "ib", "aria-label": "Attach photo", title: "Photo", onclick: () => file.click() }, icon("image")), file), sendBtn);
+  const wrap = h("div", { style: "flex:none" }, els.reply, form);
+  renderReply();
+  return wrap;
+}
+function renderReply() {
+  if (!els.reply) return;
+  els.reply.replaceChildren(...(replyTo ? [h("div", { class: "replybar" }, icon("reply"), h("div", { class: "q", text: nameOf(replyTo.f) + ": " + replyTo.s }),
+    h("button", { class: "ib", "aria-label": "Cancel reply", onclick: () => { replyTo = null; renderReply(); } }, icon("x")))] : []));
+}
+function sysText(m) {
+  const p = m.p, who = nameOf(m.from);
+  if (p.t === "leave") return who + " left";
+  if (p.ev === "create") return who + " created the group “" + (cleanName(p.n) || "Group") + "”";
+  if (p.ev === "rename") return who + " renamed the group to “" + (cleanName(p.n) || "Group") + "”";
+  if (p.ev === "add") return who + " added " + (Array.isArray(p.who) ? p.who.filter(isId).map(nameOf).join(", ") : "people");
+  if (p.ev === "remove") return who + " removed " + (Array.isArray(p.who) ? p.who.filter(isId).map(nameOf).join(", ") : "people");
+  if (p.ev === "ttl") return who + (p.ttl ? " turned on disappearing messages (" + ttlLabel(p.ttl) + ")" : " turned off disappearing messages");
+  return "";
+}
+function imgUrl(m) {
+  if (blobUrls.has(m.id)) return blobUrls.get(m.id);
+  const u = URL.createObjectURL(new Blob([m.img], { type: "image/jpeg" }));
+  blobUrls.set(m.id, u);
+  return u;
+}
+function renderMsgs(forceBottom) {
+  const box = els.msgs, chat = CHATS.get(current);
+  if (!box || !chat) return;
+  const nearBottom = forceBottom || box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  const nodes = [h("div", { class: "e2e" }, icon("lock"), "Messages are end-to-end encrypted. No one outside this chat – not even the server's owner – can read them.")];
+  let lastDay = "", prevFrom = null;
+  const others = chat.members.filter(u => u !== ME.id);
+  for (const m of CHATMSGS) {
+    if (m.status === "ok" && m.p.t === "read") continue;
+    const day = new Date(m.at).toDateString();
+    if (day !== lastDay) { nodes.push(h("div", { class: "day", text: fmtDay(m.at) })); lastDay = day; prevFrom = null; }
+    if (m.status === "ok" && (m.p.t === "sys" || m.p.t === "leave")) { const t = sysText(m); if (t) nodes.push(h("div", { class: "sys" }, m.p.ev === "ttl" ? icon("timer") : null, t)); prevFrom = null; continue; }
+    const mine = m.from === ME.id;
+    const cls = "b" + (mine ? " me" : "") + (prevFrom !== m.from ? " first" : "");
+    if (m.status !== "ok") {
+      const why = m.status === "unverified" ? `Couldn't verify this message from ${nameOf(m.from)}. It may be forged, or their security key changed.` : "This message can't be decrypted on this key.";
+      nodes.push(h("div", { class: cls + " bad", role: "note" }, icon("warn"), why));
+      prevFrom = m.from; continue;
+    }
+    const p = m.p;
+    const read = mine && others.length && others.every(u => ((chat.reads || {})[u] || 0) >= m.at);
+    const ft = h("span", { class: "ft" }, m.oldKey && !mine ? h("span", { title: "Signed with an older key of " + nameOf(m.from), style: "color:var(--warn)" }, icon("warn")) : null, p.x ? icon("timer") : null, fmtTime(m.at), mine ? h("span", { class: read ? "rd" : "", title: read ? "Read" : "Sent" }, icon(read ? "checks" : "check")) : null);
+    const kids = [];
+    if (chat.kind === "group" && !mine && prevFrom !== m.from) kids.push(h("div", { class: "who", style: `color:hsl(${hue(m.from)} 55% 45%)`, text: nameOf(m.from) }));
+    if (p.r && typeof p.r === "object" && typeof p.r.s === "string") kids.push(h("div", { class: "q", text: (isId(p.r.f) ? nameOf(p.r.f) : "") + ": " + cleanText(p.r.s).slice(0, 120) }));
+    if (p.t === "img" && m.img) kids.push(h("img", { src: imgUrl(m), alt: "Photo", loading: "lazy", onclick: ev => { ev.stopPropagation(); viewImage(imgUrl(m)); } }));
+    if (typeof p.text === "string" && p.text) kids.push(h("span", { class: "tx", text: cleanText(p.text) }));
+    else if (p.t === "text") kids.push(h("span", { class: "tx", text: "" }));
+    kids.push(ft);
+    nodes.push(h("div", { class: cls, tabindex: 0, onclick: () => msgMenu(m), onkeydown: e => { if (e.key === "Enter") msgMenu(m); } }, kids));
+    prevFrom = m.from;
+  }
+  box.replaceChildren(...nodes);
+  if (nearBottom) box.scrollTop = box.scrollHeight;
+}
+function viewImage(url) {
+  const v = h("div", { class: "viewer", onclick: () => v.remove() }, h("img", { src: url, alt: "Photo" }), h("button", { class: "ib", "aria-label": "Close", onclick: () => v.remove() }, icon("x")));
+  document.body.append(v);
+}
+async function msgMenu(m) {
+  if (m.status !== "ok") {
+    const r = await sheet((box, close) => box.append(
+      h("button", { class: "opt", onclick: () => close("review") }, icon("key"), h("span", { class: "l", text: "Review security key" })),
+      h("button", { class: "opt danger", onclick: () => close("del") }, icon("trash"), h("span", { class: "l", text: "Delete for me" }))));
+    if (r === "review" && m.from && m.from !== ME.id) openContact(m.from);
+    if (r === "del") db.doc(P.inbox(ME.id) + "/" + m.id).delete().catch(e => toast(e.message));
+    return;
+  }
+  const chat = CHATS.get(m.c), mine = m.from === ME.id;
+  const r = await sheet((box, close) => box.append(
+    chat && chat.members.includes(ME.id) ? h("button", { class: "opt", onclick: () => close("reply") }, icon("reply"), h("span", { class: "l", text: "Reply" })) : null,
+    m.p.text ? h("button", { class: "opt", onclick: () => close("copy") }, icon("copy"), h("span", { class: "l", text: "Copy text" })) : null,
+    h("button", { class: "opt", onclick: () => close("info") }, icon("info"), h("span", { class: "l" }, "Details", h("small", { text: (mine ? "Sent " : "Received · signed by " + nameOf(m.from) + " · ") + new Date(m.at).toLocaleString() }))),
+    h("button", { class: "opt danger", onclick: () => close("del") }, icon("trash"), h("span", { class: "l", text: "Delete for me" })),
+    mine ? h("button", { class: "opt danger", onclick: () => close("delall") }, icon("trash"), h("span", { class: "l", text: "Delete for everyone" })) : null));
+  if (r === "reply") { replyTo = { id: m.id, f: m.from, s: summary(m).slice(0, 120) }; renderReply(); const c = document.getElementById("composer"); if (c) c.focus(); }
+  if (r === "copy") { try { await navigator.clipboard.writeText(m.p.text); toast("Copied"); } catch { toast("Couldn't copy"); } }
+  if (r === "info") toast("Signature verified · AES-256-GCM · ECDH P-256", 3200);
+  if (r === "del") db.doc(P.inbox(ME.id) + "/" + m.id).delete().catch(e => toast(e.message));
+  if (r === "delall" && await confirmBox("Delete for everyone?", "The message is removed from every member's inbox. Someone may already have read it.", "Delete", true)) {
+    await Promise.allSettled(m.recips.map(u => db.doc(P.inbox(u) + "/" + m.id).delete()));
+  }
+}
+async function prepareImage(f) {
+  if (!f.type.startsWith("image/")) throw new Error("Choose an image.");
+  if (f.size > 40e6) throw new Error("That image is too large.");
+  const url = URL.createObjectURL(f);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("Couldn't read that image.")); i.src = url; });
+    let max = 1600, q = 0.82;
+    for (let n = 0; n < 10; n++) {
+      const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.round(img.naturalWidth * s)), hh = Math.max(1, Math.round(img.naturalHeight * s));
+      const cv = h("canvas", { width: w, height: hh });
+      const ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, hh); ctx.drawImage(img, 0, 0, w, hh);
+      const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", q));
+      if (blob && blob.size <= MAX_IMG) return { bytes: new Uint8Array(await blob.arrayBuffer()), w, h: hh };
+      if (q > 0.5) q -= 0.12; else max = Math.round(max * 0.75);
+    }
+    throw new Error("Couldn't shrink that image enough.");
+  } finally { URL.revokeObjectURL(url); }
+}
+
+/* ---------------- panels ---------------- */
+const panels = [];
+function panel(title, body, opts = {}) {
+  const p = h("div", { class: "panel", role: "dialog", "aria-label": title },
+    h("div", { class: "bar" }, h("button", { class: "ib", "aria-label": "Back", onclick: () => closePanel(p) }, icon("back")), h("h2", { text: title }), opts.action || null),
+    h("div", { class: "scroll" }, body));
+  els.app.append(p); panels.push(p);
+  return p;
+}
+function closePanel(p) { const i = panels.indexOf(p); if (i >= 0) panels.splice(i, 1); p.remove(); }
+function closePanels() { panels.splice(0).forEach(p => p.remove()); }
+function switchRow(label, sub, checked, onchange) {
+  const inp = h("input", { type: "checkbox", "aria-label": label }); inp.checked = checked;
+  inp.addEventListener("change", () => onchange(inp.checked, inp));
+  return h("label", { class: "opt" }, h("span", { class: "l" }, label, sub ? h("small", { text: sub }) : null), h("span", { class: "switch" }, inp, h("i")));
+}
+function people(filter) {
+  return [...DIR.values()].filter(d => d.uid !== ME.id && !(CONTACTS.get(d.uid) && CONTACTS.get(d.uid).blocked)).filter(d => !filter || nameOf(d.uid).toLowerCase().includes(filter))
+    .sort((a, b) => nameOf(a.uid).localeCompare(nameOf(b.uid)));
+}
+function personRow(d, onclick, right) {
+  const c = CONTACTS.get(d.uid);
+  return h("button", { class: "item", onclick },
+    avatar(d.uid, nameOf(d.uid)),
+    h("div", { class: "meta" }, h("div", { class: "n" }, h("span", { text: nameOf(d.uid) }), c && c.verified ? icon("shieldok") : null),
+      h("div", { class: "s" }, h("span", { text: c ? (c.changed ? "⚠ Security key changed" : c.verified ? "Verified" : "Not verified yet") : "Uses Sealed" }))),
+    right || null);
+}
+function openNewChat() {
+  const q = h("input", { class: "in", placeholder: "Search people", "aria-label": "Search people" });
+  const list = h("div");
+  const draw = () => {
+    const ps = people(q.value.trim().toLowerCase());
+    list.replaceChildren(
+      h("button", { class: "item", onclick: openNewGroup }, avatar("group", "", false, "users"), h("div", { class: "meta" }, h("div", { class: "n", text: "New group" }))),
+      ...(ps.length ? ps.map(d => personRow(d, () => startDm(d.uid))) : [h("div", { class: "empty", text: q.value ? "No one matches." : "Nobody else has set up Sealed on this instance yet. Share the app with them – they'll appear here once they create their keys." })]));
+  };
+  q.addEventListener("input", draw);
+  panel("New chat", [h("div", { class: "search" }, q), list]);
+  draw();
+}
+function openNewGroup() {
+  const picked = new Set();
+  const nameIn = h("input", { class: "in", placeholder: "Group name", maxlength: 40, "aria-label": "Group name" });
+  const chips = h("div", { class: "chips" }), list = h("div");
+  const btn = h("button", { class: "ib", "aria-label": "Create group", title: "Create", onclick: async () => {
+    const n = cleanName(nameIn.value);
+    if (!n) return toast("Give the group a name.");
+    if (!picked.size) return toast("Pick at least one person.");
+    btn.disabled = true;
+    try {
+      for (const u of picked) if (!(await ensureContact(u))) throw new Error(nameOf(u) + " has no security key.");
+      const gn = b64(rnd(16));
+      const chat = { id: await groupId(ME.id, gn), kind: "group", name: n, members: [ME.id, ...picked], owner: ME.id, o0: ME.id, gn, ep: 0, gone: {}, ttl: 0, ttlRev: 0, lastRead: 0, reads: {}, created: Date.now() };
+      await saveChat(chat);
+      await sendTo(chat, { t: "sys", ev: "create" });
+      closePanels(); openChat(chat.id);
+    } catch (e) { btn.disabled = false; toast(e.message || "Couldn't create the group."); }
+  } }, icon("check"));
+  const draw = () => {
+    chips.replaceChildren(...[...picked].map(u => h("span", { class: "pill", text: nameOf(u) })));
+    list.replaceChildren(...people().map(d => personRow(d, () => { picked.has(d.uid) ? picked.delete(d.uid) : picked.add(d.uid); draw(); },
+      h("span", { class: "pick" + (picked.has(d.uid) ? " on" : "") }, picked.has(d.uid) ? icon("check") : null))));
+    if (!list.childNodes.length) list.append(h("div", { class: "empty", text: "Nobody else uses Sealed here yet." }));
+  };
+  panel("New group", [h("div", { class: "pad", style: "background:var(--panel)" }, nameIn), chips, list], { action: btn });
+  draw();
+}
+async function safetyBlock(uid, keys) {
+  const sn = await safetyNumber({ uid: ME.id, sig: ID.sigRaw, dh: ID.dhRaw }, { uid, sig: keys.sig, dh: keys.dh });
+  return h("div", { class: "safety", "aria-label": "Safety number", id: "safety" }, sn.map(g => h("span", { text: g })));
+}
+async function openContact(uid) {
+  const c = await ensureContact(uid);
+  if (!c) return toast("No security key found.");
+  const body = h("div");
+  const draw = async () => {
+    const cc = CONTACTS.get(uid) || c;
+    const kids = [h("div", { class: "hero" }, avatar(uid, nameOf(uid)), h("div", { class: "nm", text: nameOf(uid) }),
+      cc.nick && cc.name !== cc.nick ? h("div", { class: "sub", text: "Calls themselves “" + cc.name + "”" }) : null,
+      cc.changed ? h("span", { class: "pill warn" }, icon("warn"), "Security key changed") : cc.verified ? h("span", { class: "pill ok" }, icon("shieldok"), "Verified") : h("span", { class: "pill" }, icon("shield"), "Not verified"))];
+    if (cc.changed) {
+      kids.push(h("div", { class: "sec" }, h("h3", { text: "New safety number" }), await safetyBlock(uid, cc.changed),
+        h("div", { class: "pad hint", text: `Compare this number with ${nameOf(uid)} in person or on a call. If it matches what they see, accept the new key. If you can't confirm, don't send anything sensitive.` }),
+        h("div", { class: "pad row" }, h("button", { class: "btn", text: "Accept new key", onclick: async () => {
+          cc.current = { sig: cc.changed.sig, dh: cc.changed.dh };
+          if (!cc.trusted.includes(cc.changed.sig)) cc.trusted.push(cc.changed.sig);
+          cc.changed = null; cc.verified = false; await saveContact(cc);
+          toast("New key accepted"); draw(); if (current) { if (lastChatSnap) serial(() => onChat(lastChatSnap)); renderConv(); }
+        } }))));
+    } else {
+      kids.push(h("div", { class: "sec" }, h("h3", { text: "Safety number" }), await safetyBlock(uid, cc.current),
+        h("div", { class: "pad hint", text: `${nameOf(uid)} sees the same 60 digits on their phone. Compare them in person or on a call – if they match, nobody can be listening in.` }),
+        switchRow("Mark as verified", "Only after comparing the numbers", !!cc.verified, async v => { cc.verified = v; await saveContact(cc); draw(); if (current) renderConv(); })));
+    }
+    kids.push(h("div", { class: "sec" },
+      h("button", { class: "opt", onclick: async () => { const n = await promptBox("Nickname", "Only you see this name.", cc.nick || ""); if (n !== null) { cc.nick = cleanName(n) || undefined; await saveContact(cc); draw(); renderList(); if (current) renderConv(); } } }, icon("edit"), h("span", { class: "l" }, "Set nickname", h("small", { text: cc.nick || "None" }))),
+      h("button", { class: "opt" + (cc.blocked ? "" : " danger"), onclick: async () => {
+        if (!cc.blocked && !(await confirmBox("Block " + nameOf(uid) + "?", "Their messages will be hidden and you won't send them read receipts.", "Block", true))) return;
+        cc.blocked = !cc.blocked; await saveContact(cc); draw(); renderList(); if (current) { serial(() => lastChatSnap && onChat(lastChatSnap)); renderConv(); }
+      } }, icon("block"), h("span", { class: "l", text: cc.blocked ? "Unblock" : "Block" }))));
+    body.replaceChildren(...kids);
+  };
+  panel("Contact", body);
+  await draw();
+}
+async function openInfo(chatId) {
+  const chat = CHATS.get(chatId); if (!chat) return;
+  if (chat.kind === "dm") {
+    const peer = dmPeer(chat);
+    if (peer) await openContact(peer); else toast("This is your own chat.");
+    const p = panels[panels.length - 1];
+    if (p) p.querySelector(".scroll").append(chatSettings(chat));
+    return;
+  }
+  const body = h("div");
+  const draw = () => {
+    const c = CHATS.get(chatId) || chat, owner = c.owner === ME.id, member = c.members.includes(ME.id);
+    body.replaceChildren(
+      h("div", { class: "hero" }, avatar(c.id, c.name, false, "users"), h("div", { class: "nm", text: c.name }), h("div", { class: "sub", text: c.members.length + " members · end-to-end encrypted" })),
+      owner && member ? h("div", { class: "sec" }, h("button", { class: "opt", onclick: async () => {
+        const n = await promptBox("Group name", "", c.name); if (!n) return;
+        const cleaned = cleanName(n); if (!cleaned) return;
+        const old = c.name, ep = c.ep || 0; c.name = cleaned; c.ep = ep + 1;
+        if (await trySend(c, { t: "sys", ev: "rename" })) { await saveChat(c); draw(); renderConv(); } else { c.name = old; c.ep = ep; }
+      } }, icon("edit"), h("span", { class: "l", text: "Rename group" }))) : null,
+      h("div", { class: "sec" }, h("h3", { text: "Members" }),
+        owner && member ? h("button", { class: "opt", onclick: () => addMembers(c, draw) }, icon("plus"), h("span", { class: "l", text: "Add members" })) : null,
+        ...c.members.map(u => {
+          const d = DIR.get(u) || { uid: u };
+          return personRow(d, () => { if (u !== ME.id) openContact(u); },
+            h("span", { class: "row" }, u === c.owner ? h("span", { class: "pill", text: "Admin" }) : null,
+              owner && u !== ME.id ? h("span", { role: "button", tabindex: 0, class: "ib", style: "color:var(--danger)", "aria-label": "Remove " + nameOf(u), onclick: async e => {
+                e.stopPropagation();
+                if (!(await confirmBox("Remove " + nameOf(u) + "?", "They won't receive new messages.", "Remove", true))) return;
+                const before = c.members.slice(), ep = c.ep || 0;
+                c.members = c.members.filter(x => x !== u); c.ep = ep + 1;
+                // tell the removed person and the rest
+                try { await sendTo(c, { t: "sys", ev: "remove", who: [u] }, null, [...new Set([ME.id, ...before])]); await saveChat(c); draw(); renderConv(); }
+                catch (x) { c.members = before; c.ep = ep; toast(x.message); }
+              } }, icon("x")) : null));
+        })),
+      chatSettings(c),
+      member ? h("div", { class: "sec" }, h("button", { class: "opt danger", onclick: async () => {
+        if (!(await confirmBox("Leave " + c.name + "?", "You won't receive new messages from this group.", "Leave", true))) return;
+        if (await trySend(c, { t: "leave" })) { c.members = c.members.filter(u => u !== ME.id); if (c.owner === ME.id) c.owner = [...c.members].sort()[0] || null; await saveChat(c); draw(); renderConv(); }
+      } }, icon("out"), h("span", { class: "l", text: "Leave group" }))) : null);
+  };
+  panel("Group info", body);
+  draw();
+}
+async function addMembers(c, redraw) {
+  const picked = new Set();
+  const list = h("div");
+  const draw = () => {
+    const ps = people().filter(d => !c.members.includes(d.uid));
+    list.replaceChildren(...(ps.length ? ps.map(d => personRow(d, () => { picked.has(d.uid) ? picked.delete(d.uid) : picked.add(d.uid); draw(); },
+      h("span", { class: "pick" + (picked.has(d.uid) ? " on" : "") }, picked.has(d.uid) ? icon("check") : null))) : [h("div", { class: "empty", text: "Everyone is already in this group." })]));
+  };
+  let p;
+  const btn = h("button", { class: "ib", "aria-label": "Add", onclick: async () => {
+    if (!picked.size) return;
+    const before = c.members.slice(), ep = c.ep || 0;
+    c.members = [...new Set([...c.members, ...picked])]; c.ep = ep + 1;
+    for (const u of picked) if (c.gone) delete c.gone[u];
+    try { await sendTo(c, { t: "sys", ev: "add", who: [...picked] }); await saveChat(c); closePanel(p); redraw(); renderConv(); }
+    catch (e) { c.members = before; c.ep = ep; toast(e.message); }
+  } }, icon("check"));
+  p = panel("Add members", list, { action: btn });
+  draw();
+}
+function chatSettings(chat0) {
+  const live = () => CHATS.get(chat0.id) || chat0;
+  const member = chat0.members.includes(ME.id);
+  return h("div", { class: "sec" }, h("h3", { text: "Chat" }),
+    member ? h("button", { class: "opt", onclick: async () => {
+      const chat = live();
+      const v = await sheet((box, close) => box.append(h("div", { class: "pad" }, h("h3", { style: "margin:6px 0", text: "Disappearing messages" }), h("p", { text: "New messages vanish for everyone after this time. Applies to messages sent from now on." })),
+        ...TTLS.map(([s, l]) => h("button", { class: "opt", onclick: () => close(s) }, h("span", { class: "pick" + ((chat.ttl || 0) === s ? " on" : "") }, (chat.ttl || 0) === s ? icon("check") : null), h("span", { class: "l", text: l })))));
+      if (v === null || v === (chat.ttl || 0)) return;
+      const old = chat.ttl; chat.ttl = v;
+      if (await trySend(chat, { t: "sys", ev: "ttl", ttl: v })) { chat.ttlRev = Date.now(); await saveChat(chat); closePanels(); renderConv(); } else chat.ttl = old;
+    } }, icon("timer"), h("span", { class: "l" }, "Disappearing messages", h("small", { text: ttlLabel(chat0.ttl || 0) }))) : null,
+    h("button", { class: "opt danger", onclick: async () => {
+      const chat = live();
+      if (!(await confirmBox("Delete this chat?", "All its messages are deleted from your inbox on all your devices. Others keep their copies.", "Delete", true))) return;
+      const s = await db.collection(P.inbox(ME.id)).where("c", "==", chat.id).limit(1000).get();
+      await Promise.allSettled(s.docs.map(d => db.doc(P.inbox(ME.id) + "/" + d.id).delete()));
+      chat.hidden = true; chat.lastRead = Date.now(); await saveChat(chat);
+      closePanels(); closeChat();
+    } }, icon("trash"), h("span", { class: "l", text: "Delete chat" })));
+}
+async function openSettings() {
+  const fp = await fingerprint(ME.id, ID.sigRaw, ID.dhRaw);
+  const body = h("div",
+    null,
+    h("div", { class: "hero" }, avatar(ME.id, myName()), h("div", { class: "nm", text: myName() }), h("div", { class: "sub mono", text: "Your key: " + fp.match(/.{5}/g).join(" ") })),
+    h("div", { class: "sec" }, h("h3", { text: "Profile" }),
+      h("button", { class: "opt", onclick: async () => {
+        const n = await promptBox("Your name", "Visible to everyone on this instance.", myName());
+        if (n && cleanName(n)) { SETTINGS.name = cleanName(n); await saveSettings(); await publishDir(); closePanels(); openSettings(); }
+      } }, icon("user"), h("span", { class: "l" }, "Name", h("small", { text: myName() })))),
+    h("div", { class: "sec" }, h("h3", { text: "Privacy" }),
+      switchRow("Read receipts", "If off, you won't send or see read receipts", SETTINGS.readReceipts !== false, async v => { SETTINGS.readReceipts = v; await saveSettings(); }),
+      switchRow("Stay unlocked on this device", "Keeps a non-exportable key in this browser only", !!(await dev.get("u:" + ME.id)), async (v, inp) => {
+        if (v) {
+          const pass = await passPrompt("Confirm your passphrase");
+          if (!pass) { inp.checked = false; return; }
+          const kr = (await db.doc(P.keyring()).get()).data();
+          try { const { salt, iter } = keyringParams(kr); const key = await passKey(pass, salt, iter); await unlockSecret(kr, key); await dev.put("u:" + ME.id, { key, salt: kr.kdf.salt }); }
+          catch { inp.checked = false; return toast("Wrong passphrase."); }
+        } else await dev.del("u:" + ME.id);
+      }),
+      h("button", { class: "opt", onclick: () => lockNow() }, icon("lock"), h("span", { class: "l" }, "Lock now", h("small", { text: "Clears your keys from memory" })))),
+    h("div", { class: "sec" }, h("h3", { text: "Security" }),
+      h("button", { class: "opt", onclick: changePassphrase }, icon("key"), h("span", { class: "l" }, "Change passphrase", h("small", { text: "Your keys stay the same" }))),
+      h("button", { class: "opt", onclick: howItWorks }, icon("shield"), h("span", { class: "l" }, "How Sealed protects you")),
+      h("button", { class: "opt danger", onclick: async () => {
+        if (await confirmBox("Reset your keys?", "You'll get new keys. Your chats and contacts on this account are deleted and old messages can never be decrypted again. Your contacts will see that your key changed.", "Reset", true)) { closePanels(); teardown(); showSetup(true); }
+      } }, icon("warn"), h("span", { class: "l" }, "Reset keys", h("small", { text: "Only if you think your keys or passphrase leaked" })))));
+  panel("Settings", body);
+}
+function passPrompt(title) {
+  return sheet((box, close) => {
+    const inp = h("input", { class: "in", type: "password", autocomplete: "current-password", "aria-label": "Passphrase" });
+    box.append(h("form", { onsubmit: e => { e.preventDefault(); close(inp.value); } }, h("div", { class: "pad" }, h("h3", { style: "margin:6px 0", text: title }), inp),
+      h("div", { class: "acts" }, h("button", { type: "button", class: "btn ghost", text: "Cancel", onclick: () => close(null) }), h("button", { class: "btn", text: "OK" }))));
+  });
+}
+function changePassphrase() {
+  const cur = h("input", { class: "in", type: "password", autocomplete: "current-password", "aria-label": "Current passphrase" });
+  const n1 = h("input", { class: "in", type: "password", autocomplete: "new-password", "aria-label": "New passphrase" });
+  const n2 = h("input", { class: "in", type: "password", autocomplete: "new-password", "aria-label": "Repeat new passphrase" });
+  const err = h("div", { class: "err" }), btn = h("button", { class: "btn wide", text: "Change passphrase" });
+  let p;
+  const form = h("form", { class: "pad", onsubmit: async e => {
+    e.preventDefault(); err.textContent = "";
+    if (n1.value.length < 10 || strength(n1.value) < 50) return (err.textContent = "Choose a stronger passphrase.");
+    if (n1.value !== n2.value) return (err.textContent = "The new passphrases don't match.");
+    btn.disabled = true; btn.textContent = "Re-encrypting…";
+    try {
+      const kr = (await db.doc(P.keyring()).get()).data();
+      const { salt, iter } = keyringParams(kr);
+      let secret;
+      try { secret = await unlockSecret(kr, await passKey(cur.value, salt, iter)); } catch { throw new Error("The current passphrase is wrong."); }
+      const { doc, key } = await lockSecret(secret, n1.value);
+      keyringCt = doc.box.ct;
+      await db.doc(P.keyring()).set(doc);
+      if (await dev.get("u:" + ME.id)) await dev.put("u:" + ME.id, { key, salt: doc.kdf.salt });
+      toast("Passphrase changed"); closePanel(p);
+    } catch (x) { err.textContent = x.message; btn.disabled = false; btn.textContent = "Change passphrase"; }
+  } }, h("label", { class: "f", text: "Current passphrase" }), cur, h("label", { class: "f", text: "New passphrase" }), n1, h("label", { class: "f", text: "Repeat new passphrase" }), n2, err, btn,
+    h("div", { class: "note", text: "Other devices that stay unlocked will ask for the new passphrase." }));
+  p = panel("Change passphrase", form);
+}
+function howItWorks() {
+  const li = (t, d) => h("div", { class: "opt", style: "cursor:default" }, icon("check"), h("span", { class: "l" }, t, h("small", { text: d })));
+  panel("How Sealed protects you", [
+    h("div", { class: "sec" }, h("h3", { text: "What's protected" }),
+      li("End-to-end encryption", "Every message and photo is encrypted on your device with a fresh AES-256-GCM key, wrapped for each recipient with a one-time ECDH P-256 key."),
+      li("Signed messages", "Each message is signed with the sender's identity key. Tampered or forged messages are shown as unverifiable."),
+      li("Keys never leave your device unencrypted", "Your private keys are stored encrypted with your passphrase (PBKDF2, 600 000 rounds). The passphrase is never sent anywhere."),
+      li("Safety numbers", "Compare safety numbers to rule out a man-in-the-middle. Key changes pause sending until you review them."),
+      li("Private inbox", "Only you can read your inbox. Your contacts, chats and settings are encrypted too."),
+      li("Photos", "Photos are re-encoded on your device, which strips location and camera data, then encrypted.")),
+    h("div", { class: "sec" }, h("h3", { text: "What to keep in mind" }),
+      li("Who talks to whom", "The server sees which accounts exchange messages and when, and message sizes – not their content."),
+      li("The app itself", "The server delivers this app's code. Use Sealed on a server whose operator you trust."),
+      li("Your devices", "Anyone who unlocks your device while Sealed is unlocked can read your chats. Lock it when you're done."),
+      li("Forward secrecy", "Old messages stay readable with your keys so all your devices can show history. Use disappearing messages for sensitive chats, and reset your keys if you think they leaked."))
+  ]);
+}
+
+await start();
+})().catch(e => {
+  console.error(e);
+  const r = document.getElementById("root");
+  r.textContent = "";
+  const c = document.createElement("div"); c.className = "center";
+  const card = document.createElement("div"); card.className = "card";
+  const t = document.createElement("h1"); t.textContent = "Something went wrong";
+  const p = document.createElement("p"); p.textContent = (e && e.message) || String(e);
+  card.append(t, p); c.append(card); r.append(c);
+});
+</script>
+</body>
+</html>

@@ -231,6 +231,27 @@
       "tests": 0
     },
     {
+      "slug": "sealed",
+      "title": "Sealed",
+      "description": "End-to-end encrypted messenger: private chats, groups and photos with signed messages, safety numbers and disappearing messages.",
+      "version": 1,
+      "status": "beta",
+      "language": "en",
+      "category": "social",
+      "themeColor": "#0f3d3a",
+      "path": "apps/sealed",
+      "entry": "apps/sealed/index.html",
+      "icon": "apps/sealed/icon.svg",
+      "capabilities": [
+        "db",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [],
+      "tests": 1
+    },
+    {
       "slug": "stillwater",
       "title": "Stillwater",
       "description": "A calm meditation timer with breathing guide, synthesised bells and ambience, a journal, and stats with streaks and a yearly heatmap.",
