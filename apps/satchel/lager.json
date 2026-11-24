@@ -1,0 +1,26 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "satchel",
+  "title": "Satchel",
+  "description": "Encrypted file sharing: private and team folders, previews, zip downloads and share links with expiry and an optional password.",
+  "version": 1,
+  "status": "beta",
+  "language": "en",
+  "category": "productivity",
+  "themeColor": "#6a1f2f",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {
+    "db": {
+      "rules": [
+        { "path": "blobs", "read": "view", "write": "self" },
+        { "path": "blobs/{self}", "write": "interact" },
+        { "path": "links", "read": "view", "write": "self" },
+        { "path": "links/{self}", "write": "interact" },
+        { "path": "team", "read": "interact", "write": "interact" },
+        { "path": "hits", "read": "interact", "write": "anyone" }
+      ]
+    },
+    "user": {}
+  }
+}
