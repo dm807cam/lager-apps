@@ -7,9 +7,10 @@ Small, self-contained web apps for [Lager](https://github.com/dm807cam/lager), t
 |---|---|---|---|---|
 | <img src="apps/byline/icon.svg" width="24" height="24" alt=""> | [Byline](apps/byline) | Cookie-free blog analytics: readers, read time, read-through, sources, trending posts and the best time to publish. | English | analytics · beta |
 |  | [Deutsch-Dino](apps/deutsch-dino) | Endloses Deutsch-Spiel für die Klassen 1 bis 4: Aufgaben lösen, Dino-Eier knacken und alle Dinos für den Dino-Park sammeln. | Deutsch | education |
+| <img src="apps/folio/icon.svg" width="24" height="24" alt=""> | [Folio](apps/folio) | An ebook reader for EPUB and text: pages or scroll, themes and fonts, highlights and notes, synced progress, reading stats and Habits. | English | reading · beta |
 | <img src="apps/gesichtsschutz/icon.svg" width="24" height="24" alt=""> | [Gesichtsschutz](apps/gesichtsschutz) | Erkennt Gesichter in deinen Fotos und macht sie direkt im Browser unkenntlich – irreversibel und ohne Upload. | Deutsch | privacy |
 |  | [Ghostberry](apps/ghostberry) | A Ghost-style blog: write with cards, publish or schedule, tags, authors, members, Ghost themes. Almanac is the default theme. | English | publishing · beta |
-| <img src="apps/habit-tracker/icon.svg" width="24" height="24" alt=""> | [Habits](apps/habit-tracker) | Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves. | English | health · beta |
+| <img src="apps/habit-tracker/icon.svg" width="24" height="24" alt=""> | [Habits](apps/habit-tracker) | Daily and weekly habits with streaks and a yearly heatmap. Your workout, meditation and reading apps tick linked habits by themselves. | English | health · beta |
 |  | [Kommentare](apps/kommentare) | Einbettbares Kommentarsystem mit verschachtelten Antworten, Daumen hoch/runter, Moderation und Site-Auswahl für mehrere Websites. | Deutsch | publishing |
 | <img src="apps/leanline/icon.svg" width="24" height="24" alt=""> | [Leanline](apps/leanline) | Log weight and body fat as often as you like and see your trend against your ideal BMI and body-fat zones. | English | health |
 |  | [Mathe-Monster](apps/mathe-monster) | Endloses Mathe-Spiel für die Klassen 1 bis 4: Aufgaben lösen, Monster besiegen, Münzen sammeln und Helden freischalten. | Deutsch | education |

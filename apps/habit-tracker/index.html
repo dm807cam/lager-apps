@@ -239,7 +239,9 @@ const KNOWN={
   "workout-tracker":{name:"Workout Tracker",color:"#1b4f8c",letter:"W",url:sib("workout-tracker"),kinds:[{kind:"workout",label:"Workout",unit:"min"}],
     suggest:{name:"Work out",icon:"💪",color:"#2f6fbf",freq:{t:"week",n:3},kind:"workout",min:0}},
   "stillwater":{name:"Stillwater",color:"#3d6c67",letter:"S",url:sib("stillwater"),kinds:[{kind:"meditation",label:"Meditation",unit:"min"}],
-    suggest:{name:"Meditate",icon:"🧘",color:"#3d8a7f",freq:{t:"daily"},kind:"meditation",min:5}}
+    suggest:{name:"Meditate",icon:"🧘",color:"#3d8a7f",freq:{t:"daily"},kind:"meditation",min:5}},
+  "folio":{name:"Folio",color:"#5b3b6e",letter:"F",url:sib("folio"),kinds:[{kind:"reading",label:"Reading",unit:"min"}],
+    suggest:{name:"Read",icon:"📖",color:"#8a5cc2",freq:{t:"daily"},kind:"reading",min:15}}
 };
 const GENERIC=[{name:"Read",icon:"📖",color:"#8a5cc2",freq:{t:"daily"}},{name:"Walk outside",icon:"🚶",color:"#5f8f3a",freq:{t:"daily"}},{name:"No phone in bed",icon:"🌙",color:"#4b5aa8",freq:{t:"daily"}},{name:"Stretch",icon:"🤸",color:"#d08a1f",freq:{t:"days",days:[1,3,5]}}];
 const COLORS=["#c2521f","#d08a1f","#5f8f3a","#3d8a7f","#2f6fbf","#4b5aa8","#8a5cc2","#c24f7a"];
@@ -415,9 +417,9 @@ function renderToday(){
 function suggestions(){const have=new Set(habits().filter(h=>h.link).map(h=>h.link.app+"/"+(h.link.kind||"")));
   return Object.keys(KNOWN).filter(id=>!blocked(id)&&!have.has(id+"/"+KNOWN[id].suggest.kind)).map(id=>({app:id,sg:KNOWN[id].suggest}))}
 function starter(){const sg=suggestions();
-  return`<section class="card"><h2 class="card-t">Start with a habit</h2><span class="sub">Habits linked to your apps tick themselves when you finish a workout or a meditation, including everything you logged before.</span>
+  return`<section class="card"><h2 class="card-t">Start with a habit</h2><span class="sub">Habits linked to your apps tick themselves when you finish a workout, a meditation or a reading session, including everything you logged before.</span>
   <div class="chips">${sg.map((x,i)=>`<button class="chip" data-sg="a${i}">${esc(x.sg.icon)} ${esc(x.sg.name)} <small>${esc(freqText(x.sg))} · ${esc(KNOWN[x.app].name)}</small></button>`).join("")}
-  ${GENERIC.map((g,i)=>`<button class="chip" data-sg="g${i}">${esc(g.icon)} ${esc(g.name)}</button>`).join("")}</div>
+  ${GENERIC.map((g,i)=>sg.some(x=>x.sg.name===g.name)?"":`<button class="chip" data-sg="g${i}">${esc(g.icon)} ${esc(g.name)}</button>`).join("")}</div>
   <div style="margin-top:14px"><button class="btn" data-new="1">Create your own</button></div></section>`}
 function suggestCard(){const sg=suggestions();if(!sg.length)return"";
   return`<section class="card"><h2 class="card-t" style="font-size:15px">Let your apps tick habits</h2><div class="chips" style="margin-top:8px">${sg.map((x,i)=>`<button class="chip" data-sg="a${i}">${esc(x.sg.icon)} ${esc(x.sg.name)} <small>${esc(freqText(x.sg))} · ${esc(KNOWN[x.app].name)}</small></button>`).join("")}</div></section>`}

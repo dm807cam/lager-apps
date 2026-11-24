@@ -1,0 +1,23 @@
+{
+  "$schema": "../../schema/lager-app.schema.json",
+  "slug": "folio",
+  "title": "Folio",
+  "description": "An ebook reader for EPUB and text: pages or scroll, themes and fonts, highlights and notes, synced progress, reading stats and Habits.",
+  "version": 1,
+  "status": "beta",
+  "language": "en",
+  "category": "reading",
+  "themeColor": "#2c1c38",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "capabilities": {
+    "assets": { "upload": "interact" },
+    "db": {},
+    "downloads": {},
+    "user": {}
+  },
+  "externalHosts": ["cdn.jsdelivr.net", "fonts.googleapis.com"],
+  "integrations": {
+    "activity-api/v1": "sender"
+  }
+}

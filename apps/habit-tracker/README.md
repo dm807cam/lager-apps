@@ -1,12 +1,12 @@
 # <img src="icon.svg" width="40" height="40" alt="" align="top"> Habits
 
-Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves.
+Daily and weekly habits with streaks and a yearly heatmap. Your workout, meditation and reading apps tick linked habits by themselves.
 
-**Language:** English · **Category:** health · **Status:** beta · **Deployed version:** 2
+**Language:** English · **Category:** health · **Status:** beta · **Deployed version:** 3
 
 ## Notes
 
-Receives finished activities from other apps through the [Activity API v1](../../docs/ACTIVITY_API.md). In `capabilities`, replace `${LAGER_APPS_DOMAIN}` with your apps domain so Workout Tracker and Stillwater on the same server may send. Scripts and phone shortcuts use the `activity-key` endpoint; its key is shown to the owner in the app under Apps.
+Receives finished activities from other apps through the [Activity API v1](../../docs/ACTIVITY_API.md). In `capabilities`, replace `${LAGER_APPS_DOMAIN}` with your apps domain so Workout Tracker, Stillwater and Folio on the same server may send. Scripts and phone shortcuts use the `activity-key` endpoint; its key is shown to the owner in the app under Apps.
 
 ## Capabilities
 

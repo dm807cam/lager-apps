@@ -13,7 +13,7 @@
     "version": { "type": "integer", "minimum": 1, "description": "The Lager version this code was last deployed as." },
     "status": { "enum": ["stable", "beta", "deprecated"], "default": "stable" },
     "language": { "type": "string", "pattern": "^[a-z]{2}$" },
-    "category": { "enum": ["analytics", "education", "finance", "games", "health", "mindfulness", "privacy", "productivity", "publishing", "social", "tools", "writing"] },
+    "category": { "enum": ["analytics", "education", "finance", "games", "health", "mindfulness", "privacy", "productivity", "publishing", "reading", "social", "tools", "writing"] },
     "themeColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
     "entry": { "const": "index.html" },
     "icon": { "type": "string", "description": "Square SVG in the subset of SVG Lager accepts for app icons." },

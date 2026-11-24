@@ -49,6 +49,34 @@
       "tests": 0
     },
     {
+      "slug": "folio",
+      "title": "Folio",
+      "description": "An ebook reader for EPUB and text: pages or scroll, themes and fonts, highlights and notes, synced progress, reading stats and Habits.",
+      "version": 1,
+      "status": "beta",
+      "language": "en",
+      "category": "reading",
+      "themeColor": "#2c1c38",
+      "path": "apps/folio",
+      "entry": "apps/folio/index.html",
+      "icon": "apps/folio/icon.svg",
+      "capabilities": [
+        "assets",
+        "db",
+        "downloads",
+        "user"
+      ],
+      "externalHosts": [
+        "cdn.jsdelivr.net",
+        "fonts.googleapis.com"
+      ],
+      "integrations": {
+        "activity-api/v1": "sender"
+      },
+      "seed": [],
+      "tests": 3
+    },
+    {
       "slug": "gesichtsschutz",
       "title": "Gesichtsschutz",
       "description": "Erkennt Gesichter in deinen Fotos und macht sie direkt im Browser unkenntlich – irreversibel und ohne Upload.",
@@ -99,8 +127,8 @@
     {
       "slug": "habit-tracker",
       "title": "Habits",
-      "description": "Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves.",
-      "version": 2,
+      "description": "Daily and weekly habits with streaks and a yearly heatmap. Your workout, meditation and reading apps tick linked habits by themselves.",
+      "version": 3,
       "status": "beta",
       "language": "en",
       "category": "health",
