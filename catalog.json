@@ -235,6 +235,27 @@
       "tests": 1
     },
     {
+      "slug": "satchel",
+      "title": "Satchel",
+      "description": "Encrypted file sharing: private and team folders, previews, zip downloads and share links with expiry and an optional password.",
+      "version": 1,
+      "status": "beta",
+      "language": "en",
+      "category": "productivity",
+      "themeColor": "#6a1f2f",
+      "path": "apps/satchel",
+      "entry": "apps/satchel/index.html",
+      "icon": "apps/satchel/icon.svg",
+      "capabilities": [
+        "db",
+        "user"
+      ],
+      "externalHosts": [],
+      "integrations": {},
+      "seed": [],
+      "tests": 1
+    },
+    {
       "slug": "satz",
       "title": "Satz",
       "description": "Fokussiertes Schreiben für ganze Bücher – mit Kapiteln, Fokusmodus und einer sortierbaren Ablage für Gedankenfetzen.",

@@ -1,0 +1,1799 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Satchel</title>
+<style>
+:root{
+  --bg:#f2f0f3; --surface:#fff; --surface-2:#f8f6f8; --hover:#efeaee; --ink:#231a20; --muted:#6f6369; --line:#e3dde1;
+  --brand:#7a2236; --brand-hover:#651b2c; --brand-ink:#fff; --brand-soft:#f4e4e8; --brand-text:#7a2236;
+  --brass:#b7851b; --danger:#b3261e; --ok:#2f6b3f; --shadow:0 12px 32px rgba(40,16,26,.16);
+  --k-image:#2c7a6a; --k-video:#4a53a8; --k-audio:#a3611a; --k-doc:#7a2236; --k-archive:#8a6a12; --k-code:#4d5a66; --k-other:#6f6369;
+  --side:252px; --font:-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI",system-ui,Roboto,"Helvetica Neue",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#151015; --surface:#1f181e; --surface-2:#261e25; --hover:#2c232b; --ink:#f2ebef; --muted:#a99ba3; --line:#362c34;
+  --brand:#a1344d; --brand-hover:#b23e58; --brand-soft:#3b1f29; --brand-text:#f08da0;
+  --brass:#e0b54b; --danger:#f2766b; --ok:#7cc48d; --shadow:0 14px 40px rgba(0,0,0,.5);
+  --k-image:#5cc0aa; --k-video:#8d95ee; --k-audio:#e7a15a; --k-doc:#f08da0; --k-archive:#e0b54b; --k-code:#9fb0bf; --k-other:#a99ba3;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:100dvh}
+.side{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:4px;padding:20px 14px;border-right:1px solid var(--line);background:var(--surface-2)}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px;font-weight:650;font-size:18px;letter-spacing:-.01em}
+.brand svg{width:30px;height:30px}
+.nav{display:flex;align-items:center;gap:12px;width:100%;padding:9px 10px;border:0;border-radius:8px;background:none;text-align:left;color:var(--ink)}
+.nav:hover{background:var(--hover)}
+.nav[aria-current=page]{background:var(--brand-soft);color:var(--brand-text);font-weight:600}
+.nav .count{margin-left:auto;color:var(--muted);font-size:13px;font-weight:400}
+.side .upload{margin:0 0 14px}
+.meter{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.meter b{color:var(--ink);font-weight:600}
+.main{min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:16px 28px 10px;display:flex;flex-direction:column;gap:12px}
+.row1{display:flex;align-items:center;gap:12px;min-width:0}
+.crumbs{display:flex;align-items:center;gap:2px;min-width:0;flex:1;font-size:21px;font-weight:650;letter-spacing:-.015em}
+.crumbs button{border:0;background:none;padding:2px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:22ch;font-weight:inherit}
+.crumbs button:hover{background:var(--hover)}
+.crumbs .sep{color:var(--muted);font-weight:400}
+.crumbs .cur{padding:2px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ib.back{display:none}
+.search{position:relative;width:min(320px,40vw)}
+.search input{width:100%;height:38px;padding:0 12px 0 36px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.search input:focus{outline:none;border-color:var(--brass)}
+.search svg{position:absolute;left:10px;top:9px;color:var(--muted)}
+.row2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:30px;padding:0 12px;border:1px solid var(--line);border-radius:15px;background:var(--surface);font-size:13px;color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.tools{display:flex;gap:4px;align-items:center}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-weight:550;white-space:nowrap}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.primary:hover{background:var(--brand-hover)}
+.btn.danger{color:var(--danger)}
+.btn.danger.solid{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:0;border-radius:8px;background:none;color:var(--muted);flex:none}
+.ib:hover{background:var(--hover);color:var(--ink)}
+.ib[aria-pressed=true]{color:var(--ink);background:var(--hover)}
+
+/* ---------- list ---------- */
+.content{padding:4px 28px 120px;flex:1}
+.head,.item{display:grid;grid-template-columns:28px 40px minmax(0,1fr) 150px 120px 90px 36px;align-items:center;gap:12px}
+.team .head,.team .item{grid-template-columns:28px 40px minmax(0,1fr) 140px 150px 120px 90px 36px}
+.head{padding:6px 10px;color:var(--muted);font-size:12.5px;border-bottom:1px solid var(--line)}
+.head button{border:0;background:none;padding:0;color:inherit;font:inherit;display:inline-flex;gap:4px;align-items:center}
+.head button[aria-sort]{color:var(--ink);font-weight:600}
+.item{position:relative;padding:7px 10px;border-bottom:1px solid var(--line);cursor:default;user-select:none;-webkit-user-select:none}
+.item:hover{background:var(--hover)}
+.item.sel{background:var(--brand-soft)}
+.item .name{min-width:0;display:flex;flex-direction:column}
+.item .name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .name .t{font-weight:500}
+.item .name .sub{display:none;color:var(--muted);font-size:12.5px}
+.item .name .where{color:var(--muted);font-size:12.5px}
+.item .c{color:var(--muted);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .open{position:absolute;inset:0;border:0;background:none;padding:0;z-index:0}
+.item>*:not(.open){position:relative;z-index:1}
+.item .name{pointer-events:none}
+.check{width:20px;height:20px;border:1.6px solid var(--muted);border-radius:5px;background:var(--surface);display:inline-flex;align-items:center;justify-content:center;padding:0;opacity:.0}
+.item:hover .check,.check:focus-visible,.selecting .check,.check[aria-checked=true]{opacity:1}
+.check[aria-checked=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.check svg{width:14px;height:14px;stroke-width:3;display:none}
+.check[aria-checked=true] svg{display:block}
+.glyph{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--kc) 14%,transparent);color:var(--kc);overflow:hidden;position:relative}
+.glyph img{width:100%;height:100%;object-fit:cover;display:block}
+.glyph .ext{position:absolute;bottom:3px;font-size:8.5px;font-weight:700;letter-spacing:.02em}
+.glyph.folder{background:none;color:var(--brass)}
+.glyph.folder svg{width:30px;height:30px;fill:color-mix(in srgb,var(--brass) 22%,transparent)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px;padding-top:12px}
+.card{position:relative;border-radius:12px;background:var(--surface);border:1px solid var(--line);overflow:hidden;user-select:none;-webkit-user-select:none}
+.card:hover{border-color:color-mix(in srgb,var(--ink) 25%,var(--line))}
+.card.sel{outline:2px solid var(--brand);outline-offset:-1px}
+.card .open{position:absolute;inset:0;border:0;background:none;z-index:0}
+.card .pic{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--kc) 10%,var(--surface-2));color:var(--kc);pointer-events:none}
+.card .pic img{width:100%;height:100%;object-fit:cover}
+.card .pic svg.i{width:38px;height:38px;stroke-width:1.4}
+.card .pic.folder{color:var(--brass);background:var(--surface-2)}
+.card .pic.folder svg.i{width:56px;height:56px;fill:color-mix(in srgb,var(--brass) 20%,transparent)}
+.card .meta{padding:8px 10px 10px;pointer-events:none;min-width:0}
+.card .meta .t{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta .sub{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .check{position:absolute;top:8px;left:8px;z-index:1}
+.card .more{position:absolute;top:4px;right:4px;z-index:1;background:color-mix(in srgb,var(--surface) 80%,transparent)}
+
+.empty{max-width:440px;margin:64px auto;text-align:center;color:var(--muted)}
+.empty h2{color:var(--ink);font-size:19px;margin:16px 0 6px;font-weight:650}
+.empty p{margin:0 0 18px}
+.empty .art{width:120px;height:96px;margin:0 auto;color:var(--brass)}
+.note{padding:10px 14px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);font-size:13.5px;margin:12px 0}
+.banner{margin:0 28px 8px;padding:10px 14px;border-radius:8px;background:color-mix(in srgb,var(--danger) 12%,var(--surface));color:var(--ink);font-size:14px}
+
+/* ---------- selection bar ---------- */
+.selbar{position:fixed;left:50%;bottom:24px;transform:translateX(calc(-50% + var(--side)/2));z-index:35;display:flex;align-items:center;gap:4px;padding:6px 6px 6px 16px;border-radius:12px;background:var(--ink);color:var(--bg);box-shadow:var(--shadow);max-width:calc(100vw - 24px)}
+.selbar .ib{color:color-mix(in srgb,var(--bg) 75%,transparent)}
+.selbar .ib:hover{background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg)}
+.selbar .n{font-weight:600;margin-right:8px;white-space:nowrap}
+
+/* ---------- luggage tag (share links) ---------- */
+.tag{position:relative;display:flex;margin-left:26px;min-height:96px;background:var(--brand);color:#fff;border-radius:0 14px 14px 0}
+.tag::before{content:"";position:absolute;left:-26px;top:0;bottom:0;width:27px;background:inherit;clip-path:polygon(100% 0,100% 100%,0 calc(100% - 26px),0 26px)}
+.tag .eye{position:relative;flex:none;width:30px;display:flex;align-items:center;justify-content:flex-start;margin-left:-14px;border-right:2px dashed rgba(255,255,255,.28)}
+.tag .eye::before{content:"";width:13px;height:13px;border-radius:50%;background:var(--bg);box-shadow:0 0 0 3px var(--brass)}
+.tag .body{flex:1;min-width:0;padding:14px 16px 14px 16px;display:flex;flex-direction:column;gap:4px}
+.tag .ttl{font-weight:650;font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag .facts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:rgba(255,255,255,.8)}
+.tag .facts span{display:inline-flex;align-items:center;gap:5px}
+.tag .facts svg.i{width:14px;height:14px}
+.tag .acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.tag .acts .btn{height:32px;padding:0 11px;font-size:13.5px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff}
+.tag .acts .btn:hover{background:rgba(255,255,255,.22)}
+.tag.dead{background:var(--surface-2);color:var(--muted);border:1px dashed var(--line)}
+.tag.dead::before{background:var(--line)}
+.tag.dead .facts{color:var(--muted)}
+.tag.dead .eye{border-color:var(--line)}
+.tag.dead .acts .btn{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.tags{display:flex;flex-direction:column;gap:14px;max-width:720px;padding-top:12px}
+.string{position:absolute;left:-60px;top:50%;width:52px;height:60px;margin-top:-58px;pointer-events:none;color:var(--brass)}
+
+/* ---------- recipient page ---------- */
+.recv{max-width:760px;margin:0 auto;padding:40px 20px 120px}
+.recv .hero{transform:rotate(-1.2deg);margin:18px 0 34px 40px}
+.recv .hero .tag{min-height:150px}
+.recv .hero .ttl{font-size:24px;white-space:normal;letter-spacing:-.015em}
+.recv .hero .msg{white-space:pre-wrap;font-size:15px;color:rgba(255,255,255,.92);margin:4px 0 2px;overflow-wrap:anywhere}
+.recv .top-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.recv .listbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;flex-wrap:wrap}
+.recv .listbar h2{font-size:15px;margin:0;color:var(--muted);font-weight:500}
+.recv .item{grid-template-columns:40px minmax(0,1fr) 90px auto}
+.recv .acts2{display:flex;gap:2px}
+.pwbox{max-width:380px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.small{font-size:13px;color:var(--muted)}
+
+/* ---------- forms, dialogs, menus ---------- */
+dialog{border:0;padding:0;border-radius:16px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow);width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
+dialog::backdrop{background:rgba(24,10,18,.45)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+.dlg h2{margin:0;padding:20px 22px 6px;font-size:18px;font-weight:650}
+.dlg .bd{padding:8px 22px 4px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.dlg .bd p{margin:0;color:var(--muted)}
+.dlg .ft{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px 20px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:550}
+label.f .hint{font-weight:400;color:var(--muted)}
+.in{width:100%;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+textarea.in{height:auto;min-height:72px;padding:10px 12px;resize:vertical}
+.in:focus{outline:none;border-color:var(--brass);background:var(--surface)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:13.5px}
+.seg button[aria-pressed=true]{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-text);font-weight:600}
+.err{color:var(--danger);font-size:13.5px;min-height:1em}
+.linkbox{display:flex;gap:8px}
+.linkbox .in{font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tree{border:1px solid var(--line);border-radius:10px;max-height:300px;overflow:auto;padding:4px}
+.tree button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:7px 8px;border-radius:6px;text-align:left}
+.tree button:hover{background:var(--hover)}
+.tree button[aria-pressed=true]{background:var(--brand-soft);color:var(--brand-text);font-weight:600}
+.tree button:disabled{opacity:.4;cursor:default}
+.tree svg.i{color:var(--brass)}
+.menu{position:fixed;z-index:60;min-width:210px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.menu button{display:flex;align-items:center;gap:12px;width:100%;padding:9px 10px;border:0;border-radius:7px;background:none;text-align:left}
+.menu button:hover,.menu button:focus-visible{background:var(--hover);outline:none}
+.menu button.danger{color:var(--danger)}
+.menu hr{border:0;border-top:1px solid var(--line);margin:5px 4px}
+
+/* ---------- preview ---------- */
+dialog.pv{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border-radius:0;background:#100b0e;color:#f2ebef}
+.pvw{display:flex;flex-direction:column;height:100%}
+.pvh{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top))}
+.pvh .ib{color:#cdbfc6}
+.pvh .ib:hover{background:rgba(255,255,255,.1);color:#fff}
+.pvh .t{flex:1;min-width:0}
+.pvh .t div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.pvh .t small{color:#a99ba3}
+.pvb{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 56px 20px}
+.pvb img,.pvb video{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px}
+.pvb audio{width:min(520px,100%)}
+.pvb iframe{width:100%;height:100%;border:0;background:#fff;border-radius:4px}
+.pvb pre{width:100%;max-width:960px;height:100%;margin:0;overflow:auto;padding:18px 20px;background:#1b1418;border-radius:8px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#eadfe5}
+.pvb .tbl{width:100%;max-width:1100px;height:100%;overflow:auto;background:#1b1418;border-radius:8px}
+.pvb table{border-collapse:collapse;font-size:13px}
+.pvb td,.pvb th{border:1px solid #3a2e35;padding:5px 9px;white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.pvb th{background:#261d22;position:sticky;top:0}
+.pvb .nav-l,.pvb .nav-r{position:absolute;top:50%;margin-top:-22px;width:44px;height:44px;border-radius:22px;border:0;background:rgba(255,255,255,.08);color:#fff;display:flex;align-items:center;justify-content:center}
+.pvb .nav-l{left:6px}.pvb .nav-r{right:6px}
+.pvb .nav-l:hover,.pvb .nav-r:hover{background:rgba(255,255,255,.18)}
+.pvmsg{text-align:center;color:#cdbfc6;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pvmsg .big{width:84px;height:84px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);color:var(--kc)}
+.pvmsg .big svg.i{width:40px;height:40px;stroke-width:1.4}
+.bar{height:4px;border-radius:2px;background:rgba(127,127,127,.25);overflow:hidden;width:220px}
+.bar i{display:block;height:100%;background:var(--brass);width:0;transition:width .2s}
+
+/* ---------- uploads tray, toasts, drop ---------- */
+.tray{position:fixed;right:20px;bottom:20px;z-index:30;width:360px;max-width:calc(100vw - 24px);border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.tray .th{display:flex;align-items:center;gap:6px;padding:10px 8px 10px 16px;font-weight:600}
+.tray .th span{flex:1}
+.tray .tl{max-height:260px;overflow:auto;border-top:1px solid var(--line)}
+.tray .tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:9px 8px 9px 16px;border-bottom:1px solid var(--line)}
+.tray .tr:last-child{border-bottom:0}
+.tray .tr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.tray .tr .st{font-size:12.5px;color:var(--muted)}
+.tray .tr .st.bad{color:var(--danger)}
+.tray .tr .bar{width:100%;grid-column:1}
+.tray .tr .ib{grid-row:1/span 2;grid-column:2;width:32px;height:32px}
+.tray.min .tl{display:none}
+#toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 16px;border-radius:10px;background:var(--ink);color:var(--bg);box-shadow:var(--shadow);font-size:14px;max-width:calc(100vw - 24px)}
+.toast.bad{background:var(--danger);color:#fff}
+.toast button{border:0;background:none;color:inherit;font-weight:650;padding:4px 6px;text-decoration:underline}
+#drop{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,var(--brand) 86%,transparent);display:flex;align-items:center;justify-content:center;padding:24px;pointer-events:none}
+#drop[hidden]{display:none}
+#drop div{border:3px dashed rgba(255,255,255,.6);border-radius:24px;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;font-size:22px;font-weight:650;text-align:center}
+#drop small{font-size:15px;font-weight:400;opacity:.85}
+.tabbar,.fab{display:none}
+.center{display:flex;align-items:center;justify-content:center;min-height:60dvh;color:var(--muted)}
+.spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--brass);animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}.bar i{transition:none}}
+
+/* ---------- small screens ---------- */
+@media (max-width:1100px){
+  .head,.item{grid-template-columns:28px 40px minmax(0,1fr) 120px 80px 36px}
+  .team .head,.team .item{grid-template-columns:28px 40px minmax(0,1fr) 110px 120px 80px 36px}
+  .head .c-kind,.item .c-kind{display:none}
+}
+@media (max-width:760px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  .top{padding:10px 14px 8px;padding-top:max(10px,env(safe-area-inset-top))}
+  .crumbs{font-size:19px}
+  .crumbs .part,.crumbs .sep{display:none}
+  .ib.back{display:inline-flex}
+  .search{width:auto;flex:1}
+  .row1.searching .crumbs,.row1.searching .back{display:none}
+  .row1:not(.searching) .search{display:none}
+  .row1 .sbtn{display:inline-flex}
+  .content{padding:0 6px 150px}
+  .head{display:none}
+  .item,.team .item{grid-template-columns:40px minmax(0,1fr) 36px;padding:8px 8px;gap:12px}
+  .item .check{position:absolute;left:4px;top:4px;z-index:2;width:18px;height:18px}
+  .item .c{display:none}
+  .item .name .sub{display:block}
+  .item .chk{display:contents}
+  .item:not(.sel) .check{opacity:0}
+  .selecting .item .check{opacity:1}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:8px 8px 0}
+  .banner{margin:0 12px 8px}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 9px;border:0;background:none;font-size:11.5px;color:var(--muted)}
+  .tabbar button[aria-current=page]{color:var(--brand-text);font-weight:600}
+  .fab{display:flex;position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:16;width:56px;height:56px;border-radius:18px;border:0;background:var(--brand);color:#fff;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+  .fab svg.i{width:26px;height:26px}
+  .selbar{transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom))}
+  .tray{right:12px;left:12px;width:auto;bottom:calc(72px + env(safe-area-inset-bottom))}
+  .tray .tl{max-height:150px}
+  #toasts{bottom:calc(80px + env(safe-area-inset-bottom))}
+  .pvb{padding:0 0 12px}
+  .pvb .nav-l,.pvb .nav-r{display:none}
+  .recv{padding:20px 14px 120px}
+  .recv .hero{margin:10px 0 26px 34px}
+  .recv .item{grid-template-columns:40px minmax(0,1fr) auto}
+  .recv .item .c{display:none}
+  .tags{padding:8px 8px 0}
+  .string{display:none}
+}
+@media (min-width:761px){.sbtn{display:none}}
+</style>
+</head>
+<body>
+<div id="app"><div class="center"><div class="spin" role="status" aria-label="Loading"></div></div></div>
+<div id="drop" hidden><div><span id="drop-t">Drop to upload</span><small id="drop-s"></small></div></div>
+<div id="toasts" aria-live="polite"></div>
+<input type="file" id="pick-files" multiple hidden>
+<input type="file" id="pick-dir" webkitdirectory multiple hidden>
+<script>
+"use strict";
+(async () => {
+/* =====================================================================
+   Satchel: files that stay sealed. All content is AES-256-GCM encrypted
+   in the browser and stored in chunks in the instance database.
+   ===================================================================== */
+
+/* ---------- small helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const ICONS = {
+  upload: '<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+  folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  folderPlus: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/>',
+  folderUp: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 16v-6M9.5 12.5 12 10l2.5 2.5"/>',
+  file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
+  video: '<rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 10 5-3v10l-5-3"/>',
+  audio: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  archive: '<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/>',
+  code: '<path d="m9 8-5 4 5 4M15 8l5 4-5 4"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/>',
+  box: '<path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
+  grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>',
+  more: '<circle cx="12" cy="5.5" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="12" cy="18.5" r=".9"/>',
+  download: '<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+  share: '<path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  move: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 13h6M13 10.5l2.5 2.5-2.5 2.5"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  left: '<path d="m15 5-7 7 7 7"/>',
+  right: '<path d="m9 5 7 7-7 7"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  sort: '<path d="M7 4v16M3.5 7.5 7 4l3.5 3.5M17 20V4M13.5 16.5 17 20l3.5-3.5"/>',
+  up: '<path d="m7 14 5-5 5 5"/>', down: '<path d="m7 10 5 5 5-5"/>',
+  save: '<path d="M12 4v10M8 10l4 4 4-4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  retry: '<path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/>',
+  external: '<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>',
+  sealed: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="m3 8 9 6 9-6"/>'
+};
+const svg = (name, cls = "i") => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("class", cls); s.setAttribute("aria-hidden", "true"); s.innerHTML = ICONS[name] || ICONS.file; return s; };
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  if (props) for (const k of Object.keys(props)) {
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "style") e.style.cssText = v;
+    else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2), v);
+    else if (k === "value" || k === "checked" || k === "disabled" || k === "hidden") e[k] = v;
+    else e.setAttribute(k, v === true ? "" : String(v));
+  }
+  for (const c of kids.flat(Infinity)) if (c != null && c !== false) e.append(c instanceof Node ? c : String(c));
+  return e;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const enc = new TextEncoder(), dec = new TextDecoder();
+const rand = n => crypto.getRandomValues(new Uint8Array(n));
+const newId = () => Array.from(rand(10), b => b.toString(16).padStart(2, "0")).join("");
+const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/;
+const b64 = {
+  enc(u8) { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); },
+  dec(str) { const s = atob(str), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; },
+  url(u8) { return b64.enc(u8).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); },
+  unurl(s) { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return b64.dec(s); }
+};
+function fmtSize(n) {
+  if (!(n >= 0)) return "";
+  if (n < 1000) return n + " B";
+  const u = ["KB", "MB", "GB"]; let i = -1;
+  do { n /= 1000; i++; } while (n >= 1000 && i < u.length - 1);
+  return (n < 10 ? n.toFixed(1) : Math.round(n)) + " " + u[i];
+}
+const dfDay = new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" });
+const dfYear = new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" });
+const dfTime = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
+const dfFull = new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+function fmtDate(t) {
+  if (!t) return "";
+  const d = new Date(t), now = new Date(), day = 864e5;
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if (t >= start) return "Today, " + dfTime.format(d);
+  if (t >= start - day) return "Yesterday, " + dfTime.format(d);
+  return d.getFullYear() === now.getFullYear() ? dfDay.format(d) : dfYear.format(d);
+}
+function fmtUntil(t) {
+  const left = t - Date.now();
+  if (left <= 0) return "Expired";
+  if (left < 3600e3) return "Expires in " + Math.max(1, Math.round(left / 60e3)) + " min";
+  if (left < 48 * 3600e3) return "Expires in " + Math.round(left / 3600e3) + " h";
+  return "Until " + (new Date(t).getFullYear() === new Date().getFullYear() ? dfDay : dfYear).format(new Date(t));
+}
+const plural = (n, one, many) => n + " " + (n === 1 ? one : many);
+function splitExt(name) { const i = name.lastIndexOf("."); return i > 0 && i > name.length - 12 ? [name.slice(0, i), name.slice(i)] : [name, ""]; }
+const extOf = name => (splitExt(name)[1] || "").slice(1).toLowerCase();
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
+/* ---------- file kinds ---------- */
+const EXT = {
+  image: "jpg jpeg png gif webp avif heic heif bmp svg tif tiff ico jfif",
+  video: "mp4 mov webm mkv avi m4v 3gp ogv",
+  audio: "mp3 wav m4a aac ogg oga flac opus aif aiff",
+  archive: "zip rar 7z tar gz tgz bz2 xz zst dmg iso",
+  code: "js mjs cjs ts tsx jsx py rb go rs java c h cc cpp hpp cs php sh bash zsh css scss sql yml yaml toml ini swift kt lua r pl dart vue svelte",
+  doc: "pdf doc docx odt rtf txt md markdown pages xls xlsx ods csv tsv numbers ppt pptx odp key json xml html htm epub log tex"
+};
+const EXT_KIND = {}; for (const k in EXT) EXT[k].split(" ").forEach(e => EXT_KIND[e] = k);
+function kindOf(name, type) {
+  const e = extOf(name);
+  if (EXT_KIND[e]) return EXT_KIND[e];
+  type = type || "";
+  if (type.startsWith("image/")) return "image";
+  if (type.startsWith("video/")) return "video";
+  if (type.startsWith("audio/")) return "audio";
+  if (type.startsWith("text/") || type === "application/pdf" || type.includes("json")) return "doc";
+  if (/zip|compressed|tar|gzip/.test(type)) return "archive";
+  return "other";
+}
+const KIND_ICON = { image: "image", video: "video", audio: "audio", doc: "doc", archive: "archive", code: "code", other: "file" };
+const TEXT_EXT = new Set("txt md markdown csv tsv json xml html htm log yml yaml toml ini css js mjs cjs ts tsx jsx py rb go rs java c h cc cpp hpp cs php sh bash zsh sql swift kt lua r pl dart vue svelte tex srt vtt env gitignore".split(" "));
+function previewKind(f) {
+  const e = extOf(f.name), t = f.type || "", k = kindOf(f.name, t);
+  if (k === "image" && !["heic", "heif", "tif", "tiff"].includes(e)) return "image";
+  if (k === "video") return "video";
+  if (k === "audio") return "audio";
+  if (e === "pdf" || t === "application/pdf") return "pdf";
+  if (e === "csv" || e === "tsv") return "csv";
+  if (TEXT_EXT.has(e) || t.startsWith("text/") || t.includes("json")) return "text";
+  return null;
+}
+const MIME = { pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml", avif: "image/avif", mp4: "video/mp4", m4v: "video/mp4", mov: "video/quicktime", webm: "video/webm", mp3: "audio/mpeg", m4a: "audio/mp4", wav: "audio/wav", ogg: "audio/ogg", flac: "audio/flac", txt: "text/plain", md: "text/markdown", csv: "text/csv", json: "application/json", zip: "application/zip" };
+const typeFor = (name, type) => (type && type !== "application/octet-stream") ? type : (MIME[extOf(name)] || "application/octet-stream");
+
+/* ---------- crypto ---------- */
+const keyCache = new Map();
+function aesKey(str) {
+  if (!keyCache.has(str)) keyCache.set(str, crypto.subtle.importKey("raw", b64.unurl(str), "AES-GCM", false, ["encrypt", "decrypt"]));
+  return keyCache.get(str);
+}
+async function seal(key, bytes, aad) {
+  const iv = rand(12);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv, additionalData: enc.encode(aad) }, key, bytes));
+  return { iv: b64.enc(iv), d: b64.enc(ct) };
+}
+async function unseal(key, box, aad) {
+  try { return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.dec(box.iv), additionalData: enc.encode(aad) }, key, b64.dec(box.d))); }
+  catch { throw codeErr("corrupt", "This file couldn't be decrypted. It may have been changed or damaged."); }
+}
+const PW_ITER = 310000;
+async function passwordKey(password, saltB64, secret, iter) {
+  const base = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const salt = new Uint8Array([...b64.dec(saltB64), ...b64.unurl(secret)]);
+  const bits = new Uint8Array(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: iter }, base, 256));
+  return b64.url(bits);
+}
+
+/* ---------- errors and retries ---------- */
+function codeErr(code, message) { const e = new Error(message); e.code = code; return e; }
+const abortErr = () => codeErr("aborted", "Cancelled");
+function explain(e) {
+  const c = e && e.code;
+  if (c === "quota_exceeded") return "This Satchel's storage is full. Delete files, or ask its owner for more space.";
+  if (c === "not_granted") return "You don't have permission to do that here.";
+  if (c === "unavailable") return "The server can't be reached right now. Check your connection and try again.";
+  if (c === "too_large") return e.message;
+  return (e && e.message) || "Something went wrong.";
+}
+async function retry(fn, signal) {
+  let delay = 600;
+  for (let attempt = 0; ; attempt++) {
+    if (signal && signal.aborted) throw abortErr();
+    try { return await fn(); }
+    catch (e) {
+      if (!e || e.code !== "unavailable" || attempt >= 8) throw e;
+      await sleep(Math.max(delay, e.retryAfterMs || 0));
+      delay = Math.min(delay * 2, 20000);
+    }
+  }
+}
+function limiter(n) {
+  let active = 0; const q = [];
+  const next = () => {
+    if (active >= n || !q.length) return;
+    active++;
+    const job = q.shift();
+    Promise.resolve().then(job.fn).then(job.res, job.rej).finally(() => { active--; next(); });
+  };
+  return fn => new Promise((res, rej) => { q.push({ fn, res, rej }); next(); });
+}
+const writeSlot = limiter(4), readSlot = limiter(5);
+
+/* ---------- runtime ---------- */
+const db = await lager.use("db");
+const user = await lager.use("user");
+const app = $("#app");
+if (!db) {
+  app.replaceChildren(h("div", { class: "empty" }, h("h2", null, "Storage isn't available"), h("p", null, "This Satchel can't reach its database. Reload the page, or ask the owner to check the instance.")));
+  return;
+}
+const me = { id: null, name: "", canWrite: false };
+try {
+  me.id = user ? await user.id() : null;
+  me.name = (user ? await user.name() : "") || "";
+  me.canWrite = !!(user && me.id && (await user.can("data.write")) === true && SEG.test(me.id));
+} catch { /* guest */ }
+
+/* ---------- paths ---------- */
+const P = {
+  prefs: () => `data/users/${me.id}/drive`,
+  files: sp => sp === "team" ? "team/space/files" : `data/users/${me.id}/drive/files`,
+  folders: sp => sp === "team" ? "team/space/folders" : `data/users/${me.id}/drive/folders`,
+  linkRecs: () => `data/users/${me.id}/drive/links`,
+  blobs: o => `blobs/${o}/files`,
+  blob: (o, id) => `blobs/${o}/files/${id}`,
+  chunk: (o, id, i) => `blobs/${o}/files/${id}/c/${i}`,
+  thumb: (o, id) => `blobs/${o}/files/${id}/t/0`,
+  link: (o, id) => `links/${o}/l/${id}`
+};
+
+/* =====================================================================
+   Blob storage: encrypted chunks
+   ===================================================================== */
+const CHUNK = 180 * 1024;              // 180 KiB plaintext -> ~240 KiB base64, under the 256 KiB document limit
+const MAX_FILE = 250 * 1000 * 1000;
+const activeUploads = new Set();
+
+async function makeThumb(file, kind) {
+  try {
+    if (kind === "image" && file.size < 40e6 && typeof createImageBitmap === "function") {
+      const bmp = await createImageBitmap(file);
+      const b = await drawThumb(bmp, bmp.width, bmp.height);
+      bmp.close && bmp.close();
+      return b;
+    }
+    if (kind === "video") return await videoThumb(file);
+  } catch { /* no thumbnail */ }
+  return null;
+}
+async function drawThumb(src, w, hh) {
+  if (!w || !hh) return null;
+  const s = Math.min(1, 360 / Math.max(w, hh));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(w * s)); c.height = Math.max(1, Math.round(hh * s));
+  c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+  let b = await new Promise(r => c.toBlob(r, "image/webp", 0.72));
+  if (!b || b.type !== "image/webp") b = await new Promise(r => c.toBlob(r, "image/jpeg", 0.75));
+  return b && b.size < 120000 ? b : null;
+}
+function videoThumb(file) {
+  return new Promise(res => {
+    const v = document.createElement("video"), url = URL.createObjectURL(file);
+    let done = false;
+    const fin = x => { if (done) return; done = true; v.removeAttribute("src"); v.load(); URL.revokeObjectURL(url); res(x); };
+    setTimeout(() => fin(null), 6000);
+    v.muted = true; v.playsInline = true; v.preload = "auto";
+    v.onloadeddata = () => { v.currentTime = Math.min(1, (v.duration || 2) / 4); };
+    v.onseeked = async () => { try { fin(await drawThumb(v, v.videoWidth, v.videoHeight)); } catch { fin(null); } };
+    v.onerror = () => fin(null);
+    v.src = url;
+  });
+}
+
+/** Encrypts and stores a file. Resolves {bid, key, thumb}. */
+async function uploadBlob(file, { onProgress, signal } = {}) {
+  if (file.size > MAX_FILE) throw codeErr("too_large", `Files can be up to ${fmtSize(MAX_FILE)}.`);
+  const bid = newId(), key = b64.url(rand(32)), ck = await aesKey(key);
+  const n = Math.max(1, Math.ceil(file.size / CHUNK));
+  const kind = kindOf(file.name, file.type);
+  activeUploads.add(bid);
+  let written = 0;
+  try {
+    const thumbP = makeThumb(file, kind);
+    await writeSlot(() => retry(() => db.doc(P.blob(me.id, bid)).set({ v: 1, size: file.size, chunks: n, chunkSize: CHUNK, createdAt: Date.now() }), signal));
+    let sent = 0;
+    await Promise.all(Array.from({ length: n }, (_, i) => writeSlot(async () => {
+      if (signal && signal.aborted) throw abortErr();
+      const bytes = new Uint8Array(await file.slice(i * CHUNK, (i + 1) * CHUNK).arrayBuffer());
+      const box = await seal(ck, bytes, `${bid}/${i}/${n}`);
+      await retry(() => db.doc(P.chunk(me.id, bid, i)).set(box), signal);
+      written = Math.max(written, i + 1);
+      sent += bytes.length;
+      onProgress && onProgress(file.size ? sent / file.size : 1);
+    })));
+    let thumb = false;
+    const tb = await thumbP;
+    if (tb && !(signal && signal.aborted)) {
+      try {
+        const box = await seal(ck, new Uint8Array(await tb.arrayBuffer()), `${bid}/thumb`);
+        await writeSlot(() => retry(() => db.doc(P.thumb(me.id, bid)).set({ ...box, t: tb.type }), signal));
+        thumb = true;
+      } catch (e) { if (e.code === "aborted") throw e; }
+    }
+    if (signal && signal.aborted) throw abortErr();
+    return { bid, key, thumb };
+  } catch (e) {
+    deleteBlob(bid, n).catch(() => {});
+    throw e;
+  } finally {
+    setTimeout(() => activeUploads.delete(bid), 5000);
+  }
+}
+async function deleteBlob(bid, n) {
+  if (n == null) {
+    const m = S.blobs.get(bid) || (await db.doc(P.blob(me.id, bid)).get().then(s => s.exists ? s.data() : null).catch(() => null));
+    n = m ? m.chunks : 0;
+  }
+  await Promise.all([
+    ...Array.from({ length: n }, (_, i) => writeSlot(() => retry(() => db.doc(P.chunk(me.id, bid, i)).delete()))),
+    writeSlot(() => retry(() => db.doc(P.thumb(me.id, bid)).delete()))
+  ]);
+  await writeSlot(() => retry(() => db.doc(P.blob(me.id, bid)).delete()));
+}
+
+/* decrypted content cache, bounded */
+const blobCache = new Map(); let cacheBytes = 0;
+function cachePut(id, blob) {
+  if (blob.size > 80e6) return;
+  blobCache.set(id, blob); cacheBytes += blob.size;
+  for (const [k, b] of blobCache) { if (cacheBytes <= 160e6) break; blobCache.delete(k); cacheBytes -= b.size; }
+}
+/** Fetches and decrypts a stored file. ref: {o, id, key, name, type}. */
+async function getBlob(ref, { onProgress, signal } = {}) {
+  const cid = ref.o + "/" + ref.id;
+  if (blobCache.has(cid)) { onProgress && onProgress(1); return blobCache.get(cid); }
+  const ms = await retry(() => db.doc(P.blob(ref.o, ref.id)).get(), signal);
+  if (!ms.exists) throw codeErr("gone", "This file is no longer available.");
+  const { chunks: n, size } = ms.data();
+  const ck = await aesKey(ref.key);
+  const parts = new Array(n); let got = 0;
+  await Promise.all(Array.from({ length: n }, (_, i) => readSlot(async () => {
+    if (signal && signal.aborted) throw abortErr();
+    const s = await retry(() => db.doc(P.chunk(ref.o, ref.id, i)).get(), signal);
+    if (!s.exists) throw codeErr("gone", "Part of this file is missing. It may still be uploading.");
+    parts[i] = await unseal(ck, s.data(), `${ref.id}/${i}/${n}`);
+    got += parts[i].length;
+    onProgress && onProgress(size ? got / size : 1);
+  })));
+  const blob = new Blob(parts, { type: typeFor(ref.name || "", ref.type) });
+  cachePut(cid, blob);
+  return blob;
+}
+const thumbs = new Map(), thumbReady = new Map();
+function thumbUrl(ref) {
+  const cid = ref.o + "/" + ref.id;
+  if (!thumbs.has(cid)) thumbs.set(cid, (async () => {
+    try {
+      const s = await readSlot(() => retry(() => db.doc(P.thumb(ref.o, ref.id)).get()));
+      if (!s.exists) return null;
+      const bytes = await unseal(await aesKey(ref.key), s.data(), `${ref.id}/thumb`);
+      const u = URL.createObjectURL(new Blob([bytes], { type: /^image\/(webp|jpeg)$/.test(s.data().t) ? s.data().t : "image/webp" }));
+      thumbReady.set(cid, u);
+      return u;
+    } catch { thumbs.delete(cid); return null; }
+  })());
+  return thumbs.get(cid);
+}
+const thumbObserver = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+  for (const en of entries) if (en.isIntersecting) { thumbObserver.unobserve(en.target); fillThumb(en.target); }
+}, { rootMargin: "200px" }) : null;
+function fillThumb(box) {
+  const ref = box._ref; if (!ref) return;
+  thumbUrl(ref).then(url => { if (!url || !box.isConnected) return; const img = h("img", { alt: "", src: url, decoding: "async" }); box.replaceChildren(img); });
+}
+function watchThumb(box, ref) {
+  const ready = thumbReady.get(ref.o + "/" + ref.id);
+  if (ready) { box.replaceChildren(h("img", { alt: "", src: ready, decoding: "async" })); return; }
+  box._ref = ref; thumbObserver ? thumbObserver.observe(box) : fillThumb(box);
+}
+
+/* ---------- saving files ---------- */
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = h("a", { href: url, download: name, style: "display:none" });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+/* ---------- zip (stored, UTF-8 names) ---------- */
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function dosTime(d) { return { time: (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1), date: ((Math.max(1980, d.getFullYear()) - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate() }; }
+async function makeZip(entries) {
+  const out = [], central = []; let offset = 0;
+  const used = new Set();
+  for (const e of entries) {
+    let path = e.path.replace(/^\/+/, "");
+    if (used.has(path.toLowerCase())) { const [b, x] = splitExt(path); let i = 2; while (used.has(`${b} (${i})${x}`.toLowerCase())) i++; path = `${b} (${i})${x}`; }
+    used.add(path.toLowerCase());
+    const name = enc.encode(path), data = new Uint8Array(await e.blob.arrayBuffer()), crc = crc32(data);
+    const { time, date } = dosTime(new Date(e.mtime || Date.now()));
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+    lh.setUint16(10, time, true); lh.setUint16(12, date, true); lh.setUint32(14, crc, true);
+    lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+    out.push(lh.buffer, name, data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+    ch.setUint16(12, time, true); ch.setUint16(14, date, true); ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
+    ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+    central.push(ch.buffer, name);
+    offset += 30 + name.length + data.length;
+  }
+  const cdSize = central.reduce((s, p) => s + p.byteLength, 0);
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+  end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+  return new Blob([...out, ...central, end.buffer], { type: "application/zip" });
+}
+
+/* ---------- UI primitives: toast, dialog, menu ---------- */
+function toast(msg, { bad = false, action, ms = 4200 } = {}) {
+  const t = h("div", { class: "toast" + (bad ? " bad" : ""), role: bad ? "alert" : "status" }, h("span", null, msg));
+  if (action) t.append(h("button", { onclick: () => { action.run(); t.remove(); } }, action.label));
+  $("#toasts").append(t);
+  setTimeout(() => t.remove(), ms);
+  return t;
+}
+const fail = e => { if (e && e.code === "aborted") return; console.warn(e); toast(explain(e), { bad: true, ms: 6500 }); };
+
+function dialog({ title, body, actions = [], cls = "", onClose, wide }) {
+  return new Promise(resolve => {
+    const d = h("dialog", { class: cls, "aria-label": title || "Dialog" });
+    if (wide) d.style.width = "min(620px, calc(100vw - 24px))";
+    let result = null;
+    const close = v => { result = v; d.close(); };
+    const ft = h("div", { class: "ft" });
+    actions.forEach(a => {
+      const b = h("button", { class: "btn" + (a.primary ? " primary" : "") + (a.danger ? " danger solid" : ""), type: a.primary ? "submit" : "button" }, a.label);
+      b.addEventListener("click", async ev => {
+        ev.preventDefault();
+        if (!a.run) return close(a.value ?? null);
+        b.disabled = true;
+        try { const r = await a.run(close, b); if (r !== false && d.open) close(r === undefined ? a.value ?? true : r); }
+        catch (e) { fail(e); }
+        finally { b.disabled = false; }
+      });
+      ft.append(b);
+    });
+    const form = h("form", { class: "dlg", method: "dialog" }, title ? h("h2", null, title) : null, h("div", { class: "bd" }, body), actions.length ? ft : null);
+    form.addEventListener("submit", ev => { ev.preventDefault(); const p = ft.querySelector("[type=submit]"); if (p && !p.disabled) p.click(); });
+    d.append(form);
+    d.addEventListener("close", () => { d.remove(); onClose && onClose(); resolve(result); });
+    d.addEventListener("click", ev => { if (ev.target === d) close(null); });
+    document.body.append(d);
+    d.showModal();
+    const first = d.querySelector("input:not([type=hidden]),textarea,select");
+    if (first) { first.focus(); if (first.select && first.dataset.select !== "no") { const v = first.value, i = first.dataset.stem ? splitExt(v)[0].length : v.length; try { first.setSelectionRange(0, i); } catch {} } }
+  });
+}
+async function ask({ title, label, value = "", ok = "Save", stem = false, validate }) {
+  const input = h("input", { class: "in", value, "data-stem": stem ? "1" : null, maxlength: 255, autocomplete: "off", spellcheck: "false" });
+  const err = h("div", { class: "err" });
+  return dialog({
+    title, body: [h("label", { class: "f" }, label, input), err],
+    actions: [{ label: "Cancel" }, { label: ok, primary: true, run: () => { const v = input.value.trim(); const m = validate ? validate(v) : (!v ? "Enter a name." : null); if (m) { err.textContent = m; input.focus(); return false; } return v; } }]
+  });
+}
+const confirmD = ({ title, text, ok, danger = true }) => dialog({ title, body: h("p", null, text), actions: [{ label: "Cancel" }, { label: ok, primary: !danger, danger, value: true }] });
+const nameError = v => !v ? "Enter a name." : /[\/\\]/.test(v) ? "Names can't contain / or \\." : v.length > 255 ? "Use at most 255 characters." : (v === "." || v === "..") ? "Choose a different name." : null;
+
+let openMenu = null;
+function menu(anchor, items) {
+  closeMenu();
+  const m = h("div", { class: "menu", role: "menu" });
+  items.filter(Boolean).forEach(it => {
+    if (it === "-") return m.append(h("hr"));
+    m.append(h("button", { role: "menuitem", class: it.danger ? "danger" : null, onclick: () => { closeMenu(); it.run(); } }, svg(it.icon), it.label));
+  });
+  document.body.append(m);
+  const r = anchor.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
+  let x = Math.min(r.right - mw, innerWidth - mw - 8), y = r.bottom + 4;
+  if (x < 8) x = 8;
+  if (y + mh > innerHeight - 8) y = Math.max(8, r.top - mh - 4);
+  m.style.left = x + "px"; m.style.top = y + "px";
+  openMenu = { m, anchor };
+  m.querySelector("button").focus();
+  m.addEventListener("keydown", e => {
+    const bs = [...m.querySelectorAll("button")], i = bs.indexOf(document.activeElement);
+    if (e.key === "ArrowDown") { e.preventDefault(); bs[(i + 1) % bs.length].focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); bs[(i - 1 + bs.length) % bs.length].focus(); }
+    if (e.key === "Escape") { closeMenu(); anchor.focus(); }
+    if (e.key === "Tab") closeMenu();
+  });
+}
+function closeMenu() { if (openMenu) { openMenu.m.remove(); openMenu = null; } }
+document.addEventListener("pointerdown", e => { if (openMenu && !openMenu.m.contains(e.target) && !openMenu.anchor.contains(e.target)) closeMenu(); });
+window.addEventListener("resize", closeMenu);
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch {
+    const t = h("textarea", { style: "position:fixed;opacity:0" }); t.value = text; document.body.append(t); t.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok;
+  }
+}
+
+/* =====================================================================
+   State
+   ===================================================================== */
+const S = {
+  route: { space: "mine", folder: null, link: null },
+  files: { mine: new Map(), team: new Map() },
+  folders: { mine: new Map(), team: new Map() },
+  loaded: { mine: false, team: false, blobs: false },
+  full: { mine: false, team: false },
+  blobs: new Map(),            // my stored blobs (manifests)
+  links: new Map(),            // my link records
+  hits: new Map(),             // linkId -> {open, dl}
+  prefs: { view: "list", sort: "name", dir: 1 },
+  q: "", kind: "all", sel: new Set(), searching: false,
+  error: null
+};
+const spaceName = sp => sp === "team" ? "Team" : sp === "links" ? "Links" : "My files";
+const filesOf = sp => S.files[sp], foldersOf = sp => S.folders[sp];
+const parentOf = (sp, x) => (x.parent && foldersOf(sp).has(x.parent)) ? x.parent : null;
+const folderOfFile = (sp, f) => (f.folder && foldersOf(sp).has(f.folder)) ? f.folder : null;
+function childrenOf(sp, fid) {
+  return {
+    dirs: [...foldersOf(sp).values()].filter(d => parentOf(sp, d) === fid),
+    files: [...filesOf(sp).values()].filter(f => folderOfFile(sp, f) === fid)
+  };
+}
+function pathOf(sp, fid) {
+  const out = []; let cur = fid, guard = 0;
+  while (cur && guard++ < 64) { const d = foldersOf(sp).get(cur); if (!d) break; out.unshift(d); cur = parentOf(sp, d); }
+  return out;
+}
+function descend(sp, fid, base = "") {
+  const res = { dirs: [], files: [] };
+  const walk = (id, path, depth) => {
+    if (depth > 64) return;
+    const c = childrenOf(sp, id);
+    c.files.forEach(f => res.files.push({ f, path: path + f.name }));
+    c.dirs.forEach(d => { res.dirs.push(d); walk(d.id, path + d.name + "/", depth + 1); });
+  };
+  walk(fid, base, 0);
+  return res;
+}
+const reserved = new Set();
+function uniqueName(sp, fid, name, isDir, exceptId) {
+  const c = childrenOf(sp, fid);
+  const taken = new Set((isDir ? c.dirs : c.files).filter(x => x.id !== exceptId).map(x => x.name.toLowerCase()));
+  const key = n => `${sp}/${fid}/${isDir ? "d" : "f"}/${n.toLowerCase()}`;
+  const free = n => !taken.has(n.toLowerCase()) && !reserved.has(key(n));
+  let out = name;
+  if (!free(out)) {
+    const [b, x] = isDir ? [name, ""] : splitExt(name);
+    for (let i = 2; ; i++) { out = `${b} (${i})${x}`; if (free(out)) break; }
+  }
+  return out;
+}
+const refOf = f => ({ o: f.blob.o, id: f.blob.id, key: f.key, name: f.name, type: f.type });
+
+/* ---------- live data ---------- */
+let renderQueued = false;
+function render() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(() => { renderQueued = false; draw(); }); }
+function listen(path, onDocs, mark) {
+  return db.collection(path).limit(1000).onSnapshot(snap => {
+    onDocs(snap.docs.map(d => ({ ...d.data(), id: d.id })), snap.size >= 1000);
+    if (mark) S.loaded[mark] = true;
+    S.error = null; render();
+  }, e => { S.error = explain(e); render(); });
+}
+function intoMap(map, docs) { map.clear(); docs.forEach(d => map.set(d.id, d)); }
+let prefsTimer = null;
+function savePrefs() { clearTimeout(prefsTimer); prefsTimer = setTimeout(() => db.doc(P.prefs()).set({ ...S.prefs }).catch(() => {}), 600); }
+
+function startDrive() {
+  listen(P.files("mine"), (d, full) => { intoMap(S.files.mine, d); S.full.mine = full; }, "mine");
+  listen(P.folders("mine"), d => intoMap(S.folders.mine, d));
+  listen(P.files("team"), (d, full) => { intoMap(S.files.team, d); S.full.team = full; }, "team");
+  listen(P.folders("team"), d => intoMap(S.folders.team, d));
+  listen(P.linkRecs(), d => intoMap(S.links, d));
+  listen(P.blobs(me.id), (d, full) => { intoMap(S.blobs, d); S.full.blobs = full; }, "blobs");
+  db.collection("hits").where("o", "==", me.id).limit(1000).onSnapshot(snap => {
+    S.hits.clear();
+    snap.docs.forEach(d => { const x = d.data(); if (typeof x.l !== "string") return; const c = S.hits.get(x.l) || { open: 0, dl: 0 }; if (x.e === "dl") c.dl++; else c.open++; S.hits.set(x.l, c); });
+    render();
+  }, () => {});
+  db.doc(P.prefs()).get().then(s => { if (s.exists) { const p = s.data(); S.prefs = { view: p.view === "grid" ? "grid" : "list", sort: ["name", "date", "size"].includes(p.sort) ? p.sort : "name", dir: p.dir === -1 ? -1 : 1 }; render(); } }).catch(() => {});
+  setTimeout(housekeeping, 8000);
+  setInterval(housekeeping, 30 * 60e3);
+}
+
+/** Deletes my stored blobs that nothing refers to any more and links that have expired. */
+let housekeepingBusy = false;
+async function housekeeping() {
+  if (housekeepingBusy || !S.loaded.mine || !S.loaded.team || !S.loaded.blobs || S.full.mine || S.full.team || S.error) return;
+  housekeepingBusy = true;
+  try {
+    const used = new Set();
+    for (const sp of ["mine", "team"]) for (const f of filesOf(sp).values()) if (f.blob && f.blob.o === me.id) used.add(f.blob.id);
+    const cutoff = Date.now() - 3600e3;
+    for (const [bid, m] of S.blobs) {
+      if (used.has(bid) || activeUploads.has(bid) || !(m.createdAt < cutoff)) continue;
+      await deleteBlob(bid, m.chunks).catch(() => {});
+    }
+    for (const [lid, r] of S.links) {
+      if (r.expiresAt && r.expiresAt < Date.now() && !r.purged) {
+        await db.doc(P.link(me.id, lid)).delete().catch(() => {});
+        await db.doc(`${P.linkRecs()}/${lid}`).update({ purged: true }).catch(() => {});
+      }
+    }
+  } finally { housekeepingBusy = false; }
+}
+
+/* =====================================================================
+   Uploads
+   ===================================================================== */
+const jobs = [];
+let trayMin = false, trayCloseTimer = null;
+const runUpload = limiter(2);
+function enqueue(file, sp, folderId, relDirs = []) {
+  const job = { id: newId(), file, sp, folder: folderId, dirs: relDirs, name: file.name, size: file.size, progress: 0, state: "queued", ctrl: new AbortController(), error: "" };
+  jobs.push(job);
+  startJob(job);
+  drawTray();
+}
+function startJob(job) {
+  job.state = "queued"; job.progress = 0; job.error = ""; job.ctrl = new AbortController();
+  runUpload(async () => {
+    if (job.ctrl.signal.aborted) return;
+    job.state = "uploading"; drawTray();
+    try {
+      const folder = job.dirs.length ? await ensurePath(job.sp, job.folder, job.dirs) : job.folder;
+      const r = await uploadBlob(job.file, { signal: job.ctrl.signal, onProgress: p => { job.progress = p; drawTrayLater(); } });
+      const name = uniqueName(job.sp, folder, job.file.name.slice(0, 255) || "Untitled", false);
+      const id = newId(), now = Date.now();
+      const meta = { name, type: typeFor(job.file.name, job.file.type), size: job.file.size, folder: folder || null, key: r.key, blob: { o: me.id, id: r.bid }, thumb: r.thumb, createdAt: now, updatedAt: now, by: me.id, byName: me.name };
+      await retry(() => db.doc(`${P.files(job.sp)}/${id}`).set(meta));
+      filesOf(job.sp).set(id, { ...meta, id });
+      job.state = "done"; job.progress = 1; render();
+    } catch (e) {
+      if (e.code === "aborted" || job.ctrl.signal.aborted) job.state = "cancelled";
+      else { job.state = "error"; job.error = explain(e); }
+    }
+    drawTray();
+  });
+}
+const pathCache = new Map();
+async function ensurePath(sp, base, parts) {
+  let cur = base || null;
+  for (let i = 0; i < parts.length; i++) {
+    const key = sp + "|" + (base || "") + "|" + parts.slice(0, i + 1).join("/");
+    if (!pathCache.has(key)) {
+      const parent = cur, name = parts[i].slice(0, 255);
+      pathCache.set(key, (async () => {
+        const existing = childrenOf(sp, parent).dirs.find(d => d.name.toLowerCase() === name.toLowerCase());
+        if (existing) return existing.id;
+        return createFolder(sp, parent, name, true);
+      })());
+    }
+    try { cur = await pathCache.get(key); } catch (e) { pathCache.delete(key); throw e; }
+  }
+  return cur;
+}
+async function createFolder(sp, parent, name, exact) {
+  const id = newId(), now = Date.now();
+  const n = exact ? name : uniqueName(sp, parent, name, true);
+  const doc = { name: n, parent: parent || null, createdAt: now, updatedAt: now, by: me.id, byName: me.name };
+  await retry(() => db.doc(`${P.folders(sp)}/${id}`).set(doc));
+  foldersOf(sp).set(id, { ...doc, id });
+  return id;
+}
+let trayRaf = false;
+function drawTrayLater() { if (trayRaf) return; trayRaf = true; setTimeout(() => { trayRaf = false; drawTray(); }, 150); }
+function drawTray() {
+  let tray = $("#tray");
+  if (!jobs.length) { tray && tray.remove(); return; }
+  const active = jobs.filter(j => j.state === "queued" || j.state === "uploading");
+  const errs = jobs.filter(j => j.state === "error").length;
+  const done = jobs.filter(j => j.state === "done").length;
+  const title = active.length ? `Uploading ${plural(active.length, "file", "files")}` : errs ? `${plural(errs, "upload", "uploads")} failed` : `${plural(done, "file", "files")} uploaded`;
+  const rows = jobs.slice(-200).reverse().map(j => {
+    const st = j.state === "uploading" ? `${Math.round(j.progress * 100)}% of ${fmtSize(j.size)}` : j.state === "queued" ? "Waiting" : j.state === "done" ? fmtSize(j.size) : j.state === "cancelled" ? "Cancelled" : j.error;
+    const btn = (j.state === "queued" || j.state === "uploading") ? h("button", { class: "ib", "aria-label": "Cancel upload of " + j.name, onclick: () => { j.ctrl.abort(); j.state = "cancelled"; drawTray(); } }, svg("x"))
+      : j.state === "error" ? h("button", { class: "ib", "aria-label": "Retry " + j.name, onclick: () => startJob(j) }, svg("retry"))
+      : j.state === "done" ? h("span", { class: "ib", style: "color:var(--ok)" }, svg("check")) : h("span");
+    return h("div", { class: "tr" }, h("div", { class: "nm" }, j.name), btn,
+      j.state === "uploading" ? h("div", { class: "bar" }, h("i", { style: `width:${Math.round(j.progress * 100)}%` })) : h("div", { class: "st" + (j.state === "error" ? " bad" : "") }, st));
+  });
+  const fresh = h("section", { class: "tray" + (trayMin ? " min" : ""), id: "tray", "aria-label": "Uploads" },
+    h("div", { class: "th" }, h("span", { role: "status" }, title),
+      h("button", { class: "ib", "aria-label": trayMin ? "Show uploads" : "Hide upload list", onclick: () => { trayMin = !trayMin; drawTray(); } }, svg(trayMin ? "up" : "down")),
+      !active.length ? h("button", { class: "ib", "aria-label": "Close", onclick: () => { jobs.length = 0; drawTray(); } }, svg("x")) : null),
+    h("div", { class: "tl" }, rows));
+  clearTimeout(trayCloseTimer);
+  if (!active.length && !errs) trayCloseTimer = setTimeout(() => { if (jobs.every(j => j.state === "done" || j.state === "cancelled")) { jobs.length = 0; drawTray(); } }, 5000);
+  const sc = tray && $(".tl", tray) ? $(".tl", tray).scrollTop : 0;
+  tray ? tray.replaceWith(fresh) : document.body.append(fresh);
+  $(".tl", fresh).scrollTop = sc;
+}
+window.addEventListener("beforeunload", e => { if (jobs.some(j => j.state === "uploading" || j.state === "queued")) { e.preventDefault(); e.returnValue = ""; } });
+
+function uploadTarget() {
+  const sp = S.route.space === "team" ? "team" : "mine";
+  return { sp, folder: S.route.space === "links" ? null : S.route.folder };
+}
+function addFiles(list, withDirs) {
+  if (!me.canWrite) return;
+  const { sp, folder } = uploadTarget();
+  let n = 0;
+  for (const item of list) {
+    const file = item.file || item;
+    const rel = item.dirs || (withDirs && file.webkitRelativePath ? file.webkitRelativePath.split("/").slice(0, -1) : []);
+    enqueue(file, sp, folder, rel); n++;
+  }
+  if (n && S.route.space === "links") navigate("mine", null);
+}
+$("#pick-files").addEventListener("change", e => { addFiles([...e.target.files]); e.target.value = ""; });
+$("#pick-dir").addEventListener("change", e => { addFiles([...e.target.files], true); e.target.value = ""; });
+const pickFiles = () => $("#pick-files").click();
+const pickDir = () => $("#pick-dir").click();
+
+/* drag and drop, with folders */
+let dragDepth = 0;
+const isFileDrag = e => e.dataTransfer && [...e.dataTransfer.types].includes("Files");
+window.addEventListener("dragenter", e => {
+  if (!isFileDrag(e) || !me.canWrite || S.route.link) return;
+  e.preventDefault(); dragDepth++;
+  const { sp, folder } = uploadTarget();
+  $("#drop-t").textContent = "Drop to upload";
+  $("#drop-s").textContent = "to " + [spaceName(sp), ...pathOf(sp, folder).map(d => d.name)].join(" / ");
+  $("#drop").hidden = false;
+});
+window.addEventListener("dragover", e => { if (isFileDrag(e) && me.canWrite && !S.route.link) e.preventDefault(); });
+window.addEventListener("dragleave", e => { if (!isFileDrag(e)) return; dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $("#drop").hidden = true; });
+window.addEventListener("drop", async e => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault(); dragDepth = 0; $("#drop").hidden = true;
+  if (!me.canWrite || S.route.link) return;
+  const items = [...(e.dataTransfer.items || [])].map(i => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+  if (!items.length) return addFiles([...e.dataTransfer.files]);
+  const out = [];
+  const readAll = r => new Promise(res => { const acc = []; const next = () => r.readEntries(b => { if (!b.length) return res(acc); acc.push(...b); next(); }, () => res(acc)); next(); });
+  const walk = async (entry, dirs) => {
+    if (entry.isFile) { const file = await new Promise((res, rej) => entry.file(res, rej)).catch(() => null); if (file) out.push({ file, dirs }); }
+    else if (entry.isDirectory) { for (const c of await readAll(entry.createReader())) await walk(c, [...dirs, entry.name]); }
+  };
+  for (const en of items) await walk(en, []);
+  addFiles(out);
+});
+document.addEventListener("paste", e => {
+  if (!me.canWrite || S.route.link || e.target.closest("input,textarea")) return;
+  const files = [...(e.clipboardData && e.clipboardData.files || [])];
+  if (files.length) { e.preventDefault(); addFiles(files.map((f, i) => (f.name && f.name !== "image.png") ? f : new File([f], `Pasted ${new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-")}${i ? "-" + i : ""}.${(f.type.split("/")[1] || "bin").replace("jpeg", "jpg")}`, { type: f.type }))); }
+});
+
+/* =====================================================================
+   File actions
+   ===================================================================== */
+async function downloadFile(f) {
+  const t = toast(`Preparing ${f.name}…`, { ms: 600000 });
+  try { saveBlob(await getBlob(refOf(f)), f.name); hitFor(null); }
+  catch (e) { fail(e); }
+  finally { t.remove(); }
+}
+async function downloadMany(entries, zipName) {
+  if (entries.length === 1 && !entries[0].path.includes("/")) return downloadFile(entries[0].f);
+  if (!entries.length) return toast("There's nothing to download here.");
+  const total = entries.reduce((s, e) => s + (e.f.size || 0), 0);
+  const label = h("span", null, `Preparing ${plural(entries.length, "file", "files")}…`);
+  const t = toast("", { ms: 600000 }); t.firstChild.replaceWith(label);
+  try {
+    let got = 0; const parts = [];
+    for (const e of entries) {
+      const blob = await getBlob(refOf(e.f));
+      got += e.f.size || 0;
+      label.textContent = `Preparing ${Math.round(got / (total || 1) * 100)}%`;
+      parts.push({ path: e.path, blob, mtime: e.f.updatedAt || e.f.createdAt });
+    }
+    label.textContent = "Packing zip…";
+    saveBlob(await makeZip(parts), zipName.replace(/[\/\\]/g, "-") + ".zip");
+  } catch (e) { fail(e); }
+  finally { t.remove(); }
+}
+async function renameItem(sp, x, isDir) {
+  const v = await ask({ title: isDir ? "Rename folder" : "Rename file", label: "Name", value: x.name, stem: !isDir, validate: nameError });
+  if (!v || v === x.name) return;
+  const parent = isDir ? parentOf(sp, x) : folderOfFile(sp, x);
+  const clash = (isDir ? childrenOf(sp, parent).dirs : childrenOf(sp, parent).files).some(y => y.id !== x.id && y.name.toLowerCase() === v.toLowerCase());
+  if (clash) return toast(`There's already ${isDir ? "a folder" : "a file"} called “${v}” here.`, { bad: true });
+  await db.doc(`${isDir ? P.folders(sp) : P.files(sp)}/${x.id}`).update({ name: v, updatedAt: Date.now() }).catch(fail);
+}
+async function newFolder() {
+  const sp = S.route.space === "team" ? "team" : "mine";
+  const v = await ask({ title: "New folder", label: "Name", value: uniqueName(sp, S.route.folder, "New folder", true), ok: "Create folder", validate: nameError });
+  if (!v) return;
+  try { await createFolder(sp, S.route.folder, v); render(); } catch (e) { fail(e); }
+}
+async function deleteFileMeta(sp, f, keepBlob) {
+  await retry(() => db.doc(`${P.files(sp)}/${f.id}`).delete());
+  filesOf(sp).delete(f.id);
+  if (!keepBlob && f.blob && f.blob.o === me.id) {
+    const still = ["mine", "team"].some(s => [...filesOf(s).values()].some(y => y.blob && y.blob.id === f.blob.id && y.blob.o === me.id));
+    if (!still) deleteBlob(f.blob.id).catch(() => {});
+  }
+}
+async function deleteItems(sp, keys) {
+  const dirs = [], fls = [];
+  keys.forEach(k => { const [t, id] = k.split(":"); if (t === "d" && foldersOf(sp).get(id)) dirs.push(foldersOf(sp).get(id)); if (t === "f" && filesOf(sp).get(id)) fls.push(filesOf(sp).get(id)); });
+  const allFiles = [...fls], allDirs = [...dirs];
+  dirs.forEach(d => { const r = descend(sp, d.id); allFiles.push(...r.files.map(x => x.f)); allDirs.push(...r.dirs); });
+  const inLinks = countInLinks(allFiles);
+  const what = allDirs.length && allFiles.length ? `${plural(allDirs.length, "folder", "folders")} and ${plural(allFiles.length, "file", "files")}` : allDirs.length ? plural(allDirs.length, "folder", "folders") : plural(allFiles.length, "file", "files");
+  const one = keys.length === 1 ? (dirs[0] || fls[0]).name : null;
+  const text = (one ? `“${one}”${dirs.length ? (allFiles.length ? ` and the ${plural(allFiles.length, "file", "files")} in it` : "") : ""}` : what) +
+    (sp === "team" ? " will be deleted for everyone in Team." : " will be deleted.") + " This can't be undone." +
+    (inLinks ? ` ${inLinks === 1 ? "A share link includes" : "Share links include"} some of these files; they'll stop working for them.` : "");
+  if (!await confirmD({ title: one ? `Delete ${dirs.length ? "folder" : "file"}?` : `Delete ${what}?`, text, ok: "Delete" })) return;
+  S.sel.clear(); render();
+  try {
+    for (const f of allFiles) await deleteFileMeta(sp, f);
+    for (const d of allDirs.reverse()) { await retry(() => db.doc(`${P.folders(sp)}/${d.id}`).delete()); foldersOf(sp).delete(d.id); }
+    toast(one ? `Deleted “${one}”` : `Deleted ${what}`);
+  } catch (e) { fail(e); }
+  render();
+}
+function countInLinks(files) {
+  const ids = new Set(files.map(f => f.blob && f.blob.id));
+  let n = 0;
+  for (const r of S.links.values()) if (!r.purged && (r.blobIds || []).some(b => ids.has(b))) n++;
+  return n;
+}
+
+/* moving, also between My files and Team */
+async function moveDialog(sp, keys) {
+  const items = keys.map(k => { const [t, id] = k.split(":"); return t === "d" ? { t, x: foldersOf(sp).get(id) } : { t, x: filesOf(sp).get(id) }; }).filter(i => i.x);
+  if (!items.length) return;
+  const banned = new Set();
+  items.filter(i => i.t === "d").forEach(i => { banned.add(i.x.id); descend(sp, i.x.id).dirs.forEach(d => banned.add(d.id)); });
+  let target = sp, dest = null;
+  const tree = h("div", { class: "tree", role: "group", "aria-label": "Folders" });
+  const seg = h("div", { class: "seg" });
+  const drawTree = () => {
+    seg.replaceChildren(...["mine", "team"].map(s => h("button", { type: "button", "aria-pressed": String(target === s), onclick: () => { target = s; dest = null; drawTree(); } }, spaceName(s))));
+    const rows = [];
+    const add = (fid, depth) => {
+      const kids = childrenOf(target, fid).dirs.sort((a, b) => collator.compare(a.name, b.name));
+      kids.forEach(d => {
+        const bad = target === sp && banned.has(d.id);
+        rows.push(h("button", { type: "button", disabled: bad, style: `padding-left:${12 + depth * 18}px`, "aria-pressed": String(dest === d.id), onclick: () => { dest = d.id; drawTree(); } }, svg("folder"), d.name));
+        if (!bad) add(d.id, depth + 1);
+      });
+    };
+    rows.push(h("button", { type: "button", "aria-pressed": String(dest === null), onclick: () => { dest = null; drawTree(); } }, svg(target === "team" ? "users" : "box"), spaceName(target)));
+    add(null, 1);
+    tree.replaceChildren(...rows);
+  };
+  drawTree();
+  const label = items.length === 1 ? `“${items[0].x.name}”` : plural(items.length, "item", "items");
+  const ok = await dialog({ title: `Move ${label}`, body: [seg, tree, h("p", { class: "small" }, "Moving between My files and Team changes who can see the files.")], actions: [{ label: "Cancel" }, { label: "Move here", primary: true, value: true }] });
+  if (!ok) return;
+  S.sel.clear();
+  try {
+    if (target === sp) {
+      for (const i of items) {
+        if (i.t === "d") { if (parentOf(sp, i.x) === dest) continue; const name = uniqueName(sp, dest, i.x.name, true, i.x.id); await db.doc(`${P.folders(sp)}/${i.x.id}`).update({ parent: dest, name, updatedAt: Date.now() }); }
+        else { if (folderOfFile(sp, i.x) === dest) continue; const name = uniqueName(sp, dest, i.x.name, false, i.x.id); await db.doc(`${P.files(sp)}/${i.x.id}`).update({ folder: dest, name, updatedAt: Date.now() }); }
+      }
+      toast(`Moved ${label}`);
+    } else {
+      const t = toast(`Moving ${label} to ${spaceName(target)}…`, { ms: 600000 });
+      try { for (const i of items) i.t === "d" ? await transferFolder(sp, i.x, target, dest) : await transferFile(sp, i.x, target, dest); }
+      finally { t.remove(); }
+      toast(`Moved ${label} to ${spaceName(target)}`);
+    }
+  } catch (e) { fail(e); }
+  render();
+}
+async function transferFile(from, f, to, dest) {
+  const now = Date.now();
+  let blob = f.blob, key = f.key, thumb = !!f.thumb;
+  if (f.blob.o !== me.id) {          // someone else's upload: store my own encrypted copy first
+    const data = await getBlob(refOf(f));
+    const r = await uploadBlob(new File([data], f.name, { type: f.type }));
+    blob = { o: me.id, id: r.bid }; key = r.key; thumb = r.thumb;
+  }
+  const name = uniqueName(to, dest, f.name, false);
+  const meta = { name, type: f.type, size: f.size, folder: dest || null, key, blob, thumb, createdAt: f.createdAt || now, updatedAt: now, by: f.by || me.id, byName: f.byName || me.name };
+  const id = newId();
+  await retry(() => db.doc(`${P.files(to)}/${id}`).set(meta));
+  filesOf(to).set(id, { ...meta, id });
+  await deleteFileMeta(from, f, f.blob.o === me.id);
+}
+async function transferFolder(from, d, to, dest) {
+  const nid = await createFolder(to, dest, d.name);
+  const c = childrenOf(from, d.id);
+  for (const f of c.files) await transferFile(from, f, to, nid);
+  for (const sub of c.dirs) await transferFolder(from, sub, to, nid);
+  await retry(() => db.doc(`${P.folders(from)}/${d.id}`).delete());
+  foldersOf(from).delete(d.id);
+}
+
+/* =====================================================================
+   Share links
+   ===================================================================== */
+const EXPIRY = [["1 hour", 3600e3], ["1 day", 864e5], ["7 days", 7 * 864e5], ["30 days", 30 * 864e5], ["Never", 0]];
+const linkUrl = (lid, secret) => `${location.origin}${location.pathname}#l=${encodeURIComponent(lid)}&o=${encodeURIComponent(me.id)}&k=${secret}`;
+async function shareDialog(sp, keys) {
+  const entries = []; let title = "";
+  const dirs = [];
+  keys.forEach(k => {
+    const [t, id] = k.split(":");
+    if (t === "f" && filesOf(sp).get(id)) entries.push({ f: filesOf(sp).get(id), path: filesOf(sp).get(id).name });
+    if (t === "d" && foldersOf(sp).get(id)) { const d = foldersOf(sp).get(id); dirs.push(d); entries.push(...descend(sp, d.id, keys.length > 1 ? d.name + "/" : "").files); }
+  });
+  if (!entries.length) return toast(dirs.length ? "This folder is empty. Add files before sharing it." : "Choose files to share.", { bad: true });
+  if (entries.length > 500) return toast("A link can hold up to 500 files. Share fewer at once.", { bad: true });
+  title = keys.length === 1 ? (dirs[0] ? dirs[0].name : entries[0].f.name) : plural(entries.length, "file", "files");
+  const total = entries.reduce((s, e) => s + (e.f.size || 0), 0);
+  let exp = 7 * 864e5;
+  const tIn = h("input", { class: "in", value: title, maxlength: 120, "data-select": "no" });
+  const mIn = h("textarea", { class: "in", maxlength: 1000, placeholder: "Add a note for the people you send this to" });
+  const pIn = h("input", { class: "in", type: "password", autocomplete: "new-password", placeholder: "No password" });
+  const seg = h("div", { class: "seg", role: "group", "aria-label": "Link expires after" });
+  const drawSeg = () => seg.replaceChildren(...EXPIRY.map(([l, v]) => h("button", { type: "button", "aria-pressed": String(exp === v), onclick: () => { exp = v; drawSeg(); } }, l)));
+  drawSeg();
+  const err = h("div", { class: "err" });
+  const lid = await dialog({
+    title: "Create share link",
+    body: [
+      h("p", null, `${plural(entries.length, "file", "files")}, ${fmtSize(total)}.` + (dirs.length ? " Files you add to the folder later aren't included." : "")),
+      h("label", { class: "f" }, "Title", tIn),
+      h("label", { class: "f" }, h("span", null, "Note ", h("span", { class: "hint" }, "optional")), mIn),
+      h("div", { class: "f", style: "display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:550" }, "Expires after", seg),
+      h("label", { class: "f" }, h("span", null, "Password ", h("span", { class: "hint" }, "optional, send it separately")), pIn),
+      err
+    ],
+    actions: [{ label: "Cancel" }, { label: "Create link", primary: true, run: async (close, b) => {
+      b.textContent = "Creating…";
+      try { return await createLink({ title: tIn.value.trim() || title, message: mIn.value.trim(), expiresIn: exp, password: pIn.value, entries }); }
+      catch (e) { err.textContent = explain(e); b.textContent = "Create link"; return false; }
+    } }]
+  });
+  if (lid) { S.sel.clear(); render(); showLink(lid, true); }
+}
+async function createLink({ title, message, expiresIn, password, entries }) {
+  const lid = newId(), secret = b64.url(rand(32)), now = Date.now();
+  const expiresAt = expiresIn ? now + expiresIn : null;
+  let keyStr = secret, pw = null;
+  if (password) { const salt = b64.enc(rand(16)); pw = { salt, iter: PW_ITER }; keyStr = await passwordKey(password, salt, secret, PW_ITER); }
+  const payload = { v: 1, title, message, from: me.name || "Someone", createdAt: now, items: entries.map(e => ({ name: e.f.name, path: e.path, type: e.f.type, size: e.f.size, key: e.f.key, o: e.f.blob.o, id: e.f.blob.id, thumb: !!e.f.thumb, mtime: e.f.updatedAt || e.f.createdAt })) };
+  const box = await seal(await aesKey(keyStr), enc.encode(JSON.stringify(payload)), `link/${me.id}/${lid}`);
+  await retry(() => db.doc(P.link(me.id, lid)).set({ v: 1, createdAt: now, expiresAt, pw, box }));
+  const rec = { secret, title, count: entries.length, size: entries.reduce((s, e) => s + (e.f.size || 0), 0), names: entries.slice(0, 3).map(e => e.f.name), blobIds: entries.map(e => e.f.blob.id), password: !!password, createdAt: now, expiresAt };
+  try { await retry(() => db.doc(`${P.linkRecs()}/${lid}`).set(rec)); }
+  catch (e) { db.doc(P.link(me.id, lid)).delete().catch(() => {}); throw e; }
+  S.links.set(lid, { ...rec, id: lid });
+  return lid;
+}
+async function shareUrl(url, title) {
+  if (navigator.share && matchMedia("(pointer:coarse)").matches) { try { await navigator.share({ title, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+  (await copyText(url)) ? toast("Link copied") : toast("Couldn't copy. Select the link and copy it yourself.", { bad: true });
+}
+function showLink(lid, fresh) {
+  const r = S.links.get(lid); if (!r) return;
+  const url = linkUrl(lid, r.secret);
+  const inp = h("input", { class: "in", value: url, readonly: true, "aria-label": "Share link", onfocus: e => e.target.select() });
+  dialog({
+    title: fresh ? "Your link is ready" : r.title,
+    body: [
+      tagFor(lid, r, { compact: true }),
+      h("div", { class: "linkbox" }, inp, h("button", { type: "button", class: "btn", onclick: async () => (await copyText(url)) ? toast("Link copied") : inp.select() }, svg("copy"), "Copy")),
+      h("p", { class: "small" }, r.password
+        ? "The link opens only with the password. Send the password another way, for example in a message instead of the e-mail."
+        : "Anyone who has this link and can open this Satchel can see these files. The key is part of the link, so the server only ever stores them encrypted."),
+    ],
+    actions: [navigator.share ? { label: "Share…", run: () => { shareUrl(url, r.title); return false; } } : null, { label: "Done", primary: true }].filter(Boolean)
+  });
+}
+async function revokeLink(lid) {
+  const r = S.links.get(lid);
+  const dead = r && (r.purged || (r.expiresAt && r.expiresAt < Date.now()));
+  if (!dead && !await confirmD({ title: "Delete link?", text: `“${r ? r.title : "This link"}” will stop working right away for everyone who has it. Your files stay where they are.`, ok: "Delete link" })) return;
+  try {
+    await retry(() => db.doc(P.link(me.id, lid)).delete());
+    await retry(() => db.doc(`${P.linkRecs()}/${lid}`).delete());
+    S.links.delete(lid); render();
+    toast("Link deleted");
+    db.collection("hits").where("o", "==", me.id).where("l", "==", lid).limit(1000).get().then(s => s.docs.forEach(d => db.doc("hits/" + d.id).delete().catch(() => {}))).catch(() => {});
+  } catch (e) { fail(e); }
+}
+let currentLink = null;
+function hitFor(kind) {
+  if (!currentLink || currentLink.o === me.id) return;
+  const k = kind || "dl";
+  if (currentLink.counted.has(k)) return;
+  currentLink.counted.add(k);
+  db.collection("hits").add({ l: currentLink.l, o: currentLink.o, e: k, at: Date.now() }).catch(() => {});
+}
+
+/* luggage tag */
+function tagFor(lid, r, { compact } = {}) {
+  const expired = r.purged || (r.expiresAt && r.expiresAt < Date.now());
+  const hits = S.hits.get(lid) || { open: 0, dl: 0 };
+  const facts = h("div", { class: "facts" },
+    h("span", null, svg("file"), `${plural(r.count || 0, "file", "files")}, ${fmtSize(r.size || 0)}`),
+    h("span", null, svg("clock"), r.expiresAt ? fmtUntil(r.expiresAt) : "No expiry"),
+    r.password ? h("span", null, svg("lock"), "Password") : null,
+    !compact ? h("span", null, svg("eye"), `${plural(hits.open, "open", "opens")}, ${plural(hits.dl, "download", "downloads")}`) : null);
+  const acts = compact ? null : h("div", { class: "acts" },
+    !expired ? h("button", { class: "btn", onclick: () => showLink(lid) }, svg("link"), "Show link") : null,
+    !expired ? h("button", { class: "btn", onclick: () => shareUrl(linkUrl(lid, r.secret), r.title) }, svg("copy"), navigator.share && matchMedia("(pointer:coarse)").matches ? "Share" : "Copy") : null,
+    h("button", { class: "btn", onclick: () => revokeLink(lid) }, svg("trash"), "Delete"));
+  return h("div", { class: "tag" + (expired ? " dead" : "") },
+    compact ? null : stringSvg(),
+    h("div", { class: "eye" }),
+    h("div", { class: "body" }, h("div", { class: "ttl" }, r.title || "Untitled link"), facts, acts));
+}
+
+/* =====================================================================
+   Preview
+   ===================================================================== */
+async function preview(list, index, { linkMode = false } = {}) {
+  let i = index, ctrl = null, url = null;
+  const titleEl = h("div"), subEl = h("small"), bodyEl = h("div", { class: "pvb" });
+  const d = h("dialog", { class: "pv", "aria-label": "Preview" });
+  const cleanup = () => { if (ctrl) ctrl.abort(); if (url) URL.revokeObjectURL(url); url = null; };
+  const go = n => { if (n < 0 || n >= list.length) return; i = n; show(); };
+  const actions = h("div", { style: "display:flex;gap:2px" });
+  d.append(h("div", { class: "pvw" },
+    h("div", { class: "pvh" },
+      h("button", { class: "ib", "aria-label": "Close preview", onclick: () => d.close() }, svg("x")),
+      h("div", { class: "t" }, titleEl, subEl), actions),
+    bodyEl));
+  d.addEventListener("keydown", e => { if (e.key === "ArrowLeft") go(i - 1); if (e.key === "ArrowRight") go(i + 1); });
+  let sx = null;
+  bodyEl.addEventListener("touchstart", e => { sx = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+  bodyEl.addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 70 && !bodyEl.querySelector("pre,.tbl,iframe")) go(i + (dx < 0 ? 1 : -1)); sx = null; });
+  d.addEventListener("close", () => { cleanup(); d.remove(); });
+  document.body.append(d); d.showModal();
+
+  async function show() {
+    cleanup();
+    const it = list[i], f = it.f;
+    titleEl.textContent = f.name;
+    subEl.textContent = [fmtSize(f.size), list.length > 1 ? `${i + 1} of ${list.length}` : ""].filter(Boolean).join(", ");
+    actions.replaceChildren(...[
+      h("button", { class: "ib", "aria-label": "Download", title: "Download", onclick: () => downloadFile(f) }, svg("download")),
+      !linkMode && it.sp ? h("button", { class: "ib", "aria-label": "Share link", title: "Share link", onclick: () => { d.close(); shareDialog(it.sp, ["f:" + f.id]); } }, svg("link")) : null].filter(Boolean));
+    const kind = previewKind(f), k = kindOf(f.name, f.type);
+    const nav = [
+      i > 0 ? h("button", { class: "nav-l", "aria-label": "Previous", onclick: () => go(i - 1) }, svg("left")) : null,
+      i < list.length - 1 ? h("button", { class: "nav-r", "aria-label": "Next", onclick: () => go(i + 1) }, svg("right")) : null
+    ].filter(Boolean);
+    const msg = (text, extra) => h("div", { class: "pvmsg", style: `--kc:var(--k-${k})` }, h("div", { class: "big" }, svg(KIND_ICON[k])), h("div", null, text), extra);
+    if (!kind) { bodyEl.replaceChildren(msg("There's no preview for this kind of file.", h("button", { class: "btn primary", onclick: () => downloadFile(f) }, svg("download"), "Download")), ...nav); return; }
+    if (kind === "video" || kind === "audio" ? f.size > 120e6 : f.size > 60e6) { bodyEl.replaceChildren(msg(`This file is ${fmtSize(f.size)}, too large to preview here.`, h("button", { class: "btn primary", onclick: () => downloadFile(f) }, svg("download"), "Download")), ...nav); return; }
+    const bar = h("i");
+    bodyEl.replaceChildren(msg("Decrypting…", h("div", { class: "bar" }, bar)), ...nav);
+    ctrl = new AbortController();
+    const my = ctrl;
+    let blob;
+    try { blob = await getBlob(refOf(f), { signal: my.signal, onProgress: p => { bar.style.width = Math.round(p * 100) + "%"; } }); }
+    catch (e) { if (my.signal.aborted) return; bodyEl.replaceChildren(msg(explain(e)), ...nav); return; }
+    if (my.signal.aborted || list[i] !== it) return;
+    let node;
+    if (kind === "text" || kind === "csv") {
+      const text = dec.decode(new Uint8Array(await blob.slice(0, 2e6).arrayBuffer()));
+      if (kind === "csv") node = csvTable(text, extOf(f.name) === "tsv" ? "\t" : null);
+      if (!node) node = h("pre", { tabindex: 0 }, text + (blob.size > 2e6 ? "\n\n… The preview shows the first 2 MB." : ""));
+    } else {
+      url = URL.createObjectURL(blob);
+      if (kind === "image") node = h("img", { src: url, alt: f.name, onerror: () => bodyEl.replaceChildren(msg("This image can't be shown in the browser.", h("button", { class: "btn primary", onclick: () => downloadFile(f) }, svg("download"), "Download")), ...nav) });
+      if (kind === "video") node = h("video", { src: url, controls: true, autoplay: true, playsinline: true });
+      if (kind === "audio") node = h("audio", { src: url, controls: true, autoplay: true });
+      if (kind === "pdf") node = matchMedia("(pointer:coarse)").matches
+        ? msg("Open the PDF to read it.", h("a", { class: "btn primary", href: url, target: "_blank", rel: "noopener" }, svg("external"), "Open PDF"))
+        : h("iframe", { src: url, title: f.name });
+    }
+    bodyEl.replaceChildren(node, ...nav);
+    if (linkMode) hitFor("open");
+  }
+  show();
+}
+function csvTable(text, sep) {
+  const lines = text.split(/\r?\n/).slice(0, 501);
+  if (!sep) { const first = lines[0] || ""; sep = [",", ";", "\t"].sort((a, b) => first.split(b).length - first.split(a).length)[0]; }
+  const rows = [];
+  let buf = text.slice(0, 1e6), row = [], cell = "", q = false;
+  for (let j = 0; j < buf.length && rows.length < 500; j++) {
+    const c = buf[j];
+    if (q) { if (c === '"') { if (buf[j + 1] === '"') { cell += '"'; j++; } else q = false; } else cell += c; }
+    else if (c === '"') q = true;
+    else if (c === sep) { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && buf[j + 1] === "\n") j++; row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  if (rows.length < 1 || rows[0].length < 2) return null;
+  const [head, ...body] = rows;
+  return h("div", { class: "tbl", tabindex: 0 }, h("table", null,
+    h("thead", null, h("tr", null, head.map(c => h("th", { title: c }, c)))),
+    h("tbody", null, body.map(r => h("tr", null, r.map(c => h("td", { title: c }, c)))))));
+}
+
+/* =====================================================================
+   Drawing the drive
+   ===================================================================== */
+const brandMark = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 64 64"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<rect width="64" height="64" rx="15" fill="#7a2236"/><path d="M22 14h24a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H22l-8-8V22z" fill="#f4e4e8"/><circle cx="23" cy="32" r="4.5" fill="#7a2236"/><circle cx="23" cy="32" r="4.5" fill="none" stroke="#e0b54b" stroke-width="2.4"/><path d="M33 26h11M33 32h11M33 38h7" stroke="#7a2236" stroke-width="3" stroke-linecap="round"/>'; return s; };
+function navigate(space, folder) {
+  const hash = "#/" + space + (folder ? "/" + encodeURIComponent(folder) : "");
+  if (location.hash !== hash) location.hash = hash; else route();
+}
+function parseRoute() {
+  const raw = location.hash.slice(1);
+  if (/(^|&)k=/.test(raw) && /(^|&)l=/.test(raw)) { const p = new URLSearchParams(raw); return { link: { l: p.get("l") || "", o: p.get("o") || "", k: p.get("k") || "" } }; }
+  const [sp, fid] = raw.replace(/^\//, "").split("/");
+  return { space: ["mine", "team", "links"].includes(sp) ? sp : "mine", folder: fid ? decodeURIComponent(fid) : null, link: null };
+}
+function route() {
+  const r = parseRoute();
+  const prev = S.route;
+  S.route = { space: r.space || "mine", folder: r.folder || null, link: r.link || null };
+  if (prev.space !== S.route.space || prev.folder !== S.route.folder) { S.sel.clear(); }
+  if (prev.space !== S.route.space) { S.q = ""; S.searching = false; }
+  closeMenu();
+  if (S.route.link) return openLink(S.route.link);
+  currentLink = null;
+  if (!me.canWrite) return drawVisitor();
+  render();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
+function sortItems(arr, isDir) {
+  const { sort, dir } = S.prefs;
+  return arr.sort((a, b) => {
+    let c = 0;
+    if (sort === "date") c = (a.updatedAt || 0) - (b.updatedAt || 0);
+    else if (sort === "size" && !isDir) c = (a.size || 0) - (b.size || 0);
+    if (!c) c = collator.compare(a.name, b.name);
+    return c * dir;
+  });
+}
+function visibleItems(sp) {
+  const q = S.q.trim().toLowerCase();
+  let dirs, fls;
+  if (q || S.kind !== "all") {
+    fls = [...filesOf(sp).values()];
+    dirs = q ? [...foldersOf(sp).values()].filter(d => d.name.toLowerCase().includes(q)) : [];
+    if (q) fls = fls.filter(f => f.name.toLowerCase().includes(q));
+    if (!q) { const scope = new Set([S.route.folder, ...descend(sp, S.route.folder).dirs.map(d => d.id)]); fls = fls.filter(f => scope.has(folderOfFile(sp, f))); }
+    if (S.kind !== "all") { dirs = []; fls = fls.filter(f => { const k = kindOf(f.name, f.type); return S.kind === "doc" ? (k === "doc" || k === "code") : k === S.kind; }); }
+  } else ({ dirs, files: fls } = childrenOf(sp, S.route.folder));
+  return { dirs: sortItems(dirs, true), files: sortItems(fls, false), flat: !!(q || S.kind !== "all") };
+}
+function itemMenu(sp, key, anchor) {
+  const [t, id] = key.split(":");
+  const x = t === "d" ? foldersOf(sp).get(id) : filesOf(sp).get(id);
+  if (!x) return;
+  const other = sp === "team" ? "mine" : "team";
+  menu(anchor, t === "d" ? [
+    { icon: "folder", label: "Open", run: () => navigate(sp, id) },
+    { icon: "link", label: "Share link", run: () => shareDialog(sp, [key]) },
+    { icon: "download", label: "Download as zip", run: () => downloadMany(descend(sp, id).files, x.name) },
+    "-",
+    { icon: "edit", label: "Rename", run: () => renameItem(sp, x, true) },
+    { icon: "move", label: "Move", run: () => moveDialog(sp, [key]) },
+    "-",
+    { icon: "trash", label: "Delete", danger: true, run: () => deleteItems(sp, [key]) }
+  ] : [
+    { icon: "eye", label: "Preview", run: () => openFile(sp, x) },
+    { icon: "download", label: "Download", run: () => downloadFile(x) },
+    { icon: "link", label: "Share link", run: () => shareDialog(sp, [key]) },
+    "-",
+    { icon: "edit", label: "Rename", run: () => renameItem(sp, x, false) },
+    { icon: "move", label: "Move", run: () => moveDialog(sp, [key]) },
+    { icon: other === "team" ? "users" : "box", label: other === "team" ? "Move to Team" : "Move to My files", run: async () => { const tt = toast("Moving…", { ms: 600000 }); try { await transferFile(sp, x, other, null); toast(`Moved “${x.name}” to ${spaceName(other)}`); } catch (e) { fail(e); } finally { tt.remove(); render(); } } },
+    "-",
+    { icon: "trash", label: "Delete", danger: true, run: () => deleteItems(sp, [key]) }
+  ]);
+}
+function openFile(sp, f) {
+  const { files: fls } = visibleItems(sp);
+  const list = fls.map(x => ({ f: x, sp }));
+  const i = Math.max(0, list.findIndex(x => x.f.id === f.id));
+  preview(list.length ? list : [{ f, sp }], i);
+}
+function toggleSel(key) { S.sel.has(key) ? S.sel.delete(key) : S.sel.add(key); render(); }
+
+let lpTimer = null, lpFired = false;
+function pressHandlers(key, onOpen) {
+  return {
+    onpointerdown: e => { lpFired = false; if (e.pointerType !== "touch") return; clearTimeout(lpTimer); lpTimer = setTimeout(() => { lpFired = true; if (navigator.vibrate) navigator.vibrate(10); toggleSel(key); }, 450); },
+    onpointerup: () => clearTimeout(lpTimer), onpointercancel: () => clearTimeout(lpTimer), onpointerleave: () => clearTimeout(lpTimer),
+    onclick: e => { if (lpFired) { lpFired = false; e.preventDefault(); return; } if (S.sel.size || e.metaKey || e.ctrlKey || e.shiftKey) { toggleSel(key); return; } onOpen(); },
+    oncontextmenu: e => { if (e.pointerType === "touch" || matchMedia("(pointer:coarse)").matches) e.preventDefault(); }
+  };
+}
+function glyphFor(f, big) {
+  const k = kindOf(f.name, f.type);
+  const box = h("div", { class: big ? "pic" : "glyph", style: `--kc:var(--k-${k})` }, svg(KIND_ICON[k]), !big ? h("span", { class: "ext" }, extOf(f.name).slice(0, 4).toUpperCase()) : null);
+  if (f.thumb) watchThumb(box, refOf(f));
+  return box;
+}
+
+function draw() {
+  if (S.route.link || !me.canWrite) return;
+  const sp = S.route.space;
+  const shell = h("div", { class: "shell" + (S.sel.size ? " selecting" : "") });
+  const counts = { mine: filesOf("mine").size, team: filesOf("team").size, links: [...S.links.values()].filter(r => !r.purged && !(r.expiresAt && r.expiresAt < Date.now())).length };
+  const used = [...S.blobs.values()].reduce((s, m) => s + (m.size || 0), 0);
+  const navBtn = (s, icon) => h("button", { class: "nav", "aria-current": sp === s ? "page" : null, onclick: () => navigate(s, null) }, svg(icon), spaceName(s), counts[s] ? h("span", { class: "count num" }, counts[s]) : null);
+  shell.append(h("aside", { class: "side", "aria-label": "Spaces" },
+    h("div", { class: "brand" }, brandMark(), "Satchel"),
+    h("button", { class: "btn primary upload", onclick: e => menu(e.currentTarget, [{ icon: "upload", label: "Upload files", run: pickFiles }, { icon: "folderUp", label: "Upload folder", run: pickDir }]) }, svg("upload"), "Upload"),
+    navBtn("mine", "box"), navBtn("team", "users"), navBtn("links", "link"),
+    h("div", { class: "meter" }, S.loaded.blobs ? [h("b", { class: "num" }, fmtSize(used)), ` stored by you in ${plural(S.blobs.size, "file", "files")}`] : " ",
+      h("div", { style: "margin-top:6px" }, "Encrypted on this device before upload."))));
+  const main = h("main", { class: "main" + (sp === "team" ? " team" : "") });
+  main.append(sp === "links" ? topLinks() : topFiles(sp));
+  if (S.error) main.append(h("div", { class: "banner", role: "alert" }, S.error));
+  main.append(sp === "links" ? drawLinks() : drawFiles(sp));
+  shell.append(main);
+  const fresh = [shell,
+    h("nav", { class: "tabbar", "aria-label": "Spaces" }, ["mine", "team", "links"].map(s => h("button", { "aria-current": sp === s ? "page" : null, onclick: () => navigate(s, null) }, svg(s === "mine" ? "box" : s === "team" ? "users" : "link"), spaceName(s)))),
+    !S.sel.size && sp !== "links" ? h("button", { class: "fab", "aria-label": "Add", onclick: e => menu(e.currentTarget, [{ icon: "upload", label: "Upload files", run: pickFiles }, { icon: "folderUp", label: "Upload folder", run: pickDir }, { icon: "folderPlus", label: "New folder", run: newFolder }]) }, svg("plus")) : null,
+    S.sel.size && sp !== "links" ? selBar(sp) : null].filter(Boolean);
+  const act = document.activeElement, fk = act && act.dataset && app.contains(act) ? act.dataset.fk : null;
+  const caret = fk === "q" ? act.selectionStart : 0;
+  const scroll = window.scrollY;
+  app.replaceChildren(...fresh);
+  window.scrollTo(0, scroll);
+  if (fk) { const el = app.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (el) { el.focus({ preventScroll: true }); if (fk === "q") try { el.setSelectionRange(caret, caret); } catch {} } }
+}
+function topFiles(sp) {
+  const crumbs = pathOf(sp, S.route.folder);
+  const cur = crumbs.length ? crumbs[crumbs.length - 1] : null;
+  const top = h("div", { class: "top" });
+  const row1 = h("div", { class: "row1" + (S.searching ? " searching" : "") });
+  const parent = cur ? parentOf(sp, cur) : null;
+  row1.append(...[
+    cur ? h("button", { class: "ib back", "aria-label": "Back", onclick: () => navigate(sp, parent) }, svg("left")) : null,
+    h("nav", { class: "crumbs", "aria-label": "Folder path" },
+      crumbs.length ? [h("button", { class: "part", onclick: () => navigate(sp, null) }, spaceName(sp)),
+        ...crumbs.slice(0, -1).flatMap(d => [h("span", { class: "sep" }, "/"), h("button", { class: "part", onclick: () => navigate(sp, d.id) }, d.name)]),
+        h("span", { class: "sep" }, "/"), h("span", { class: "cur", "aria-current": "page" }, cur.name)]
+        : h("span", { class: "cur" }, spaceName(sp))),
+    h("div", { class: "search" }, svg("search"), h("input", { id: "q", "data-fk": "q", type: "search", placeholder: `Search ${spaceName(sp)}`, "aria-label": `Search ${spaceName(sp)}`, value: S.q, autocomplete: "off",
+      oninput: e => { S.q = e.target.value; S.sel.clear(); render(); }, onkeydown: e => { if (e.key === "Escape") { S.q = ""; S.searching = false; render(); } } })),
+    h("button", { class: "ib sbtn", "aria-label": S.searching ? "Close search" : "Search", onclick: () => { S.searching = !S.searching; if (!S.searching) S.q = ""; render(); if (S.searching) setTimeout(() => $("#q") && $("#q").focus(), 30); } }, svg(S.searching ? "x" : "search")),
+    h("button", { class: "ib", "aria-label": "New folder", title: "New folder", onclick: newFolder }, svg("folderPlus"))].filter(Boolean));
+  const kinds = [["all", "All"], ["image", "Images"], ["video", "Videos"], ["audio", "Audio"], ["doc", "Documents"], ["archive", "Archives"]];
+  const row2 = h("div", { class: "row2" },
+    h("div", { class: "chips", role: "group", "aria-label": "Show" }, kinds.map(([k, l]) => h("button", { class: "chip", "data-fk": "k" + k, "aria-pressed": String(S.kind === k), onclick: () => { S.kind = k; S.sel.clear(); render(); } }, l))),
+    h("div", { class: "tools" },
+      h("button", { class: "ib", "aria-label": "Sort", title: "Sort", onclick: e => menu(e.currentTarget, [["name", "Name"], ["date", "Last changed"], ["size", "Size"]].map(([k, l]) => ({ icon: S.prefs.sort === k ? (S.prefs.dir > 0 ? "up" : "down") : "sort", label: l + (S.prefs.sort === k ? (S.prefs.dir > 0 ? ", ascending" : ", descending") : ""), run: () => setSort(k) }))) }, svg("sort")),
+      h("button", { class: "ib", "aria-label": S.prefs.view === "grid" ? "Show as list" : "Show as grid", title: S.prefs.view === "grid" ? "List" : "Grid", onclick: () => { S.prefs.view = S.prefs.view === "grid" ? "list" : "grid"; savePrefs(); render(); } }, svg(S.prefs.view === "grid" ? "list" : "grid"))));
+  top.append(row1, row2);
+  return top;
+}
+function setSort(k) { if (S.prefs.sort === k) S.prefs.dir *= -1; else { S.prefs.sort = k; S.prefs.dir = k === "name" ? 1 : -1; } savePrefs(); render(); }
+function drawFiles(sp) {
+  const c = h("div", { class: "content" });
+  if (!S.loaded[sp]) { c.append(h("div", { class: "center" }, h("div", { class: "spin", role: "status", "aria-label": "Loading" }))); return c; }
+  const { dirs, files: fls, flat } = visibleItems(sp);
+  if (S.full[sp]) c.append(h("div", { class: "note" }, "This space has more than 1000 files. Only the first 1000 are shown; move some into the other space or delete old ones."));
+  if (!dirs.length && !fls.length) { c.append(emptyState(sp, flat)); return c; }
+  const all = [...dirs.map(d => "d:" + d.id), ...fls.map(f => "f:" + f.id)];
+  if (S.prefs.view === "grid") {
+    const g = h("div", { class: "grid" });
+    dirs.forEach(d => g.append(card(sp, d, true, flat)));
+    fls.forEach(f => g.append(card(sp, f, false, flat)));
+    c.append(g);
+  } else {
+    const allSel = all.length && all.every(k => S.sel.has(k));
+    const sortBtn = (k, l) => h("button", { "aria-sort": S.prefs.sort === k ? (S.prefs.dir > 0 ? "ascending" : "descending") : null, onclick: () => setSort(k) }, l, S.prefs.sort === k ? svg(S.prefs.dir > 0 ? "up" : "down") : null);
+    c.append(h("div", { class: "head", role: "row" },
+      h("button", { class: "check", role: "checkbox", "aria-checked": String(!!allSel), "aria-label": "Select all", style: "opacity:1", onclick: () => { if (allSel) S.sel.clear(); else all.forEach(k => S.sel.add(k)); render(); } }, svg("check")),
+      h("span"), sortBtn("name", "Name"), sp === "team" ? h("span", null, "Added by") : null, h("span", { class: "c-kind" }, "Kind"), sortBtn("date", "Last changed"), sortBtn("size", "Size"), h("span")));
+    const list = h("div", { role: "list" });
+    dirs.forEach(d => list.append(row(sp, d, true, flat)));
+    fls.forEach(f => list.append(row(sp, f, false, flat)));
+    c.append(list);
+  }
+  return c;
+}
+const KIND_LABEL = { image: "Image", video: "Video", audio: "Audio", doc: "Document", archive: "Archive", code: "Code", other: "File" };
+function whereOf(sp, x, isDir) { const p = pathOf(sp, isDir ? parentOf(sp, x) : folderOfFile(sp, x)); return [spaceName(sp), ...p.map(d => d.name)].join(" / "); }
+function row(sp, x, isDir, flat) {
+  const key = (isDir ? "d:" : "f:") + x.id, sel = S.sel.has(key);
+  const open = () => isDir ? navigate(sp, x.id) : openFile(sp, x);
+  const k = isDir ? null : kindOf(x.name, x.type);
+  const sub = isDir ? fmtDate(x.updatedAt) : `${fmtSize(x.size)}, ${fmtDate(x.updatedAt)}`;
+  return h("div", { class: "item" + (sel ? " sel" : ""), role: "listitem" },
+    h("button", { class: "open", "data-fk": "o" + key, "aria-label": (isDir ? "Open folder " : "Preview ") + x.name, ...pressHandlers(key, open) }),
+    h("span", { class: "chk" }, h("button", { class: "check", "data-fk": "c" + key, role: "checkbox", "aria-checked": String(sel), "aria-label": "Select " + x.name, onclick: () => toggleSel(key) }, svg("check"))),
+    isDir ? h("div", { class: "glyph folder" }, svg("folder")) : glyphFor(x, false),
+    h("div", { class: "name" }, h("span", { class: "t" }, x.name), flat ? h("span", { class: "where" }, whereOf(sp, x, isDir)) : null, h("span", { class: "sub" }, sub)),
+    sp === "team" ? h("span", { class: "c" }, x.by === me.id ? "You" : (x.byName || "Someone")) : null,
+    h("span", { class: "c c-kind" }, isDir ? "Folder" : KIND_LABEL[k]),
+    h("span", { class: "c" }, fmtDate(x.updatedAt)),
+    h("span", { class: "c num" }, isDir ? plural(childrenOf(sp, x.id).files.length + childrenOf(sp, x.id).dirs.length, "item", "items") : fmtSize(x.size)),
+    h("button", { class: "ib", "data-fk": "m" + key, "aria-label": "Actions for " + x.name, onclick: e => itemMenu(sp, key, e.currentTarget) }, svg("more")));
+}
+function card(sp, x, isDir, flat) {
+  const key = (isDir ? "d:" : "f:") + x.id, sel = S.sel.has(key);
+  const open = () => isDir ? navigate(sp, x.id) : openFile(sp, x);
+  return h("div", { class: "card" + (sel ? " sel" : "") },
+    h("button", { class: "open", "data-fk": "o" + key, "aria-label": (isDir ? "Open folder " : "Preview ") + x.name, ...pressHandlers(key, open) }),
+    isDir ? h("div", { class: "pic folder" }, svg("folder")) : glyphFor(x, true),
+    h("div", { class: "meta" }, h("div", { class: "t" }, x.name), h("div", { class: "sub" }, flat ? whereOf(sp, x, isDir) : isDir ? plural(childrenOf(sp, x.id).files.length + childrenOf(sp, x.id).dirs.length, "item", "items") : `${fmtSize(x.size)}, ${fmtDate(x.updatedAt)}`)),
+    h("button", { class: "check", "data-fk": "c" + key, role: "checkbox", "aria-checked": String(sel), "aria-label": "Select " + x.name, onclick: () => toggleSel(key) }, svg("check")),
+    h("button", { class: "ib more", "data-fk": "m" + key, "aria-label": "Actions for " + x.name, onclick: e => itemMenu(sp, key, e.currentTarget) }, svg("more")));
+}
+function emptyArt() {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 120 96"); s.setAttribute("class", "art"); s.setAttribute("aria-hidden", "true");
+  s.innerHTML = '<path d="M30 20h66a6 6 0 0 1 6 6v44a6 6 0 0 1-6 6H30L14 60V36z" fill="currentColor" opacity=".16"/><path d="M30 20h66a6 6 0 0 1 6 6v44a6 6 0 0 1-6 6H30L14 60V36z" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="32" cy="48" r="6" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M46 38v20" stroke="currentColor" stroke-width="2" stroke-dasharray="3 4"/><path d="M58 40h30M58 48h30M58 56h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M26 48c-10-2-16-10-18-24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  return s;
+}
+function emptyState(sp, flat) {
+  if (flat) return h("div", { class: "empty" }, h("h2", null, S.q ? `Nothing called “${S.q}”` : "No files of this kind here"), h("p", null, S.q ? `Search looks at names in all folders of ${spaceName(sp)}.` : "Choose All to see everything."),
+    h("button", { class: "btn", onclick: () => { S.q = ""; S.kind = "all"; render(); } }, "Clear filters"));
+  if (S.route.folder) return h("div", { class: "empty" }, emptyArt(), h("h2", null, "This folder is empty"), h("p", null, "Drop files here or upload them."), h("button", { class: "btn primary", onclick: pickFiles }, svg("upload"), "Upload files"));
+  return h("div", { class: "empty" }, emptyArt(),
+    h("h2", null, sp === "team" ? "Nothing in Team yet" : "Your satchel is empty"),
+    h("p", null, sp === "team" ? "Files here are shared with everyone who can add files to this Satchel. Upload something, or move files over from My files." : "Upload files to keep them here, privately. Then send them to anyone with an encrypted link."),
+    h("div", { style: "display:flex;gap:8px;justify-content:center;flex-wrap:wrap" }, h("button", { class: "btn primary", onclick: pickFiles }, svg("upload"), "Upload files"), h("button", { class: "btn", onclick: pickDir }, svg("folderUp"), "Upload folder")),
+    h("p", { class: "small", style: "margin-top:18px" }, "You can also drag files onto this window or paste them."));
+}
+function selBar(sp) {
+  const keys = [...S.sel];
+  const hasDir = keys.some(k => k.startsWith("d:"));
+  const entries = () => { const out = []; keys.forEach(k => { const [t, id] = k.split(":"); if (t === "f" && filesOf(sp).get(id)) out.push({ f: filesOf(sp).get(id), path: filesOf(sp).get(id).name }); if (t === "d" && foldersOf(sp).get(id)) out.push(...descend(sp, id, foldersOf(sp).get(id).name + "/").files); }); return out; };
+  return h("div", { class: "selbar", role: "toolbar", "aria-label": "Selection" },
+    h("span", { class: "n", role: "status" }, `${keys.length} selected`),
+    h("button", { class: "ib", "aria-label": "Share link", title: "Share link", onclick: () => shareDialog(sp, keys) }, svg("link")),
+    h("button", { class: "ib", "aria-label": "Download", title: hasDir || keys.length > 1 ? "Download as zip" : "Download", onclick: () => downloadMany(entries(), "Satchel " + new Date().toISOString().slice(0, 10)) }, svg("download")),
+    h("button", { class: "ib", "aria-label": "Move", title: "Move", onclick: () => moveDialog(sp, keys) }, svg("move")),
+    h("button", { class: "ib", "aria-label": "Delete", title: "Delete", onclick: () => deleteItems(sp, keys) }, svg("trash")),
+    h("button", { class: "ib", "aria-label": "Clear selection", title: "Clear selection", onclick: () => { S.sel.clear(); render(); } }, svg("x")));
+}
+function topLinks() {
+  return h("div", { class: "top" }, h("div", { class: "row1" }, h("div", { class: "crumbs" }, h("span", { class: "cur" }, "Links"))));
+}
+function drawLinks() {
+  const c = h("div", { class: "content" });
+  const recs = [...S.links.values()].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  if (!recs.length) {
+    c.append(h("div", { class: "empty" }, emptyArt(), h("h2", null, "No links yet"),
+      h("p", null, "Choose files or a folder, then Share link. Each link is encrypted with its own key, can expire and can have a password."),
+      h("button", { class: "btn primary", onclick: () => navigate("mine", null) }, "Go to My files")));
+    return c;
+  }
+  const live = recs.filter(r => !r.purged && !(r.expiresAt && r.expiresAt < Date.now())), dead = recs.filter(r => !live.includes(r));
+  const wrap = h("div", { class: "tags" });
+  live.forEach(r => wrap.append(stringTag(r)));
+  if (dead.length) {
+    wrap.append(h("div", { class: "small", style: "margin:10px 0 0 26px" }, "Expired. These links no longer open."));
+    dead.forEach(r => wrap.append(stringTag(r)));
+  }
+  c.append(wrap);
+  return c;
+}
+function stringSvg() {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 52 60"); s.setAttribute("class", "string"); s.setAttribute("aria-hidden", "true");
+  s.innerHTML = '<path d="M52 58C30 56 10 40 6 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  return s;
+}
+const stringTag = r => tagFor(r.id, r);
+
+/* =====================================================================
+   Recipient page
+   ===================================================================== */
+async function openLink(ref) {
+  currentLink = null;
+  const bar = h("div", { class: "top-actions" },
+    h("div", { class: "brand", style: "padding:0" }, brandMark(), "Satchel"),
+    me.canWrite ? h("button", { class: "btn", onclick: () => navigate("mine", null) }, svg("box"), "My files") : null);
+  const page = h("div", { class: "recv" }, bar);
+  const body = h("div");
+  page.append(body);
+  app.replaceChildren(page);
+  const stop = (title, text) => body.replaceChildren(h("div", { class: "empty" }, emptyArt(), h("h2", null, title), h("p", null, text)));
+  if (!SEG.test(ref.l) || !SEG.test(ref.o) || !/^[A-Za-z0-9_-]{43}$/.test(ref.k)) return stop("This link is incomplete", "Part of the address is missing. Ask the person who sent it to copy the whole link again.");
+  body.replaceChildren(h("div", { class: "center" }, h("div", { class: "spin", role: "status", "aria-label": "Loading" })));
+  let snap;
+  try { snap = await retry(() => db.doc(P.link(ref.o, ref.l)).get()); }
+  catch (e) { return stop("This link can't be opened right now", explain(e)); }
+  if (!snap.exists) return stop("This link doesn't work any more", "The person who shared it deleted it or it expired. Ask them for a new link.");
+  const doc = snap.data();
+  if (doc.expiresAt && doc.expiresAt < Date.now()) return stop("This link has expired", `It was available until ${dfFull.format(new Date(doc.expiresAt))}. Ask the person who shared it for a new link.`);
+  const aad = `link/${ref.o}/${ref.l}`;
+  const decryptWith = async keyStr => JSON.parse(dec.decode(await unseal(await aesKey(keyStr), doc.box, aad)));
+  let data;
+  if (doc.pw) {
+    data = await new Promise(resolve => {
+      const pin = h("input", { class: "in", type: "password", autocomplete: "current-password", "aria-label": "Password" });
+      const err = h("div", { class: "err", role: "alert" });
+      const btn = h("button", { class: "btn primary wide", type: "submit" }, "Open");
+      const form = h("form", { class: "pwbox" }, emptyArt(), h("h2", { style: "text-align:center;margin:4px 0" }, "This link has a password"), h("p", { class: "small", style: "text-align:center;margin:0 0 6px" }, "The person who shared it should have sent it to you separately."), pin, btn, err);
+      form.addEventListener("submit", async e => {
+        e.preventDefault(); if (!pin.value) return pin.focus();
+        btn.disabled = true; btn.textContent = "Checking…"; err.textContent = "";
+        try { resolve(await decryptWith(await passwordKey(pin.value, doc.pw.salt, ref.k, doc.pw.iter || PW_ITER))); }
+        catch { err.textContent = "That password isn't right. Check it and try again."; btn.disabled = false; btn.textContent = "Open"; pin.select(); }
+      });
+      body.replaceChildren(form); pin.focus();
+    });
+  } else {
+    try { data = await decryptWith(ref.k); }
+    catch { return stop("This link can't be opened", "The key in the address doesn't fit. Ask the person who sent it to copy the whole link again."); }
+  }
+  if (!data || !Array.isArray(data.items)) return stop("This link can't be opened", "Its contents are damaged.");
+  const items = data.items.filter(x => x && typeof x.name === "string" && typeof x.key === "string" && SEG.test(String(x.o)) && SEG.test(String(x.id))).slice(0, 500)
+    .map(x => ({ f: { id: x.id, name: x.name.slice(0, 255), path: String(x.path || x.name).slice(0, 1000), type: String(x.type || ""), size: +x.size || 0, key: x.key, blob: { o: x.o, id: x.id }, thumb: !!x.thumb, updatedAt: +x.mtime || 0 } }));
+  currentLink = { ...ref, counted: new Set() };
+  hitFor("open");
+  const total = items.reduce((s, i) => s + i.f.size, 0);
+  const hero = h("div", { class: "hero" }, h("div", { class: "tag" },
+    h("div", { class: "eye" }),
+    h("div", { class: "body", style: "padding:20px 22px" },
+      h("div", { class: "facts" }, h("span", null, `From ${String(data.from || "Someone").slice(0, 80)}`)),
+      h("div", { class: "ttl" }, String(data.title || "Shared files").slice(0, 120)),
+      data.message ? h("div", { class: "msg" }, String(data.message).slice(0, 1000)) : null,
+      h("div", { class: "facts", style: "margin-top:6px" },
+        h("span", null, svg("file"), `${plural(items.length, "file", "files")}, ${fmtSize(total)}`),
+        h("span", null, svg("clock"), doc.expiresAt ? fmtUntil(doc.expiresAt) : "No expiry"),
+        h("span", null, svg("lock"), "End-to-end encrypted")))));
+  const zipName = String(data.title || "Shared files").slice(0, 80);
+  const listbar = h("div", { class: "listbar" }, h("h2", null, "Files"),
+    h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" },
+      me.canWrite && ref.o !== me.id ? h("button", { class: "btn", onclick: () => saveToMine(items, zipName) }, svg("save"), "Save to My files") : null,
+      items.length > 1 ? h("button", { class: "btn primary", onclick: () => { hitFor("dl"); downloadMany(items.map(i => ({ f: i.f, path: i.f.path })), zipName); } }, svg("download"), "Download all") : null));
+  const list = h("div", { role: "list" });
+  const pvList = items.map(i => ({ f: i.f }));
+  items.forEach((it, idx) => {
+    const f = it.f;
+    list.append(h("div", { class: "item", role: "listitem" },
+      h("button", { class: "open", "aria-label": "Preview " + f.name, onclick: () => preview(pvList, idx, { linkMode: true }) }),
+      glyphFor(f, false),
+      h("div", { class: "name" }, h("span", { class: "t" }, f.name), f.path !== f.name ? h("span", { class: "where" }, f.path.split("/").slice(0, -1).join(" / ")) : null, h("span", { class: "sub" }, fmtSize(f.size))),
+      h("span", { class: "c num" }, fmtSize(f.size)),
+      h("div", { class: "acts2" },
+        h("button", { class: "ib", "aria-label": "Download " + f.name, title: "Download", onclick: () => { hitFor("dl"); downloadFile(f); } }, svg("download")))));
+  });
+  body.replaceChildren(hero, listbar, list,
+    h("p", { class: "small", style: "margin-top:22px" }, "These files were encrypted before they were stored. Your browser decrypts them with the key in this link; the server can't read them."));
+}
+async function saveToMine(items, title) {
+  const t = toast(`Saving ${plural(items.length, "file", "files")}…`, { ms: 600000 });
+  try {
+    const folder = items.length > 1 ? await createFolder("mine", null, title.replace(/[\/\\]/g, "-") || "Shared files") : null;
+    for (const it of items) {
+      const blob = await getBlob(refOf(it.f));
+      const dirs = it.f.path.split("/").slice(0, -1).filter(Boolean);
+      enqueue(new File([blob], it.f.name, { type: it.f.type }), "mine", folder, items.length > 1 ? dirs.slice(dirs.length && dirs[0] === title ? 1 : 0) : []);
+    }
+    toast("Saving to My files. You can follow the progress below.", { action: { label: "Open My files", run: () => navigate("mine", folder) } });
+  } catch (e) { fail(e); }
+  finally { t.remove(); }
+}
+
+/* ---------- people without upload rights ---------- */
+function drawVisitor() {
+  app.replaceChildren(h("div", { class: "recv" },
+    h("div", { class: "top-actions" }, h("div", { class: "brand", style: "padding:0" }, brandMark(), "Satchel")),
+    h("div", { class: "empty" }, emptyArt(), h("h2", null, "Open a shared link"),
+      h("p", null, me.id ? "You can open files people share with you here. To keep your own files in this Satchel, ask its owner to let you add files." : "This is where files shared through Satchel open. Use the full link you were sent; it contains the key to the files."))));
+}
+
+/* ---------- keyboard ---------- */
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input,textarea,select,dialog") || S.route.link || !me.canWrite) return;
+  if (e.key === "/" && S.route.space !== "links") { e.preventDefault(); S.searching = true; render(); setTimeout(() => $("#q") && $("#q").focus(), 30); }
+  if (e.key === "Escape" && S.sel.size) { S.sel.clear(); render(); }
+  if ((e.key === "a" && (e.metaKey || e.ctrlKey)) && S.route.space !== "links") { e.preventDefault(); const { dirs, files: f } = visibleItems(S.route.space); dirs.forEach(d => S.sel.add("d:" + d.id)); f.forEach(x => S.sel.add("f:" + x.id)); render(); }
+});
+
+/* ---------- start ---------- */
+if (me.canWrite) startDrive();
+route();
+})();
+</script>
+</body>
+</html>
