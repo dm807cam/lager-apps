@@ -22,7 +22,7 @@ const lineOf = (text, index) => text.slice(0, index).split("\n").length;
 
 const CAPABILITIES = ["db", "user", "permissions", "assets", "room", "page", "downloads", "ingest", "embed", "complete"];
 const IMPLICIT = new Set(["db", "user", "permissions"]);
-const CATEGORIES = ["analytics", "education", "finance", "games", "health", "mindfulness", "privacy", "productivity", "publishing", "social", "tools", "writing"];
+const CATEGORIES = ["analytics", "education", "finance", "games", "health", "mindfulness", "privacy", "productivity", "publishing", "reading", "social", "tools", "writing"];
 const CDN_HOSTS = ["cdn.jsdelivr.net", "data.jsdelivr.com", "fonts.googleapis.com", "fonts.gstatic.com", "unpkg.com", "cdnjs.cloudflare.com", "esm.sh", "esm.run", "ga.jspm.io"];
 const SLUG = /^[a-z0-9][a-z0-9-]{0,62}$/;
 const SEGMENT = /^[A-Za-z0-9_\-.~:@+]{1,200}$/;

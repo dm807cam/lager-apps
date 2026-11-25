@@ -1,6 +1,6 @@
 # Activity API v1
 
-How apps tell the [Habit Tracker](../apps/habit-tracker) about finished activities, so habits linked to them tick themselves. Senders today: [Workout Tracker](../apps/workout-tracker) and [Stillwater](../apps/stillwater).
+How apps tell the [Habit Tracker](../apps/habit-tracker) about finished activities, so habits linked to them tick themselves. Senders today: [Workout Tracker](../apps/workout-tracker), [Stillwater](../apps/stillwater) and [Folio](../apps/folio).
 
 ## Transport
 

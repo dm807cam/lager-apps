@@ -2,8 +2,8 @@
   "$schema": "../../schema/lager-app.schema.json",
   "slug": "habit-tracker",
   "title": "Habits",
-  "description": "Daily and weekly habits with streaks and a yearly heatmap. Your workout and meditation apps tick linked habits by themselves.",
-  "version": 2,
+  "description": "Daily and weekly habits with streaks and a yearly heatmap. Your workout, meditation and reading apps tick linked habits by themselves.",
+  "version": 3,
   "status": "beta",
   "language": "en",
   "category": "health",
@@ -23,7 +23,8 @@
           "name": "activity",
           "origins": [
             "https://workout-tracker.${LAGER_APPS_DOMAIN}",
-            "https://stillwater.${LAGER_APPS_DOMAIN}"
+            "https://stillwater.${LAGER_APPS_DOMAIN}",
+            "https://folio.${LAGER_APPS_DOMAIN}"
           ]
         },
         {

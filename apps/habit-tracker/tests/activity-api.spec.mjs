@@ -100,4 +100,19 @@ test.describe("habits", () => {
       { app: "stillwater", name: "Stillwater" }));
     await expect(check).toHaveAttribute("aria-pressed", "true");
   });
+  test("Folio reading sessions tick the suggested Read habit", async ({ openApp }) => {
+    const { page, errors } = await openApp("habit-tracker");
+    const folio = { app: "folio", name: "Folio", kinds: [{ kind: "reading", label: "Reading", unit: "min" }] };
+    // the suggestion exists before Folio ever sent anything, and the generic "Read" chip isn't shown twice
+    await expect(page.locator(".chip", { hasText: "Read" })).toHaveCount(1);
+    await page.getByRole("button", { name: /Read/ }).first().click();   // suggestion: 15+ min a day, linked to Folio
+    await page.locator("#sheet button[type=submit]").click();
+    const check = page.locator(".habit", { hasText: "Read" }).locator("[data-check]");
+    await page.evaluate(b => window.__lager.ingest("inbox", b), batch([{ id: "r1", kind: "reading", date: day(0), minutes: 9, value: 6, unit: "pages", title: "An Invented Novel" }], folio));
+    await expect.poll(async () => (await docs(page, "activities/folio~r1")).length).toBe(1);
+    await expect(check).toHaveAttribute("aria-pressed", "false");
+    await page.evaluate(b => window.__lager.ingest("inbox", b), batch([{ id: "r2", kind: "reading", date: day(0), minutes: 7, value: 5, unit: "pages" }], folio));
+    await expect(check).toHaveAttribute("aria-pressed", "true");
+    expect(errors).toEqual([]);
+  });
 });

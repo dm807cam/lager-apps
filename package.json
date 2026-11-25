@@ -12,7 +12,10 @@
     "check": "npm run validate && npm run catalog:check && npm test"
   },
   "devDependencies": {
-    "@playwright/test": "1.49.1"
+    "@playwright/test": "1.49.1",
+    "jszip": "^3.10.1"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
